@@ -1,0 +1,55 @@
+﻿<UserControl
+    x:Class="CSRefectorCurio.MyToolWindowControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mod="clr-namespace:DataTools.CSTools"
+    xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:util="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+    Name="MyToolWindow"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    toolkit:Themes.UseVsTheme="True"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+
+        <HierarchicalDataTemplate DataType="{x:Type mod:ProjectReader}" ItemsSource="{Binding ProjectFolder.Children}">
+            <TextBlock Text="{Binding ProjectFolder.Title}" />
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate DataType="{x:Type mod:CSDirectory}" ItemsSource="{Binding Children}">
+            <TextBlock Text="{Binding Title}" />
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate DataType="{x:Type mod:CSCodeFile}" ItemsSource="{Binding Children}">
+            <TextBlock Text="{Binding Title}" />
+        </HierarchicalDataTemplate>
+
+        <DataTemplate DataType="{x:Type mod:CSMarker}">
+            <TextBlock Text="{Binding Title}" />
+        </DataTemplate>
+
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <Label
+                x:Name="lblHeadline"
+                Margin="10"
+                HorizontalAlignment="Center">
+                Title
+            </Label>
+            <Button
+                Name="button1"
+                Width="120"
+                Height="80"
+                Click="button1_Click"
+                Content="Click me!" />
+        </StackPanel>
+    </Grid>
+</UserControl>

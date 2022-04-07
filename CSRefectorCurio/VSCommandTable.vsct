@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Include href="KnownImageIds.vsct"/>
+  <Include href="VSGlobals.vsct"/>
+
+  <Commands package="CSRefectorCurio">
+    <!--This section defines the elements the user can interact with, like a menu command or a button or combo box in a toolbar. -->
+		  
+    <Groups>
+        <Group guid="CSRefectorCurio" id="MyGroup" priority="0x0101" />
+    </Groups>
+
+    <Buttons>
+		  
+	<Button guid="CSRefectorCurio" id="MyCommand" priority="0x0100" type="Button">
+        <Icon guid="ImageCatalogGuid" id="Namespace" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+            <ButtonText>CS Refactor Curio</ButtonText>
+            <LocCanonicalName>.View.MyToolWindow</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+	
+	
+   <CommandPlacements>
+
+      <!-- Placement for group. The parent of a group is a menu, context menu or toolbar. 
+           The priority sets the position of the group compared to the priority of other existing groups in the menu.    
+      -->
+      <CommandPlacement guid="CSRefectorCurio" id="MyGroup" priority="0xFFFF">
+         <!-- The parent of the group will be the code window context menu -->
+         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_SOLNNODE"/>
+      </CommandPlacement>
+
+      <!-- Placement for command. The parent of a command is always a group, never a menu, context menu or toolbar. -->
+      <CommandPlacement guid="CSRefectorCurio" id="MyCommand" priority="0x0001" >
+         <Parent guid="CSRefectorCurio" id="MyGroup"/>
+      </CommandPlacement>
+   </CommandPlacements>
+
+
+  <Symbols>
+    <GuidSymbol name="CSRefectorCurio" value="{509332bb-65f0-4ad8-a444-ab6bc75ed9aa}">
+      <IDSymbol name="MyCommand" value="0x0100" />
+      <IDSymbol name="MyGroup" value="0x01012" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
