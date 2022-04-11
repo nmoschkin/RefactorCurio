@@ -12,8 +12,14 @@ namespace CSRefectorCurio
     /// </summary>
     internal sealed partial class PackageGuids
     {
-        public const string CSRefectorCurioString = "509332bb-65f0-4ad8-a444-ab6bc75ed9aa";
-        public static Guid CSRefectorCurio = new Guid(CSRefectorCurioString);
+        public const string CSRefactorCurioString = "7d2f91a0-c582-4e4b-9355-1f1a8b7134be";
+        public static Guid CSRefactorCurio = new Guid(CSRefactorCurioString);
+
+        public const string guidCSRefactorCurioPackageCmdSetString = "c9b89645-59a8-4d6b-ac62-25631a5bfe54";
+        public static Guid guidCSRefactorCurioPackageCmdSet = new Guid(guidCSRefactorCurioPackageCmdSetString);
+
+        public const string UIContextGuidString = "17d7439f-90f8-4396-9b51-8309208381a5";
+        public static Guid UIContextGuid = new Guid(UIContextGuidString);
     }
     /// <summary>
     /// Helper class that encapsulates all CommandIDs uses across VS Package.
@@ -21,7 +27,7 @@ namespace CSRefectorCurio
     internal sealed partial class PackageIds
     {
         public const int ShowCurioExplorerCommand = 0x0100;
-        public const int ShowJSONPasterCommand = 0x0101;
+        public const int ShowClassFromJsonCommand = 0x0101;
         public const int RefactorCurioGroup = 0x1012;
         public const int RefactorCurioProjectGroup = 0x1013;
     }

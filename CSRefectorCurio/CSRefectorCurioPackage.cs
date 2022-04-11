@@ -1,14 +1,18 @@
 ﻿global using Community.VisualStudio.Toolkit;
-
 global using Microsoft.VisualStudio.Shell;
+global using Microsoft.VisualStudio.Shell.Events;
 
 global using System;
 
 global using Task = System.Threading.Tasks.Task;
 
+using CSRefectorCurio.Commands;
 using CSRefectorCurio.ViewModels;
 
 using DataTools.CSTools;
+
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 
 using System.Collections;
 using System.Runtime.InteropServices;
@@ -18,12 +22,20 @@ namespace CSRefectorCurio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideToolWindow(typeof(CurioExplorerToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.SolutionExplorer)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(PackageGuids.CSRefectorCurioString)]    
+    [Guid(PackageGuids.CSRefactorCurioString)]
+    [ProvideUIContextRule(UIContextGuid,
+    name: "Filter For Single Selection",
+    expression: "SingleSel",
+    termNames: new[] { "SingleSel" },
+    termValues: new[] { "HierSingleSelectionName:^.+$" })]
     public sealed class CSRefectorCurioPackage : ToolkitPackage
     {
         internal CurioExplorerViewModel curiovm;
+        
+        public const string UIContextGuid = "17D7439F-90F8-4396-9B51-8309208381A5";
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
@@ -31,20 +43,25 @@ namespace CSRefectorCurio
 
             await this.RegisterCommandsAsync();
             this.RegisterToolWindows();
-
            
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             curiovm = new CurioExplorerViewModel();
 
             EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
-            dte.Events.SolutionEvents.Opened += SolutionEvents_Opened;
-            dte.Events.SolutionEvents.BeforeClosing += SolutionEvents_BeforeClosing;
+
+            if (dte.Solution is object && dte.Solution.IsOpen)
+            {
+                LoadProject();
+            }
+
+            Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += HandleOpenSolution;
+
         }
 
-        private void SelectionEvents_OnChange()
+        private void HandleOpenSolution(object sender, OpenSolutionEventArgs e)
         {
-            var foo = "bar";
+            LoadProject();            
         }
 
         private void LoadProject()
@@ -66,20 +83,6 @@ namespace CSRefectorCurio
 
                 ctrl.DataContext = curiovm;
             });
-        }
-
-        protected override async Task OnAfterPackageLoadedAsync(CancellationToken cancellationToken)
-        {
-            await base.OnAfterPackageLoadedAsync(cancellationToken);
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
-            if (dte.Solution.IsOpen)
-            {
-                LoadProject();
-            }
         }
 
         private void SolutionEvents_BeforeClosing()

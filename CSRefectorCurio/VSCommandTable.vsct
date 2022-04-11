@@ -25,6 +25,7 @@
             </Button>
           <Button guid="guidCSRefactorCurioPackageCmdSet" id="ShowClassFromJsonCommand" priority="0x0100" type="Button">
               <Icon guid="ImageCatalogGuid" id="JSONScript" />
+			  <CommandFlag>DynamicVisibility</CommandFlag>
 			  <CommandFlag>IconIsMoniker</CommandFlag>
 			  <Strings>
                   <ButtonText>New Class From JSON</ButtonText>
@@ -32,9 +33,7 @@
           </Button>
     </Buttons>
   </Commands>
-
-
-    <CommandPlacements>
+	<CommandPlacements>
 
         <!-- Placement for group. The parent of a group is a menu, context menu or toolbar. 
            The priority sets the position of the group compared to the priority of other existing groups in the menu.    
@@ -59,13 +58,19 @@
 		</CommandPlacement>
 
 	</CommandPlacements>
-
+	
+	<VisibilityConstraints>
+		<VisibilityItem guid="guidCSRefactorCurioPackageCmdSet" id="ShowClassFromJsonCommand"  context="UIContextGuid"/>
+	</VisibilityConstraints>
+	
     <Symbols>
+		<GuidSymbol name="CSRefactorCurio" value="{7d2f91a0-c582-4e4b-9355-1f1a8b7134be}" />
         <GuidSymbol name="guidCSRefactorCurioPackageCmdSet" value="{c9b89645-59a8-4d6b-ac62-25631a5bfe54}">
             <IDSymbol name="ShowCurioExplorerCommand" value="0x0100" />
 			<IDSymbol name="ShowClassFromJsonCommand" value="0x0101" />
 			<IDSymbol name="RefactorCurioGroup" value="0x01012" />
 			<IDSymbol name="RefactorCurioProjectGroup" value="0x01013" />
 		</GuidSymbol>
+		<GuidSymbol name="UIContextGuid" value="{17D7439F-90F8-4396-9B51-8309208381A5}" />
   </Symbols>
 </CommandTable>
