@@ -44,7 +44,7 @@
 				<CommandFlag>DynamicVisibility</CommandFlag>
 				<CommandFlag>IconIsMoniker</CommandFlag>
 				<Strings>
-					<ButtonText>New Class From JSON File(s)</ButtonText>
+					<ButtonText>New Class From JSON File</ButtonText>
 				</Strings>
 			</Button>
 		</Buttons>
