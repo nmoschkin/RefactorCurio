@@ -11,33 +11,45 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CSRefectorCurio.Forms
+namespace CSRefactorCurio.Forms
 {
-    public partial class PasteJSONForm : Form
+    public partial class JsonGeneratorForm : Form
     {
-        object context;
+        EnvDTE.ProjectItem context;
 
-        public PasteJSONForm()
+        public JsonGeneratorForm()
         {
             InitializeComponent();
             txtJson.TextChanged += TxtJson_TextChanged;
             txtJson.KeyDown += TxtJson_KeyDown;
         }
 
-        public PasteJSONForm(object context)
+        public JsonGeneratorForm(EnvDTE.ProjectItem context) : this()
         {
+            
             this.context = context;
-
-            if (context is EnvDTE.Project proj)
+            
+            if (context.ContainingProject is EnvDTE.Project proj)
             {
-                var en = proj.Properties as IEnumerable<EnvDTE.Property>;
+                var en = proj.Properties;
 
-                foreach (var prop in en)
+                foreach (EnvDTE.Property prop in en)
                 {
                     if (prop.Name == "DefaultNamespace")
                     {
-                        txtNamespace.Text = (string)prop.Value;
+                     
+                        if (prop.Value is string s)
+                        {
+                            txtNamespace.Text = s;
+                        }
+
+                        break;
                     }
+                }
+
+                if (string.IsNullOrEmpty(txtNamespace.Text))
+                {
+                    txtNamespace.Text = proj.Name;
                 }
             }
         }

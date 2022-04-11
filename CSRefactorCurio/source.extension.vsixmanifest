@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="CSRefectorCurio.7d2f91a0-c582-4e4b-9355-1f1a8b7134be" Version="1.0" Language="en-US" Publisher="Nathaniel Moschkin" />
-        <DisplayName>CSRefectorCurio</DisplayName>
+        <Identity Id="CSRefactorCurio.89917d41-d017-4d22-a06f-a065312f5631" Version="1.0" Language="en-US" Publisher="Nathaniel Moschkin" />
+        <DisplayName>CSRefactorCurio</DisplayName>
         <Description>Empty VSIX Project.</Description>
         <Icon>Resources\Icon.png</Icon>
         <PreviewImage>Resources\Icon.png</PreviewImage>
@@ -12,8 +12,6 @@
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
-    <Dependencies>
-    </Dependencies>
     <Prerequisites>
         <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,)" DisplayName="Visual Studio core editor" />
     </Prerequisites>

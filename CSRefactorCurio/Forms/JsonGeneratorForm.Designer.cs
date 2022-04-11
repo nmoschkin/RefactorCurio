@@ -1,6 +1,6 @@
-﻿namespace CSRefectorCurio.Forms
+﻿namespace CSRefactorCurio.Forms
 {
-    partial class PasteJSONForm
+    partial class JsonGeneratorForm
     {
         /// <summary>
         /// Required designer variable.

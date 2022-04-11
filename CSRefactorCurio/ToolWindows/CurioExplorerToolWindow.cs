@@ -1,14 +1,11 @@
 ﻿using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Threading;
 
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
-namespace CSRefectorCurio
+namespace CSRefactorCurio
 {
     public class CurioExplorerToolWindow : BaseToolWindow<CurioExplorerToolWindow>
     {
@@ -17,16 +14,16 @@ namespace CSRefectorCurio
         public override Type PaneType => typeof(Pane);
 
         public override Task<FrameworkElement> CreateAsync(int toolWindowId, CancellationToken cancellationToken)
-        {           
+        {
             return Task.FromResult<FrameworkElement>(new CurioExplorer());
         }
 
-        [Guid("f1e4c1ba-fb8d-45bd-a3df-7acd4e13754a")]
+        [Guid("dd72a1c2-bbc9-43ce-a17f-e9609876669b")]
         internal class Pane : ToolWindowPane
-        {            
+        {
             public Pane()
             {
-                BitmapImageMoniker = KnownMonikers.Namespace;      
+                BitmapImageMoniker = KnownMonikers.ToolWindow;
             }
         }
     }

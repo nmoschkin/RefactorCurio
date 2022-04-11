@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CSTools;
 using DataTools.MathTools;
+
+using CSRefactorCurio;
 
 namespace DataTools.CSTools
 {

@@ -10,11 +10,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{4BC74415-FC00-4C6B-ACAB-F5DECB043770}</ProjectGuid>
+    <ProjectGuid>{D3420F70-76F5-4296-BCAA-1585BCE26D95}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSRefectorCurio</RootNamespace>
-    <AssemblyName>CSRefectorCurio</AssemblyName>
+    <RootNamespace>CSRefactorCurio</RootNamespace>
+    <AssemblyName>CSRefactorCurio</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
@@ -46,7 +46,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AppResources.Designer.cs" />
+    <Compile Include="AppResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Build\MSBuildTool.cs" />
     <Compile Include="Commands\ShowClassFromJsonCommand.cs" />
     <Compile Include="CS\Code\CSCodeParser.cs" />
@@ -57,16 +61,16 @@
     <Compile Include="DataTools\ObjectMerge.cs" />
     <Compile Include="DataTools\ObservableBase.cs" />
     <Compile Include="DataTools\TextTools.cs" />
-    <Compile Include="Forms\PasteJSONForm.cs">
+    <Compile Include="Forms\JsonGeneratorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\PasteJSONForm.Designer.cs">
-      <DependentUpon>PasteJSONForm.cs</DependentUpon>
+    <Compile Include="Forms\JsonGeneratorForm.Designer.cs">
+      <DependentUpon>JsonGeneratorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="JS\CSJsonClassGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\ShowCurioExplorerCommand.cs" />
-    <Compile Include="CSRefectorCurioPackage.cs" />
+    <Compile Include="CSRefactorCurioPackage.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -109,7 +113,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -124,18 +127,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Community.VisualStudio.VSCT" Version="16.0.29.6" PrivateAssets="all" />
-    <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.430" ExcludeAssets="Runtime">
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.1.4054">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.394" ExcludeAssets="Runtime" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AppResources.resx" />
-    <EmbeddedResource Include="Forms\PasteJSONForm.resx">
-      <DependentUpon>PasteJSONForm.cs</DependentUpon>
+    <EmbeddedResource Include="AppResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\JsonGeneratorForm.resx">
+      <DependentUpon>JsonGeneratorForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

@@ -1,4 +1,5 @@
 ﻿global using Community.VisualStudio.Toolkit;
+
 global using Microsoft.VisualStudio.Shell;
 global using Microsoft.VisualStudio.Shell.Events;
 
@@ -6,8 +7,7 @@ global using System;
 
 global using Task = System.Threading.Tasks.Task;
 
-using CSRefectorCurio.Commands;
-using CSRefectorCurio.ViewModels;
+using CSRefactorCurio.ViewModels;
 
 using DataTools.CSTools;
 
@@ -18,7 +18,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace CSRefectorCurio
+namespace CSRefactorCurio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
@@ -34,34 +34,27 @@ namespace CSRefectorCurio
     public sealed class CSRefectorCurioPackage : ToolkitPackage
     {
         internal CurioExplorerViewModel curiovm;
-        
+
         public const string UIContextGuid = "17D7439F-90F8-4396-9B51-8309208381A5";
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            CurioExplorer.ServiceProvider = this;
-
             await this.RegisterCommandsAsync();
             this.RegisterToolWindows();
-           
+
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             curiovm = new CurioExplorerViewModel();
 
             EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
 
             if (dte.Solution is object && dte.Solution.IsOpen)
             {
                 LoadProject();
             }
 
-            Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += HandleOpenSolution;
+            dte.Events.SolutionEvents.Opened += SolutionEvents_Opened;
+            dte.Events.SolutionEvents.BeforeClosing += SolutionEvents_BeforeClosing;
 
-        }
-
-        private void HandleOpenSolution(object sender, OpenSolutionEventArgs e)
-        {
-            LoadProject();            
         }
 
         private void LoadProject()
@@ -72,15 +65,15 @@ namespace CSRefectorCurio
 
                 EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
-                var ctrl = FindToolWindow();
                 curiovm.Projects.Clear();
 
-                foreach (EnvDTE.Project item in (IEnumerable)dte.ActiveSolutionProjects)
+                foreach (EnvDTE.Project item in (IEnumerable)dte.Solution.Projects)
                 {
-                    if (item.FullName.ToLower().EndsWith(".csproj"))  
+                    if (item.FullName.ToLower().EndsWith(".csproj"))
                         curiovm.Projects.Add(new ProjectReader(item.FullName));
                 }
 
+                var ctrl = FindToolWindow();
                 ctrl.DataContext = curiovm;
             });
         }

@@ -1,4 +1,4 @@
-﻿using CSRefectorCurio;
+﻿using CSRefactorCurio;
 
 using System.Reflection;
 using System.Runtime.InteropServices;

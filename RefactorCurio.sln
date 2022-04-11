@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSRefectorCurio", "CSRefectorCurio\CSRefectorCurio.csproj", "{4BC74415-FC00-4C6B-ACAB-F5DECB043770}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSRefactorCurio", "CSRefactorCurio\CSRefactorCurio.csproj", "{D3420F70-76F5-4296-BCAA-1585BCE26D95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +21,14 @@ Global
 		{4BC74415-FC00-4C6B-ACAB-F5DECB043770}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4BC74415-FC00-4C6B-ACAB-F5DECB043770}.Release|x86.ActiveCfg = Release|x86
 		{4BC74415-FC00-4C6B-ACAB-F5DECB043770}.Release|x86.Build.0 = Release|x86
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Debug|x86.ActiveCfg = Debug|x86
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Debug|x86.Build.0 = Debug|x86
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Release|x86.ActiveCfg = Release|x86
+		{D3420F70-76F5-4296-BCAA-1585BCE26D95}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
