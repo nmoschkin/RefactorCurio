@@ -15,8 +15,11 @@ namespace CSRefactorCurio
         public const string CSRefactorCurioString = "8a72ba77-5e27-49a4-8187-edc6ae06a44a";
         public static Guid CSRefactorCurio = new Guid(CSRefactorCurioString);
 
-        public const string UIContextGuidString = "17d7439f-90f8-4396-9b51-8309208381a5";
-        public static Guid UIContextGuid = new Guid(UIContextGuidString);
+        public const string AddItemContextGuidString = "17d7439f-90f8-4396-9b51-8309208381a5";
+        public static Guid AddItemContextGuid = new Guid(AddItemContextGuidString);
+
+        public const string JsonItemContextGuidString = "cd497bc9-978b-4c88-a214-0e22886a9601";
+        public static Guid JsonItemContextGuid = new Guid(JsonItemContextGuidString);
     }
     /// <summary>
     /// Helper class that encapsulates all CommandIDs uses across VS Package.
@@ -25,7 +28,9 @@ namespace CSRefactorCurio
     {
         public const int ShowCurioExplorerCommand = 0x0100;
         public const int ShowClassFromJsonCommand = 0x0101;
+        public const int ShowClassFromJsonFileCommand = 0x0102;
         public const int RefactorCurioGroup = 0x1012;
         public const int RefactorCurioProjectGroup = 0x1013;
+        public const int RefactorCurioItemGroup = 0x1014;
     }
 }

@@ -12,10 +12,14 @@
         <Groups>
             <Group guid="CSRefactorCurio" id="RefactorCurioGroup" priority="0x0101" />
             <Group guid="CSRefactorCurio" id="RefactorCurioProjectGroup" priority="0x0101" />
-        </Groups>
+			<Group guid="CSRefactorCurio" id="RefactorCurioItemGroup" priority="0x0101">
+				<!--<GroupFlag>Dynamic</GroupFlag>-->
+			</Group>
+		</Groups>
 
         <Buttons>
-            <Button guid="CSRefactorCurio" id="ShowCurioExplorerCommand" priority="0x0100" type="Button">
+            
+			<Button guid="CSRefactorCurio" id="ShowCurioExplorerCommand" priority="0x0100" type="Button">
                 <Icon guid="ImageCatalogGuid" id="Namespace" />
                 <CommandFlag>IconIsMoniker</CommandFlag>
                 <Strings>
@@ -23,7 +27,9 @@
                     <LocCanonicalName>.View.CurioExplorerToolWindow</LocCanonicalName>
                 </Strings>
             </Button>
-            <Button guid="CSRefactorCurio" id="ShowClassFromJsonCommand" priority="0x0100" type="Button">
+            
+			<!-- This one is for the project and project folders menu -->
+			<Button guid="CSRefactorCurio" id="ShowClassFromJsonCommand" priority="0x0100" type="Button">
                 <Icon guid="ImageCatalogGuid" id="JSONScript" />
                 <CommandFlag>DynamicVisibility</CommandFlag>
                 <CommandFlag>IconIsMoniker</CommandFlag>
@@ -31,7 +37,17 @@
                     <ButtonText>New Class From JSON</ButtonText>
                 </Strings>
             </Button>
-        </Buttons>
+
+			<!-- This one is for the .json files menu -->
+			<Button guid="CSRefactorCurio" id="ShowClassFromJsonFileCommand" priority="0x0100" type="Button">
+				<Icon guid="ImageCatalogGuid" id="JSONScript" />
+				<CommandFlag>DynamicVisibility</CommandFlag>
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>New Class From JSON File(s)</ButtonText>
+				</Strings>
+			</Button>
+		</Buttons>
     </Commands>
     <CommandPlacements>
 
@@ -43,7 +59,12 @@
             <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_SOLNNODE" />
         </CommandPlacement>
 
-        <CommandPlacement guid="CSRefactorCurio" id="RefactorCurioProjectGroup" priority="0xFFFF">
+		<CommandPlacement guid="CSRefactorCurio" id="RefactorCurioItemGroup" priority="0xFFFF">
+			<!-- The parent of the group will be the solution context menu -->
+			<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE" />
+		</CommandPlacement>
+
+		<CommandPlacement guid="CSRefactorCurio" id="RefactorCurioProjectGroup" priority="0xFFFF">
             <!-- The parent of the group will be the project add context submenu -->
             <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD" />
         </CommandPlacement>
@@ -57,20 +78,32 @@
             <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD_MISC" />
         </CommandPlacement>
 
-    </CommandPlacements>
+		<CommandPlacement guid="CSRefactorCurio" id="ShowClassFromJsonFileCommand" priority="0x0001">
+			<Parent guid="CSRefactorCurio" id="RefactorCurioItemGroup" />
+		</CommandPlacement>
+
+	</CommandPlacements>
 
     <VisibilityConstraints>
-        <VisibilityItem guid="CSRefactorCurio" id="ShowClassFromJsonCommand"  context="UIContextGuid"/>
-    </VisibilityConstraints>
+        <VisibilityItem guid="CSRefactorCurio" id="ShowClassFromJsonCommand"  context="AddItemContextGuid"/>
+		<!--<VisibilityItem guid="CSRefactorCurio" id="RefactorCurioItemGroup"  context="JsonItemContextGuid"/>-->
+		<VisibilityItem guid="CSRefactorCurio" id="ShowClassFromJsonFileCommand"  context="JsonItemContextGuid"/>
+	</VisibilityConstraints>
 
     <Symbols>
-    <GuidSymbol name="CSRefactorCurio" value="{8a72ba77-5e27-49a4-8187-edc6ae06a44a}">
+
+	<GuidSymbol name="CSRefactorCurio" value="{8a72ba77-5e27-49a4-8187-edc6ae06a44a}">
         <IDSymbol name="ShowCurioExplorerCommand" value="0x0100" />
         <IDSymbol name="ShowClassFromJsonCommand" value="0x0101" />
-        <IDSymbol name="RefactorCurioGroup" value="0x01012" />
+		<IDSymbol name="ShowClassFromJsonFileCommand" value="0x0102" />
+		<IDSymbol name="RefactorCurioGroup" value="0x01012" />
         <IDSymbol name="RefactorCurioProjectGroup" value="0x01013" />
-    </GuidSymbol>
-    <GuidSymbol name="UIContextGuid" value="{17D7439F-90F8-4396-9B51-8309208381A5}" />
+		<IDSymbol name="RefactorCurioItemGroup" value="0x01014" />
+	</GuidSymbol>
+		
+    <GuidSymbol name="AddItemContextGuid" value="{17D7439F-90F8-4396-9B51-8309208381A5}" />
+    <GuidSymbol name="JsonItemContextGuid" value="{CD497BC9-978B-4C88-A214-0E22886A9601}" />
+		
   </Symbols>
     
 </CommandTable>

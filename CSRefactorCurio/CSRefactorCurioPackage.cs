@@ -22,11 +22,16 @@ namespace CSRefactorCurio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
-    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
+    //[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideToolWindow(typeof(CurioExplorerToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.SolutionExplorer)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(PackageGuids.CSRefactorCurioString)]
-    [ProvideUIContextRule(UIContextGuid,
+    [ProvideUIContextRule(JsonItemContextGuid,
+    name: "Filter For JSON Files",
+    expression: "JsonSel",
+    termNames: new[] { "JsonSel" },
+    termValues: new[] { "HierSingleSelectionName:.json$" })]
+    [ProvideUIContextRule(AddItemContextGuid,
     name: "Filter For Single Selection",
     expression: "SingleSel",
     termNames: new[] { "SingleSel" },
@@ -35,8 +40,8 @@ namespace CSRefactorCurio
     {
         internal CurioExplorerViewModel curiovm;
 
-        public const string UIContextGuid = "17D7439F-90F8-4396-9B51-8309208381A5";
-
+        public const string AddItemContextGuid = "17D7439F-90F8-4396-9B51-8309208381A5";
+        public const string JsonItemContextGuid = "CD497BC9-978B-4C88-A214-0E22886A9601";
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.RegisterCommandsAsync();
@@ -57,6 +62,21 @@ namespace CSRefactorCurio
 
         }
 
+        protected override async Task OnAfterPackageLoadedAsync(CancellationToken cancellationToken)
+        {
+            await base.OnAfterPackageLoadedAsync(cancellationToken);
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+            if (dte.Solution is object && dte.Solution.IsOpen)
+            {
+                LoadProject();
+            }
+        }
+
+        EnvDTE.Solution currSln = null;
+
         private void LoadProject()
         {
             _ = Task.Run(async () =>
@@ -64,6 +84,9 @@ namespace CSRefactorCurio
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+                if (dte.Solution == currSln) return;
+                currSln = (EnvDTE.Solution)dte.Solution;
 
                 curiovm.Projects.Clear();
 
@@ -80,6 +103,7 @@ namespace CSRefactorCurio
 
         private void SolutionEvents_BeforeClosing()
         {
+            currSln = null;
             curiovm.Projects.Clear();
         }
 
