@@ -76,6 +76,7 @@
     </Compile>
     <Compile Include="Helpers\EnumListProvider.cs" />
     <Compile Include="Helpers\PropertyHelper.cs" />
+    <Compile Include="IPropertiesContainer.cs" />
     <Compile Include="JS\CSJsonClassGenerator.cs" />
     <Compile Include="Options\General1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

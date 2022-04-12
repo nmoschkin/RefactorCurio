@@ -26,6 +26,18 @@ namespace CSRefactorCurio.Helpers
             return null;
         }
 
+        public static void SetProperty(EnvDTE.ProjectItem item, object value, [CallerMemberName] string propertyName = null)
+        {
+
+            foreach (EnvDTE.Property property in item.Properties)
+            {
+                if (property.Name == propertyName)
+                {
+                    property.Value = value;
+                }
+            }
+        }
+
         public static object GetProperty(EnvDTE.Solution sln, [CallerMemberName] string propertyName = null)
         {
 
@@ -41,6 +53,19 @@ namespace CSRefactorCurio.Helpers
             return null;
         }
 
+        public static void SetProperty(EnvDTE.Solution sln, object value, [CallerMemberName] string propertyName = null)
+        {
+
+            foreach (EnvDTE.Property property in sln.Properties)
+            {
+
+                if (property.Name == propertyName)
+                {
+                    property.Value = value;
+                }
+            }
+        }
+
         public static object GetProperty(EnvDTE.Project project, [CallerMemberName] string propertyName = null)
         {
             foreach(EnvDTE.Property property in project.Properties)
@@ -53,5 +78,19 @@ namespace CSRefactorCurio.Helpers
 
             return null;
         }
+
+        public static void SetProperty(EnvDTE.Project project, object value, [CallerMemberName] string propertyName = null)
+        {
+            foreach (EnvDTE.Property property in project.Properties)
+            {
+                if (property.Name == propertyName)
+                {
+                    property.Value = value;
+                    break;
+                }
+            }
+        }
+
+
     }
 }
