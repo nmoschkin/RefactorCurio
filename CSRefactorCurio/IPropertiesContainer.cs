@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CSRefactorCurio
 {
-    internal interface IProperty : INotifyPropertyChanged
+    public interface IProperty : INotifyPropertyChanged
     {
         IPropertiesContainer Container { get; }
         
@@ -20,7 +20,7 @@ namespace CSRefactorCurio
         object Value { get; set; }
     }
 
-    internal interface IPropertiesContainer : INotifyPropertyChanged, IEnumerable<IProperty>
+    public interface IPropertiesContainer : INotifyPropertyChanged, IEnumerable<IProperty>
     {
         object Parent { get; }
 
@@ -28,7 +28,7 @@ namespace CSRefactorCurio
 
     }
 
-    internal class Property : ObservableBase, IProperty
+    public class Property : ObservableBase, IProperty
     {
         EnvDTE.Property _native;
 
@@ -52,15 +52,15 @@ namespace CSRefactorCurio
             }
         }
     
-        internal Property(IPropertiesContainer parent, EnvDTE.Property native)
+        public Property(IPropertiesContainer parent, EnvDTE.Property native)
         {
             _native = native;
             Container = parent;
         }
-    
+
     }
 
-    internal class PropertiesContainer : ObservableBase, IPropertiesContainer
+    public class PropertiesContainer : ObservableBase, IPropertiesContainer, IReadOnlyDictionary<string, IProperty>
     {
         EnvDTE.Properties _native;
 
@@ -71,6 +71,12 @@ namespace CSRefactorCurio
         public object Parent => _native.Parent;
 
         protected Dictionary<string, IProperty> Properties => _properties;
+
+        public IEnumerable<string> Keys => ((IReadOnlyDictionary<string, IProperty>)_properties).Keys;
+
+        public IEnumerable<IProperty> Values => ((IReadOnlyDictionary<string, IProperty>)_properties).Values;
+
+        public int Count => ((IReadOnlyCollection<KeyValuePair<string, IProperty>>)_properties).Count;
 
         public virtual IProperty this[string name]
         {
@@ -142,6 +148,21 @@ namespace CSRefactorCurio
             }
 
             yield break;
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return ((IReadOnlyDictionary<string, IProperty>)_properties).ContainsKey(key);
+        }
+
+        public bool TryGetValue(string key, out IProperty value)
+        {
+            return ((IReadOnlyDictionary<string, IProperty>)_properties).TryGetValue(key, out value);
+        }
+
+        IEnumerator<KeyValuePair<string, IProperty>> IEnumerable<KeyValuePair<string, IProperty>>.GetEnumerator()
+        {
+            return ((IEnumerable<KeyValuePair<string, IProperty>>)_properties).GetEnumerator();
         }
     }
 

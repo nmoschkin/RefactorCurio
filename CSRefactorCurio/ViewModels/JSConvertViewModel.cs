@@ -99,7 +99,7 @@ namespace CSRefactorCurio.ViewModels
 
         public JSConvertViewModel()
         {
-            foreach (var p in CSRefectorCurioPackage.CurioSolution.Projects)
+            foreach (var p in CSRefectorCurioPackage.Instance.CurioSolution.Projects)
             {
                 projects.Add(p);
             }

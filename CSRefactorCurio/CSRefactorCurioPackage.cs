@@ -37,21 +37,59 @@ namespace CSRefactorCurio
     termValues: new[] { "HierSingleSelectionName:^.+$" })]
     public sealed class CSRefectorCurioPackage : ToolkitPackage
     {
-        static internal CurioExplorerViewModel CurioSolution;
+        static object lockobj = new object();
+        static CSRefectorCurioPackage _package;
+        
+        CurioExplorerViewModel _curio;
+        
+        internal static CSRefectorCurioPackage Instance
+        {
+            get
+            {
+                lock (lockobj)
+                {
+                    return _package;
+                }
+            }
+            private set
+            {
+                lock (lockobj)
+                {
+                    _package = value;
+                }
+            }
+        }
+        
+        internal CurioExplorerViewModel CurioSolution
+        {
+            get
+            {
+                lock (lockobj)
+                {
+                    return _curio;
+                }
+            }
+            private set
+            {
+                lock(lockobj)
+                {
+                    _curio = value;
+                }
+            }
+        }
 
         public const string AddItemContextGuid = "17D7439F-90F8-4396-9B51-8309208381A5";
         public const string JsonItemContextGuid = "CD497BC9-978B-4C88-A214-0E22886A9601";
-
-        internal static CSRefectorCurioPackage Instance { get; private set; }
-
+       
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            CurioSolution = new CurioExplorerViewModel();
+            Instance = this;
+
             await this.RegisterCommandsAsync();
             this.RegisterToolWindows();
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            CurioSolution = new CurioExplorerViewModel();
 
             EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
@@ -65,8 +103,6 @@ namespace CSRefactorCurio
             dte.Events.SolutionItemsEvents.ItemAdded += SolutionItemsEvents_ItemAdded;
             dte.Events.SolutionItemsEvents.ItemRenamed += SolutionItemsEvents_ItemRenamed;
             dte.Events.SolutionItemsEvents.ItemRemoved += SolutionItemsEvents_ItemRemoved;
-
-            Instance = this;
         }
 
         private void SolutionItemsEvents_ItemRemoved(EnvDTE.ProjectItem ProjectItem)
@@ -119,9 +155,8 @@ namespace CSRefactorCurio
                 }
             }
 
-            var ctrl = FindToolWindow();
-            ctrl.DataContext = CurioSolution;
-           
+            //var ctrl = FindToolWindow();
+            //if (ctrl != null) ctrl.DataContext = CurioSolution;
         }
 
         private void LoadProject()
@@ -140,13 +175,20 @@ namespace CSRefactorCurio
             LoadProject();
         }
 
-        CurioExplorer FindToolWindow()
-        {
-            var twp = (CurioExplorerToolWindow.Pane)FindToolWindow(typeof(CurioExplorerToolWindow.Pane), 0, true);
+        //CurioExplorer FindToolWindow()
+        //{
+        //    try
+        //    {
+        //        var twp = (CurioExplorerToolWindow.Pane)FindToolWindow(typeof(CurioExplorerToolWindow.Pane), 0, true);
 
-            var ctrl = twp.Content as CurioExplorer;
-            return ctrl;
-        }
+        //        var ctrl = twp.Content as CurioExplorer;
+        //        return ctrl;
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
 
     }

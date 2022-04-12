@@ -1,4 +1,6 @@
 ﻿
+using CSRefactorCurio;
+
 using DataTools.CSTools;
 using DataTools.Observable;
 
@@ -7,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -31,26 +34,31 @@ namespace DataTools.CSTools
 
     }
 
-    public interface IProjectHost : IProjectElement
-    {
-        IProjectElement Project { get; }
-    }
 
     public interface IProjectNode : IProjectElement
     {
         ObservableCollection<IProjectElement> Children { get; }
     }
 
+    public interface IProjectHost : IProjectElement
+    {
+        IProjectNode RootFolder { get; }
+
+        IPropertiesContainer Properties { get; }
+    }
 
     public class CurioProject : ObservableBase, IProjectHost
     {
         private string projectRoot = "";
         private string projectFile = "";
+        
         private EnvDTE.Project _project;
+        private PropertiesContainer properties;
 
-        private CSDirectory projectFolder = null;
+        private CSDirectory rootFolder = null;
 
         private object selectedItem = null;
+        private bool isFrameworkProject;
 
         private XmlDocument xml;
         private string title = null;
@@ -59,9 +67,16 @@ namespace DataTools.CSTools
         private string defns;
         private string assyname;
 
+        private List<string> includes;
+        private List<string> excludes;
+
+        public bool IsFrameworkProject => isFrameworkProject;
+
         public string DefaultNamespace => defns;
 
         public string AssemblyName => assyname;
+
+        public IPropertiesContainer Properties => properties;
 
         public EnvDTE.Project NativeProject
         {
@@ -77,19 +92,23 @@ namespace DataTools.CSTools
             }
         }
 
-        public CSDirectory ProjectFolder
+        public CSDirectory RootFolder
         {
-            get => projectFolder;
+            get => rootFolder;
             protected set
             {
-                if (SetProperty(ref projectFolder, value))
+                if (SetProperty(ref rootFolder, value))
                 {
-                    OnPropertyChanged(nameof(Project));
+                    OnPropertyChanged(nameof(RootFolder));
                 }
             }
         }
 
-        public IProjectElement Project => projectFolder;
+        public IReadOnlyList<string> Includes => includes;
+
+        public IReadOnlyList<string> Excludes => excludes;
+
+        IProjectNode IProjectHost.RootFolder => rootFolder;
 
         public string ProjectRoot
         {
@@ -128,42 +147,67 @@ namespace DataTools.CSTools
             xml = new XmlDocument();
             xml.LoadXml(File.ReadAllText($"{ProjectRoot}\\{ProjectFile}"));
 
-            ProjectFolder = new CSDirectory(this, ProjectRoot);
+            bool isframe = false;
+
+            var frame = xml.GetElementsByTagName("TargetFrameworkVersion");
+            if (frame != null && frame.Count > 0)
+            {
+                isframe = true;  
+            }
+
+            var compiles = xml.GetElementsByTagName("Compile");
+            
+            var incs = new List<string>();
+            var excs = new List<string>();
+
+            foreach (XmlNode compile in compiles)
+            {
+                if (isframe)
+                {
+
+                    if (compile.Attributes["Include"] is XmlAttribute xa)
+                    {
+                        incs.Add(xa.InnerText);
+                    }
+                }
+                else
+                {
+
+                    if (compile.Attributes["Exclude"] is XmlAttribute xa)
+                    {
+                        excs.Add(xa.InnerText);
+                    }
+                }
+            }
+
+            includes = incs;
+            excludes = excs;
+            isFrameworkProject = isframe;
+
+            RootFolder = new CSDirectory(this, ProjectRoot);
 
             allNamespaces.Clear();
             allNamespaces.Add(defns);
-            allNamespaces.AddRange(ProjectFolder.GetAllNamespacesFromHere());
+            allNamespaces.AddRange(RootFolder.GetAllNamespacesFromHere());
             allNamespaces = allNamespaces.Distinct().ToList();
             allNamespaces.Sort();
 
             OnPropertyChanged(nameof(Namespaces));
         }
 
-        private string PopulateProjectProperties()
+        private void PopulateProjectProperties()
         {
-            var en = _project.Properties;
+            properties = new PropertiesContainer(_project);
 
-            foreach (EnvDTE.Property prop in en)
+            if (properties.ContainsKey("DefaultNamespace"))
             {
-                if (prop.Name == "DefaultNamespace")
-                {
-
-                    if (prop.Value is string s)
-                    {
-                        defns = s;
-                    }
-                }
-                else if (prop.Name == "AssemblyName")
-                {
-
-                    if (prop.Value is string s)
-                    {
-                        assyname = s;
-                    }
-                }
+                defns = (string)properties["DefaultNamespace"].Value;
             }
 
-            return null;
+            if (properties.ContainsKey("AssemblyName"))
+            {
+                assyname = (string)properties["AssemblyName"].Value;
+            }
         }
 
         public CurioProject(string filename, EnvDTE.Project nativeProject)
@@ -173,7 +217,7 @@ namespace DataTools.CSTools
 
             if (filename == null || !File.Exists(filename)) throw new FileNotFoundException();
 
-            ProjectRoot = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "\\");
+            ProjectRoot = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "");
             ProjectFile = Path.GetFileName(filename);   
 
             ReloadProject();

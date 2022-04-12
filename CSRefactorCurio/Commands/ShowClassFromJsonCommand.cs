@@ -39,7 +39,7 @@ namespace CSRefactorCurio
                 }
             }
 
-            if (CSRefectorCurioPackage.CurioSolution.Solution == null)
+            if (CSRefectorCurioPackage.Instance.CurioSolution.Solution == null)
             {
                 await CSRefectorCurioPackage.Instance.RefreshProjectAsync(true);
             }
@@ -71,7 +71,7 @@ namespace CSRefactorCurio
             CurioProject testproj = null;
 
             if (proj != null)
-                testproj = CSRefectorCurioPackage.CurioSolution.Projects.Where((p) => p.NativeProject.Equals(proj)).FirstOrDefault();
+                testproj = CSRefectorCurioPackage.Instance.CurioSolution.Projects.Where((p) => p.NativeProject.Equals(proj)).FirstOrDefault();
 
             JsonOptionsDialog dlg;
             

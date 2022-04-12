@@ -277,10 +277,13 @@ namespace DataTools.CSTools
 
             return null;
         }
-
+        
         public void ReadDirectory(string path = null)
         {
             var p = Project;
+            var isf = p.IsFrameworkProject;
+            var rt = p.ProjectRoot;
+
             if (p == null) return;  
 
             path = path ?? this.path;
@@ -293,13 +296,26 @@ namespace DataTools.CSTools
             var outdirs = new List<CSDirectory>();
 
             var files = Directory.GetFiles(path, "*.cs");
+            string file;
 
-            foreach (var file in files)
+            foreach (var f in files)
             {
+                file = f;
+
+                if (isf)
+                {
+                    file = file.Replace(rt + "\\", "");
+                    if (!p.Includes.Contains(file)) continue;
+                }
+                else
+                {
+                    file = file.Replace(rt + "\\", "");
+                    if (p.Excludes.Contains(file)) continue;
+                }
 
                 try
                 {
-                    var parser = CSCodeFile.LoadFromFile(file);
+                    var parser = CSCodeFile.LoadFromFile(f);
                     outfiles.Add(parser);
                 }
                 catch { }

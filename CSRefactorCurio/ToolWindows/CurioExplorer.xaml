@@ -28,9 +28,9 @@
 
                 <HierarchicalDataTemplate
                     DataType="{x:Type mod:CurioProject}"
-                    ItemsSource="{Binding ProjectFolder.Children}"
+                    ItemsSource="{Binding RootFolder.Children}"
                     >
-                    <TextBlock Text="{Binding ProjectFolder.Title}" />
+                    <TextBlock Text="{Binding Title}" />
                 </HierarchicalDataTemplate>
 
                 <HierarchicalDataTemplate
