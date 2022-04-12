@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace CSRefactorCurio.ViewModels
@@ -15,10 +16,13 @@ namespace CSRefactorCurio.ViewModels
     {
 
         public event EventHandler<RequestCloseEventArgs> RequestClose;
+        private string lastcn = "";
 
         private CSJsonClassGenerator generator;
         private CurioProject project;
         private string selNS;
+        private string filename;
+        private string dir;
 
         private ObservableCollection<string> ns = new ObservableCollection<string>();
         private ObservableCollection<CurioProject> projects = new ObservableCollection<CurioProject>();
@@ -26,6 +30,7 @@ namespace CSRefactorCurio.ViewModels
         private IOwnedCommand okCommand;
         private IOwnedCommand cancelCommand;
         private IOwnedCommand resetCommand;
+        private IOwnedCommand browseCommand;
 
         public IOwnedCommand OKCommand => okCommand;
 
@@ -33,6 +38,7 @@ namespace CSRefactorCurio.ViewModels
                 
         public IOwnedCommand ResetCommand => resetCommand;
 
+        public IOwnedCommand BrowseCommand => browseCommand;
 
         public ObservableCollection<CurioProject> Projects
         {
@@ -45,6 +51,24 @@ namespace CSRefactorCurio.ViewModels
             set
             {
                 SetProperty(ref generator, value);
+            }
+        }
+
+        public string FileName
+        {
+            get => filename;
+            set
+            {
+                SetProperty(ref filename, value);
+            }
+        }
+
+        public string Directory
+        {
+            get => dir;
+            set
+            {
+                SetProperty(ref dir, value);
             }
         }
 
@@ -67,6 +91,7 @@ namespace CSRefactorCurio.ViewModels
                     if (SetProperty(ref project, value))
                     {
                         ActiveNamespaces = new ObservableCollection<string>(project.Namespaces);
+                        Directory = project.ProjectRoot;
                     }
                 }
             }
@@ -93,6 +118,19 @@ namespace CSRefactorCurio.ViewModels
             {
 
             }, nameof(ResetCommand));
+
+            browseCommand = new OwnedCommand(this, (o) =>
+            {
+                var dlg = new FolderBrowserDialog();
+
+                dlg.SelectedPath = Directory;
+                dlg.Description = "Select output folder for JSON file.";
+
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    Directory = dlg.SelectedPath;
+                }
+            }, nameof (BrowseCommand));
         }
 
         public JSConvertViewModel(CurioProject project) : this()
@@ -106,6 +144,11 @@ namespace CSRefactorCurio.ViewModels
             SelectedNamespace = project.DefaultNamespace ?? project.AssemblyName ?? project.Namespaces.FirstOrDefault();
         }
 
+        public JSConvertViewModel(CurioProject project, string initPath) : this(project)
+        {
+            Directory = initPath;
+        }
+
         public JSConvertViewModel(CurioProject project, CSJsonClassGenerator generator) : this()
         {
             if (project == null) throw new ArgumentNullException(nameof(project));
@@ -113,13 +156,35 @@ namespace CSRefactorCurio.ViewModels
 
             this.generator = generator;
             this.generator.PropertyChanged += Generator_PropertyChanged;
+
             SelectedProject = project;
-            SelectedNamespace = project.DefaultNamespace ?? project.AssemblyName ?? project.Namespaces.FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(generator.ClassName))
+            {
+                FileName = generator.ClassName + ".cs";
+            }
+            if (!string.IsNullOrEmpty(generator.Namespace))
+            {
+                SelectedNamespace = generator.Namespace;
+            }
+            else
+            {
+                SelectedNamespace = project.DefaultNamespace ?? project.AssemblyName ?? project.Namespaces.FirstOrDefault();
+            }
         }
 
         private void Generator_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             OKCommand.QueryCanExecute();
+            if (e.PropertyName == nameof(CSJsonClassGenerator.ClassName))
+            {
+                if (string.IsNullOrEmpty(FileName) || string.IsNullOrEmpty(lastcn) || FileName == (lastcn + ".cs"))
+                {
+                    FileName = Generator.ClassName + ".cs";                    
+                }
+
+                lastcn = Generator.ClassName;
+            }
         }
 
         public string SelectedNamespace

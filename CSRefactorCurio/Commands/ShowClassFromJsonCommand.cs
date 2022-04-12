@@ -10,31 +10,59 @@ using System.Threading.Tasks;
 using CSRefactorCurio.Forms;
 using CSRefactorCurio.Dialogs;
 using DataTools.CSTools;
+using CSRefactorCurio.Helpers;
 
 namespace CSRefactorCurio
 {
     [Command(PackageIds.ShowClassFromJsonCommand)]
     internal sealed class ShowClassFromJsonCommand : BaseCommand<ShowClassFromJsonCommand>
     {
+        public static ShowClassFromJsonCommand Instance { get; private set; }
+
+        protected override Task InitializeCompletedAsync()
+        {
+            Instance = this;
+            return base.InitializeCompletedAsync();
+        }
+
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            if (CSRefectorCurioPackage.Instance == null)
+            {
+                int t = 0;
+                while (CSRefectorCurioPackage.Instance == null && t < 500)
+                {
+                    await Task.Delay(10);
+                    t++;
+                }
+            }
+
+            if (CSRefectorCurioPackage.CurioSolution.Solution == null)
+            {
+                await CSRefectorCurioPackage.Instance.RefreshProjectAsync(true);
+            }
+
             var dte = (EnvDTE.DTE)ToolkitPackage.GetGlobalService(typeof(EnvDTE.DTE));
             EnvDTE.ProjectItem selItem = null;
             EnvDTE.Project proj = null;
+            
+            string initPath = null;
 
             foreach (EnvDTE.SelectedItem o in dte.SelectedItems)
             {
-                if (o.Project is EnvDTE.Project)
+                if (o.ProjectItem is EnvDTE.ProjectItem)
+                {
+                    selItem = o.ProjectItem;
+                    initPath = (string)PropertyHelper.GetProperty(selItem, "FullPath");
+
+                    if (selItem != null) break;
+                }
+                else if (o.Project is EnvDTE.Project)
                 {
                     proj = o.Project;
                     break;
-                }
-                else
-                {
-                    selItem = o.ProjectItem;
-                    if (selItem != null) break;
                 }
             }
 
@@ -53,7 +81,14 @@ namespace CSRefactorCurio
             }
             else
             {
-                dlg = new JsonOptionsDialog(testproj);
+                if (initPath != null)
+                {
+                    dlg = new JsonOptionsDialog(testproj, initPath);
+                }
+                else
+                {
+                    dlg = new JsonOptionsDialog(testproj);
+                }
             }
 
             dlg.ShowModal();

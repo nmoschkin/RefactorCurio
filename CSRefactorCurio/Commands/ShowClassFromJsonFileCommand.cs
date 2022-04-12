@@ -14,6 +14,14 @@ namespace CSRefactorCurio
     [Command(PackageIds.ShowClassFromJsonFileCommand)]
     internal sealed class ShowClassFromJsonFileCommand : BaseCommand<ShowClassFromJsonFileCommand>
     {
+        public static ShowClassFromJsonFileCommand Instance { get; private set; }
+
+        protected override Task InitializeCompletedAsync()
+        {
+            Instance = this;
+            return base.InitializeCompletedAsync();
+        }
+
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

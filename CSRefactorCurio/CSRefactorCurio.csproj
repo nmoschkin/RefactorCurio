@@ -75,6 +75,7 @@
       <DependentUpon>JsonGeneratorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\EnumListProvider.cs" />
+    <Compile Include="Helpers\PropertyHelper.cs" />
     <Compile Include="JS\CSJsonClassGenerator.cs" />
     <Compile Include="Options\General1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -85,10 +86,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
+    <Compile Include="Validators\DirExistsValidator.cs" />
     <Compile Include="ViewModels\CurioExplorerViewModel.cs" />
     <Compile Include="ViewModels\JSConvertViewModel.cs" />
     <Compile Include="ViewModels\RequestCloseEventArgs.cs" />
-    <Compile Include="VSCommandTable.cs">
+    <Compile Include="VSCommandTable1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>VSCommandTable.vsct</DependentUpon>
@@ -110,6 +112,7 @@
     <VSCTCompile Include="VSCommandTable.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <Generator>VsctGenerator</Generator>
+      <LastGenOutput>VSCommandTable1.cs</LastGenOutput>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>

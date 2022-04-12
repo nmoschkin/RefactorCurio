@@ -94,7 +94,7 @@
     }
 
     /// <summary>
-    /// Automatically convert timestamps from the REST API.
+    /// Automatically convert long timestamps.
     /// </summary>
     public class AutoTimeConverter : JsonConverter
     {

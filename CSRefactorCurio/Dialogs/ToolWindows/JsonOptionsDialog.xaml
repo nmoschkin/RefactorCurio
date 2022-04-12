@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:val="clr-namespace:CSRefactorCurio.Validators"
     Title="Create New C# Class From JSON"
     Width="600"
     Height="500"
@@ -123,6 +124,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -181,7 +183,64 @@
                 Grid.ColumnSpan="2"
                 Margin="4,4,0,4"
                 HorizontalAlignment="Stretch"
-                Text="{Binding Generator.ClassName, Mode=TwoWay}"
+                Text="{Binding Generator.ClassName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                />
+
+            <Label
+                Grid.Row="3"
+                Grid.Column="0"
+                Margin="0,4"
+                HorizontalAlignment="Left"
+                Content="Output Filename:"
+                />
+
+            <TextBox
+                Grid.Row="3"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="4,4,0,4"
+                HorizontalAlignment="Stretch"
+                Text="{Binding FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                />
+
+            <Label
+                Grid.Row="4"
+                Grid.Column="0"
+                Margin="0,4"
+                HorizontalAlignment="Left"
+                Content="Output Folder:"
+                />
+
+            <TextBox
+                Grid.Row="4"
+                Grid.Column="1"
+                Grid.ColumnSpan="1"
+                Margin="4,4,0,4"
+                HorizontalAlignment="Stretch"
+                >
+                <TextBox.Text>
+                    <Binding
+                        Mode="TwoWay"
+                        NotifyOnValidationError="True"
+                        Path="Directory"
+                        UpdateSourceTrigger="PropertyChanged"
+                        ValidatesOnDataErrors="True"
+                        ValidatesOnNotifyDataErrors="True"
+                        >
+                        <Binding.ValidationRules>
+                            <val:DirExistsValidator />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+
+            <Button
+                Grid.Row="4"
+                Grid.Column="2"
+                Width="24"
+                Margin="4,4,0,4"
+                Command="{Binding BrowseCommand}"
+                Content="..."
                 />
 
 

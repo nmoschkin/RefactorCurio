@@ -12,7 +12,22 @@ namespace CSRefactorCurio.ViewModels
 {
     internal class CurioExplorerViewModel : ObservableBase
     {
+        EnvDTE.Solution _sln;
 
+        public CurioExplorerViewModel()
+        {
+        }
+
+        public CurioExplorerViewModel(EnvDTE.Solution sln)
+        {
+            _sln = sln;
+        }
+
+        public EnvDTE.Solution Solution
+        {
+            get => _sln;
+            internal set => _sln = value;
+        }
 
         private ObservableCollection<CurioProject> projects = new ObservableCollection<CurioProject>();
 
@@ -21,11 +36,6 @@ namespace CSRefactorCurio.ViewModels
         {
             get => projects;
         }
-
-
-
-
-
 
     }
 }

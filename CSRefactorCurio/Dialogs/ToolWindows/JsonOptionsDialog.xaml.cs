@@ -27,6 +27,14 @@ namespace CSRefactorCurio.Dialogs
             DataContext = vm;
         }
 
+        public JsonOptionsDialog(CurioProject project, string initPath)
+        {
+            InitializeComponent();
+            vm = new JSConvertViewModel(project, initPath);
+            vm.RequestClose += Vm_RequestClose;
+            DataContext = vm;
+        }
+
         private void Vm_RequestClose(object sender, RequestCloseEventArgs e)
         {
             DialogResult = e.IsSuccess;

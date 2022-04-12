@@ -22,7 +22,6 @@ namespace CSRefactorCurio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
-    //[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideToolWindow(typeof(CurioExplorerToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.SolutionExplorer)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(PackageGuids.CSRefactorCurioString)]
@@ -43,12 +42,15 @@ namespace CSRefactorCurio
         public const string AddItemContextGuid = "17D7439F-90F8-4396-9B51-8309208381A5";
         public const string JsonItemContextGuid = "CD497BC9-978B-4C88-A214-0E22886A9601";
 
+        internal static CSRefectorCurioPackage Instance { get; private set; }
+
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.RegisterCommandsAsync();
             this.RegisterToolWindows();
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
             CurioSolution = new CurioExplorerViewModel();
 
             EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
@@ -63,6 +65,8 @@ namespace CSRefactorCurio
             dte.Events.SolutionItemsEvents.ItemAdded += SolutionItemsEvents_ItemAdded;
             dte.Events.SolutionItemsEvents.ItemRenamed += SolutionItemsEvents_ItemRenamed;
             dte.Events.SolutionItemsEvents.ItemRemoved += SolutionItemsEvents_ItemRemoved;
+
+            Instance = this;
         }
 
         private void SolutionItemsEvents_ItemRemoved(EnvDTE.ProjectItem ProjectItem)
@@ -94,31 +98,35 @@ namespace CSRefactorCurio
         }
 
         EnvDTE.Solution currSln = null;
+        
+        public async Task RefreshProjectAsync(bool reload = true)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+            if (!reload && dte.Solution == currSln) return;
+            currSln = (EnvDTE.Solution)dte.Solution;
+
+            CurioSolution.Projects.Clear();
+            CurioSolution.Solution = currSln;
+
+            foreach (EnvDTE.Project item in (IEnumerable)dte.Solution.Projects)
+            {
+                if (item.FullName.ToLower().EndsWith(".csproj"))
+                {
+                    CurioSolution.Projects.Add(new CurioProject(item.FullName, item));
+                }
+            }
+
+            var ctrl = FindToolWindow();
+            ctrl.DataContext = CurioSolution;
+           
+        }
 
         private void LoadProject()
-        {
-            _ = Task.Run(async () =>
-            {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-                EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
-                if (dte.Solution == currSln) return;
-                currSln = (EnvDTE.Solution)dte.Solution;
-
-                CurioSolution.Projects.Clear();
-
-                foreach (EnvDTE.Project item in (IEnumerable)dte.Solution.Projects)
-                {
-                    if (item.FullName.ToLower().EndsWith(".csproj"))
-                    {                        
-                        CurioSolution.Projects.Add(new CurioProject(item.FullName, item));
-                    }
-                }
-
-                var ctrl = FindToolWindow();
-                ctrl.DataContext = CurioSolution;
-            });
+        {            
+            _ = RefreshProjectAsync(false);
         }
 
         private void SolutionEvents_BeforeClosing()
