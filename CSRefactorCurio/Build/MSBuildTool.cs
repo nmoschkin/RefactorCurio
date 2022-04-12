@@ -26,7 +26,7 @@ namespace DataTools.CSTools
         }
 
 
-        public bool RunMSBuild(ProjectReader project)
+        public bool RunMSBuild(CurioProject project)
         {
             var cmd = $"\"{project.ProjectRoot}\\{project.ProjectFile}\" -t:Rebuild /property:Configuration=Debug /property:Platform=\"AnyCPU\"";
 

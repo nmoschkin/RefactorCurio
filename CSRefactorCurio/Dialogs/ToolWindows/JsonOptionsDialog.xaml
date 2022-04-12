@@ -1,0 +1,239 @@
+﻿<platform:DialogWindow
+    x:Class="CSRefactorCurio.Dialogs.JsonOptionsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
+    xmlns:cs="clr-namespace:DataTools.CSTools"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:CSRefactorCurio.Helpers"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    Title="Create New C# Class From JSON"
+    Width="600"
+    Height="500"
+    d:DesignHeight="500"
+    d:DesignWidth="600"
+    toolkit:Themes.UseVsTheme="True"
+    mc:Ignorable="d"
+    >
+    <Grid Background="Transparent">
+
+        <Grid.Resources>
+            <conv:BoolConverter
+                x:Key="visConv"
+                Mode="Visibility"
+                />
+            <helpers:EnumListConverter x:Key="enumConv" />
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBox
+            x:Name="Code"
+            Margin="8"
+            AcceptsReturn="True"
+            FontFamily="Consolas"
+            HorizontalScrollBarVisibility="Auto"
+            Text="{Binding Generator.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="NoWrap"
+            VerticalScrollBarVisibility="Visible"
+            />
+
+        <CheckBox
+            Grid.Row="1"
+            Margin="8"
+            Content="Generate Time Conversion Classes"
+            IsChecked="{Binding Generator.GenerateTimeConverter, Mode=TwoWay}"
+            />
+
+        <Grid Grid.Row="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel
+                Grid.Column="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Orientation="Vertical"
+                >
+                <Label Content="Floating Point Type:" />
+                <ComboBox
+                    Margin="8"
+                    ItemsSource="{helpers:EnumList Type={x:Type cs:FPType}}"
+                    SelectedItem="{Binding Generator.FloatNumberType, Mode=TwoWay, Converter={StaticResource enumConv}}"
+                    />
+
+            </StackPanel>
+
+
+            <StackPanel
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Orientation="Vertical"
+                >
+                <Label Content="Integer Type:" />
+                <ComboBox
+                    Margin="8"
+                    ItemsSource="{helpers:EnumList Type={x:Type cs:IntType}}"
+                    SelectedItem="{Binding Generator.IntNumberType, Mode=TwoWay, Converter={StaticResource enumConv}}"
+                    />
+
+            </StackPanel>
+
+
+            <StackPanel
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Orientation="Vertical"
+                >
+                <Label Content="Indeterminate Type:" />
+                <ComboBox
+                    Margin="8"
+                    ItemsSource="{helpers:EnumList Type={x:Type cs:IndeterminateType}}"
+                    SelectedItem="{Binding Generator.IndeterminateType, Mode=TwoWay, Converter={StaticResource enumConv}}"
+                    />
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid
+            Grid.Row="3"
+            Margin="8"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Center"
+            >
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="0,4"
+                HorizontalAlignment="Left"
+                Content="Project:"
+                />
+
+            <ComboBox
+                Grid.Row="0"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="4,4,0,4"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{Binding Projects}"
+                SelectedItem="{Binding SelectedProject}"
+                />
+
+            <Label
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Margin="0,4"
+                HorizontalAlignment="Left"
+                Content="Namespace:"
+                />
+
+            <ComboBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="4,4,0,4"
+                HorizontalAlignment="Stretch"
+                IsEditable="True"
+                ItemsSource="{Binding ActiveNamespaces}"
+                Text="{Binding SelectedNamespace, Mode=TwoWay}"
+                />
+
+            <Label
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="0,4"
+                HorizontalAlignment="Left"
+                Content="Class Name:"
+                />
+
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="4,4,0,4"
+                HorizontalAlignment="Stretch"
+                Text="{Binding Generator.ClassName, Mode=TwoWay}"
+                />
+
+
+        </Grid>
+
+
+        <Grid Grid.Row="4">
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+
+
+            <Button
+                Grid.Column="0"
+                Margin="8"
+                Command="{Binding ResetCommand}"
+                Content="Clear"
+                />
+
+            <Label
+                x:Name="ErrorLabel"
+                Grid.Column="1"
+                Margin="8,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Foreground="Red"
+                Visibility="{Binding Generator.IsInvalid, Converter={StaticResource visConv}}"
+                >
+                Invalid JSON
+            </Label>
+
+            <Button
+                Grid.Column="2"
+                Margin="8"
+                Command="{Binding CancelCommand}"
+                Content="Cancel"
+                />
+
+            <Button
+                Grid.Column="3"
+                Margin="8"
+                Command="{Binding OKCommand}"
+                Content="OK"
+                />
+        </Grid>
+
+
+    </Grid>
+</platform:DialogWindow>

@@ -103,7 +103,7 @@ namespace DataTools.CSTools
     {
 
         private WeakReference<CSDirectory> parent = null;
-        private WeakReference<ProjectReader> project = null;
+        private WeakReference<CurioProject> project = null;
 
         private ObservableCollection<CSCodeFile> files;
         private ObservableCollection<CSDirectory> directories;
@@ -112,6 +112,8 @@ namespace DataTools.CSTools
 
         private string path = null;
         private string title = null;
+
+        private List<string> namespaces;
 
         public ElementType ElementType => ElementType.Directory;
 
@@ -134,7 +136,7 @@ namespace DataTools.CSTools
         }
 
 
-        public ProjectReader Project
+        public CurioProject Project
         {
             get
             {
@@ -164,10 +166,17 @@ namespace DataTools.CSTools
             get => files;
             protected set
             {
-                SetProperty(ref files, value);
+                if (SetProperty(ref files, value))
+                {
+                    CheckNamespaces();
+                }
             }
         }
 
+        public IReadOnlyList<string> Namespaces
+        {
+            get => Namespaces;
+        }
 
         public string Path
         {
@@ -195,7 +204,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public CSDirectory(ProjectReader project, string path, CSDirectory parent = null)
+        public CSDirectory(CurioProject project, string path, CSDirectory parent = null)
         {
             files = new ObservableCollection<CSCodeFile>();
             directories = new ObservableCollection<CSDirectory>();
@@ -206,10 +215,67 @@ namespace DataTools.CSTools
                 this.parent = new WeakReference<CSDirectory>(parent);
             }
             
-            this.project = new WeakReference<ProjectReader>(project);
+            this.project = new WeakReference<CurioProject>(project);
             Path = path;
 
             ReadDirectory();
+        }
+
+        public List<string> GetAllNamespacesFromHere()
+        {
+            CheckNamespaces();
+
+            List<string> ns = new List<string>();
+            ns.AddRange(namespaces);
+
+            foreach (var dir in directories)
+            {
+                ns.AddRange(dir.GetAllNamespacesFromHere());
+            }
+
+            return ns.Distinct().ToList();
+        }
+
+        public CSDirectory FindDirectory(string path)
+        {
+
+            var fp = System.IO.Path.GetFullPath(path).ToLower();
+
+            if (path.ToLower() == fp) return this;
+
+            foreach (var item in Directories)
+            {
+                var result = item.FindDirectory(path);
+                if (result != null) return result;
+            }
+
+            return null;
+        }
+
+        public CSCodeFile FindFile(string filename)
+        {
+            var fp = System.IO.Path.GetFullPath(filename).ToLower();
+
+            var pathpart = System.IO.Path.GetDirectoryName(fp);
+            var fnpart = System.IO.Path.GetFileName(fp);
+
+            if (this.path.ToLower() == pathpart)
+            {
+                foreach (var file in Files)
+                {
+                    var fnpart2 = System.IO.Path.GetFileName(file.Filename).ToLower();
+                    if (fnpart2 == fnpart) return file;
+                }
+            }
+
+            foreach (var dir in Directories)
+            {
+
+                var cf = dir.FindFile(filename);
+                if (cf != null) return cf;  
+            }
+
+            return null;
         }
 
         public void ReadDirectory(string path = null)
@@ -275,6 +341,26 @@ namespace DataTools.CSTools
                 Children.Add(item2);
             }
 
+        }
+
+        protected void CheckNamespaces()
+        {
+
+            List<string> p = new List<string>();
+
+            foreach (var item in Files)
+            {
+                foreach(var marker in item.Markers)
+                {
+                    if (!p.Contains(marker.Namespace))
+                    {
+                        p.Add(marker.Namespace);
+                    }
+                }
+            }
+
+            namespaces = p;
+            OnPropertyChanged(nameof(Namespaces));
         }
 
     }

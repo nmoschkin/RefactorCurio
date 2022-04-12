@@ -14,10 +14,10 @@ namespace CSRefactorCurio.ViewModels
     {
 
 
-        private ObservableCollection<ProjectReader> projects = new ObservableCollection<ProjectReader>();
+        private ObservableCollection<CurioProject> projects = new ObservableCollection<CurioProject>();
 
 
-        public ObservableCollection<ProjectReader> Projects
+        public ObservableCollection<CurioProject> Projects
         {
             get => projects;
         }

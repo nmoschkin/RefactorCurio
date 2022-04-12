@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using DataTools.MathTools;
 
 using CSRefactorCurio;
+using DataTools.Observable;
+using System.Collections.ObjectModel;
 
 namespace DataTools.CSTools
 {
@@ -49,15 +51,23 @@ namespace DataTools.CSTools
     /// <summary>
     /// Json to C# Class Generator
     /// </summary>
-    public class CSJsonClassGenerator
+    public class CSJsonClassGenerator : ObservableBase
     {
-        private List<string> jsonComments = new List<string>();
+        private ObservableCollection<string> jsonComments = new ObservableCollection<string>();
         int ipidx = 0;
 
         string text;
         string code;
+        string className;
+        string nameSpace;
 
+        FPType floatType = FPType.Decimal;
+        IntType intType = IntType.Long;
+        IndeterminateType indType = IndeterminateType.Float;
 
+        bool isInvalid = true;
+        bool genTC = true;
+        bool mvvm = false;
 
         bool hastime = false;
 
@@ -68,42 +78,110 @@ namespace DataTools.CSTools
         /// If this property is set to true, any long values from the example data that correspond to a UNIX-like (seconds, milliseconds, or nanoseconds) timestamp within 5 years of the current date will automatically be regarded as <see cref="DateTime"/> fields, and the required <see cref="JsonConverter{T}"/>-derived classes will be generated to decode these values.<br/><br/>
         /// If this property is set to false, long values will be converted, as-is.
         /// </remarks>
-        public bool GenerateTimeConverter { get; set; } = true;
+        public bool GenerateTimeConverter
+        {
+            get => genTC;
+            set
+            {
+                SetProperty(ref genTC, value);
+            }
+        }
 
         /// <summary>
         /// Gets the input JSON
         /// </summary>
-        public string Text => text;
+        public string Text
+        {
+            get => text;
+            set
+            {
+                if (SetProperty(ref text, value))
+                {
+                    JsonToCode();
+                }
+            }
+        }
+
+        public bool IsInvalid
+        {
+            get => isInvalid;
+            protected set
+            {
+                SetProperty(ref isInvalid, value);  
+            }
+        }
 
         /// <summary>
         /// Gets or sets of the name of the main class.
         /// </summary>
-        public string ClassName { get; set; }
+        public string ClassName
+        {
+            get => className;
+            set
+            {
+                SetProperty(ref className, value);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the optional namespace to put the generated class in.
         /// </summary>
-        public string Namespace { get; set; }
+        public string Namespace
+        {
+            get => nameSpace;
+            set
+            {
+                SetProperty(ref nameSpace, value);
+            }
+        }
 
         /// <summary>
         /// Gets or sets what types will be used for floating point properties.
         /// </summary>
-        public FPType FloatNumberType { get; set; } = FPType.Decimal;
+        public FPType FloatNumberType
+        {
+            get => floatType;
+            set
+            {
+                SetProperty(ref floatType, value);
+            }
+        }
 
         /// <summary>
         /// Gets or sets what type will be used for integer properties.
         /// </summary>
-        public IntType IntNumberType { get; set; } = IntType.Long;
+        public IntType IntNumberType
+        {
+            get => intType;
+            set
+            {
+                SetProperty(ref intType, value);
+            }
+        }
 
         /// <summary>
         /// Gets or sets what kind of number to default to if the number type is potentially indeterminate.
         /// </summary>
-        public IndeterminateType IndeterminateType { get; set; } = IndeterminateType.Float;
+        public IndeterminateType IndeterminateType
+        {
+            get => indType;
+            set
+            {
+                SetProperty(ref indType, value);
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value that indicates generating code for MVVM property setters using SetProperty(ref T, value).
         /// </summary>
-        public bool MVVMSetProperty { get; set; }
+        public bool MVVMSetProperty
+        {
+            get => mvvm;
+            set
+            {
+                SetProperty(ref mvvm, value);
+            }
+        }
         
         /// <summary>
         /// The generated C# class code.
@@ -164,6 +242,15 @@ namespace DataTools.CSTools
             JsonToCode();
         }
 
+        public ObservableCollection<string> JsonComments
+        {
+            get => jsonComments;
+            protected set
+            {
+                SetProperty(ref jsonComments, value);
+            }
+        }
+
         /// <summary>
         /// Parse the specified JSON text into a C# class of the specified name.
         /// </summary>
@@ -201,11 +288,37 @@ namespace DataTools.CSTools
         private void JsonToCode()
         {
             hastime = false;
-            string json = text;
-       
-            FindJsonComments(json);
 
-            var jobj = JsonConvert.DeserializeObject<JToken>(json);
+            string json = text?.Trim() ?? "";
+
+            if (string.IsNullOrEmpty(json))
+            {
+                IsInvalid = true;
+                code = null;
+
+                jsonComments.Clear();
+                OnPropertyChanged(nameof(OutputCode));
+
+                return;
+            }
+
+            FindJsonComments(json);
+            JToken jobj = null;
+
+            try
+            {
+                jobj = JsonConvert.DeserializeObject<JToken>(json);
+            }
+            catch
+            {
+                IsInvalid = true;
+                code = null;
+
+                jsonComments.Clear();
+                OnPropertyChanged(nameof(OutputCode));
+
+                return;
+            }
 
             List<ParsedClass> classes;
 
@@ -291,8 +404,10 @@ namespace DataTools.CSTools
                 }
             }
 
-
             code = sb.ToString();
+
+            OnPropertyChanged(nameof(OutputCode));
+            IsInvalid = false;
         }
 
         private string PrintType(JToken jp)
