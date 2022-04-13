@@ -103,6 +103,11 @@ namespace CSRefactorCurio
             dte.Events.SolutionItemsEvents.ItemAdded += SolutionItemsEvents_ItemAdded;
             dte.Events.SolutionItemsEvents.ItemRenamed += SolutionItemsEvents_ItemRenamed;
             dte.Events.SolutionItemsEvents.ItemRemoved += SolutionItemsEvents_ItemRemoved;
+            dte.Events.DocumentEvents.DocumentSaved += DocumentEvents_DocumentSaved;
+        }
+
+        private void DocumentEvents_DocumentSaved(EnvDTE.Document Document)
+        {
         }
 
         private void SolutionItemsEvents_ItemRemoved(EnvDTE.ProjectItem ProjectItem)

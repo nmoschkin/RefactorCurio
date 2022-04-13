@@ -2,6 +2,7 @@
 using CSRefactorCurio;
 
 using DataTools.CSTools;
+using DataTools.Desktop;
 using DataTools.Observable;
 
 using System;
@@ -54,6 +55,7 @@ namespace DataTools.CSTools
         
         private EnvDTE.Project _project;
         private PropertiesContainer properties;
+        private FSMonitor monitor;
 
         private CSDirectory rootFolder = null;
 
@@ -164,7 +166,6 @@ namespace DataTools.CSTools
             {
                 if (isframe)
                 {
-
                     if (compile.Attributes["Include"] is XmlAttribute xa)
                     {
                         incs.Add(xa.InnerText);
@@ -172,8 +173,7 @@ namespace DataTools.CSTools
                 }
                 else
                 {
-
-                    if (compile.Attributes["Exclude"] is XmlAttribute xa)
+                    if (compile.Attributes["Remove"] is XmlAttribute xa)
                     {
                         excs.Add(xa.InnerText);
                     }
@@ -218,8 +218,22 @@ namespace DataTools.CSTools
             if (filename == null || !File.Exists(filename)) throw new FileNotFoundException();
 
             ProjectRoot = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "");
-            ProjectFile = Path.GetFileName(filename);   
+            ProjectFile = Path.GetFileName(filename);
 
+            monitor = new FSMonitor(ProjectRoot);
+            monitor.WatchNotifyChange += Monitor_WatchNotifyChange;
+
+            ReloadProject();
+            monitor.Watch();
+        }
+
+        ~CurioProject()
+        {
+            monitor.Dispose();
+        }
+
+        private void Monitor_WatchNotifyChange(object sender, FSMonitorEventArgs e)
+        {            
             ReloadProject();
         }
 
