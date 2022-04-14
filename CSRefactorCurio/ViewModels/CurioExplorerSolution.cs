@@ -65,7 +65,7 @@ namespace CSRefactorCurio.ViewModels
         private void PopulateFrom(IList<IProjectElement> addto, IEnumerable source)
         {
 
-            DataTools.CSTools.SolutionFolder current = null;
+            DataTools.CSTools.CSSolutionFolder current = null;
 
             foreach (object obj in source)
             {
@@ -73,7 +73,7 @@ namespace CSRefactorCurio.ViewModels
                 {
                     if (item.Kind == ProjectKinds.vsProjectKindSolutionFolder)
                     {
-                        current = new DataTools.CSTools.SolutionFolder(item.Name);
+                        current = new DataTools.CSTools.CSSolutionFolder(item.Name);
                         addto.Add(current);
                         
                         PopulateFrom(current.Children, item.ProjectItems);
@@ -110,13 +110,29 @@ namespace CSRefactorCurio.ViewModels
             if (!LoadingFlag) RefreshNamespaces();
         }
 
+        private List<CurioProject> GetAllProjects(IList<IProjectElement> fromList)
+        {
+            var output = new List<CurioProject>();
+
+            foreach(var item in fromList)
+            {
+                if (item is CurioProject proj)
+                {
+                    output.Add(proj);
+                }
+                else if (item is CSSolutionFolder sf)
+                {
+                    output.AddRange(GetAllProjects(sf.Children));
+                }
+            }
+
+            return output;
+        }
+
         public void RefreshNamespaces()
         {
-            List<CurioProject> projlist = new List<CurioProject>();
-            foreach (CurioProject proj in projects) projlist.Add(proj);
-
             namespacesMap.Clear();
-            namespaces = CSNamespace.NamespacesFromProjects(projlist, namespacesMap);
+            namespaces = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap);
 
             OnPropertyChanged(nameof(Namespaces));
             if (!classMode) OnPropertyChanged(nameof(CurrentItems));

@@ -152,7 +152,7 @@
                 </HierarchicalDataTemplate>
 
                 <HierarchicalDataTemplate
-                    DataType="{x:Type mod:SolutionFolder}"
+                    DataType="{x:Type mod:CSSolutionFolder}"
                     ItemsSource="{Binding Children}"
                     >
                     <Grid>

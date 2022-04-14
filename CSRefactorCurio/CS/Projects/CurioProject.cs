@@ -44,13 +44,13 @@ namespace DataTools.CSTools
         IPropertiesContainer Properties { get; }
     }
 
-    public class SolutionFolder : ObservableBase, IProjectNode
+    public class CSSolutionFolder : ObservableBase, IProjectNode
     {
         private string title;
         
         private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
         
-        public SolutionFolder(string title)
+        public CSSolutionFolder(string title)
         {
             this.title = title;
         }

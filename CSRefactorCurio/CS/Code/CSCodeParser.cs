@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using DataTools.Text;
@@ -82,6 +83,8 @@ namespace DataTools.CSTools
         public string Kind { get; set; }
 
         public string Namespace { get; set; }
+
+        public List<Marker> Markers { get; protected internal set; }
 
         public List<WordObject> Content { get; } = new List<WordObject>();
 
@@ -440,12 +443,11 @@ namespace DataTools.CSTools
             return ParseSuccess;
         }
 
+
         protected virtual List<Marker> ParseCSCodeFile(string text)
         {
-
             bool inthing = false;
             bool indelg = false;
-            
 
             int level = 0;
             int startL = 0;
@@ -454,6 +456,7 @@ namespace DataTools.CSTools
             char[] nsallowed = (TextTools.AlphaNumericChars + "_-.").ToCharArray();
 
             var scans = new List<char[]>();
+            var scans2 = new List<char[]>();
 
             scans.Add("class".ToCharArray());
             scans.Add("interface".ToCharArray());
@@ -463,6 +466,8 @@ namespace DataTools.CSTools
             scans.Add("delegate".ToCharArray());
 
             string kind = null, name = null, generics = null;
+            string kind2 = null, name2 = null, generics2 = null;
+
             string namesp = null;
 
             int linestart = 0;
@@ -473,9 +478,14 @@ namespace DataTools.CSTools
             int endLine = 0;
             int startPos, endPos;
 
+            int startLine2 = 0;
+            int endLine2 = 0;
+            int startPos2, endPos2;
+
             bool firstNs = true;
             int lreal = 0;
             int pre = 0;
+            var reg = new Regex(@"^\s*(.+)\s+(\w+)\s*(\(|\{)\s*(.+)\s*(\)|\})");
 
             List<Marker> markers = new List<Marker>();
             Marker mark;
@@ -592,14 +602,43 @@ namespace DataTools.CSTools
                     var sbtemp = new StringBuilder();
                     sbtemp.Append(input[i]);
                     bool inlit = false;
+                    bool intrans = false;
+                    bool atrans = false;
+                    int transl = 0;
+                    List<bool> qtrans = null;
+                    List<bool> translit = null;
 
                     if (i > 0 && input[i - 1] == '@') inlit = true;
+                    if (i > 0 && input[i - 1] == '$')
+                    {
+                        intrans = true;
+                        qtrans = new List<bool>();
+                        translit = new List<bool>();
+                        qtrans.Add(true);
+                        translit.Add(false);
+                    }
 
                     for (j = i + 1; j < c; j++)
                     {
                         sbtemp.Append(input[j]);
 
-                        if (input[j] == '\n')
+                        if (intrans && input[j] == '{')
+                        {
+                            transl++;
+                            qtrans.Add(false);
+                            translit.Add(false);
+                        }
+                        else if (intrans && input[j] == '}')
+                        {
+                            if (!qtrans[transl])
+                            {
+                                qtrans.RemoveAt(transl);
+                                translit.RemoveAt(transl);
+
+                                transl--;
+                            }
+                        }
+                        else if (input[j] == '\n')
                         {
                             int oline = line;
                             //throw new SyntaxErrorException();
@@ -609,13 +648,27 @@ namespace DataTools.CSTools
                             if (line >= totalLines) throw new SyntaxErrorException($"No closed quotes found for quote starting at line {oline}");
                             continue;
                         }
-
-                        if (input[j] == '\"')
+                        if (!inlit && input[j] == '\\')
                         {
-                            
-                            if (inlit)
+                            if (intrans)
                             {
-                                if (j < c - 1)
+                                if (qtrans[transl])
+                                {
+                                    j += 1;
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                j += 1;
+                                continue;
+                            }
+                        }
+                        else if (input[j] == '\"')
+                        {
+                            if (intrans)
+                            {
+                                if (translit[transl] && j < c - 1)
                                 {
                                     if (input[j + 1] == '\"')
                                     {
@@ -623,18 +676,45 @@ namespace DataTools.CSTools
                                         continue;
                                     }
                                 }
-
-                                i = j;
-                                break;
+                                else
+                                {
+                                    qtrans[transl] = !qtrans[transl];
+                                    if (qtrans[0] == false)
+                                    {
+                                        i = j;
+                                        break;
+                                    }
+                                }
                             }
                             else
                             {
-                                if (input[j - 1] != '\\')
+                                //if (input[j - 1] != '\\')
+                                //{
+                                //    // end of the string
+                                //    i = j;
+                                //    break;
+                                //}
+
+                                if (inlit)
                                 {
-                                    // end of the string
+                                    if (j < c - 1)
+                                    {
+                                        if (input[j + 1] == '\"')
+                                        {
+                                            j++;
+                                            continue;
+                                        }
+                                    }
+
                                     i = j;
                                     break;
                                 }
+                                else
+                                {
+                                    i = j;
+                                    break;
+                                }
+
                             }
                         }
                     }
@@ -805,7 +885,7 @@ namespace DataTools.CSTools
 
                                     break;
                                 }
-                                
+
                             }
                         }
                     }
@@ -821,7 +901,6 @@ namespace DataTools.CSTools
             return markers;
 
         }
-
     }
 
     //public class SyntaxErrorException : Exception

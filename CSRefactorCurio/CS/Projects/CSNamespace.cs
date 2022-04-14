@@ -1,5 +1,6 @@
 ﻿using DataTools.CSTools;
 using DataTools.Observable;
+using DataTools.SortedLists;
 
 using System;
 using System.Collections.Generic;
@@ -78,6 +79,8 @@ namespace DataTools.CSTools
                     {
                         lvn.Children.Add(vns);
                         lvn.Namespaces.Add(vns);
+
+                        lvn.Sort();
                     }
 
                     namespaces.Add(sb.ToString(), vns);
@@ -87,6 +90,29 @@ namespace DataTools.CSTools
             }
 
             return lvn;
+        }
+
+        public void Sort(bool descending = false)
+        {
+            var m = descending ? -1 : 1;    
+
+            QuickSort.Sort(Children, (a, b) =>
+            {
+                if (a.ElementType == ElementType.Namespace && b.ElementType != ElementType.Namespace) return -1 * m;
+                else if (a.ElementType != ElementType.Namespace && b.ElementType == ElementType.Namespace) return 1 * m;
+                else return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
+            });
+
+            QuickSort.Sort(Markers, (a, b) =>
+            {
+                return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
+            });
+
+            QuickSort.Sort(Namespaces, (a, b) =>
+            {
+                return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
+            });
+
         }
 
         private static void NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces)
@@ -101,6 +127,8 @@ namespace DataTools.CSTools
                     {
                         ns.Children.Add(cls);
                         ns.Markers.Add(cls);
+
+                        ns.Sort();
                     }
                 }
             }
