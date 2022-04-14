@@ -37,41 +37,44 @@ namespace CSRefactorCurio
     termValues: new[] { "HierSingleSelectionName:^.+$" })]
     public sealed class CSRefectorCurioPackage : ToolkitPackage
     {
-        static object lockobj = new object();
+        static object syncRoot = new object();
         static CSRefectorCurioPackage _package;
-        
-        CurioExplorerViewModel _curio;
-        
+
+        EnvDTE.Solution currSln = null;
+        CurioExplorerSolution _curio;
+
+        public static object SyncRoot => syncRoot;
+
         internal static CSRefectorCurioPackage Instance
         {
             get
             {
-                lock (lockobj)
+                lock (syncRoot)
                 {
                     return _package;
                 }
             }
             private set
             {
-                lock (lockobj)
+                lock (syncRoot)
                 {
                     _package = value;
                 }
             }
         }
         
-        internal CurioExplorerViewModel CurioSolution
+        internal CurioExplorerSolution CurioSolution
         {
             get
             {
-                lock (lockobj)
+                lock (syncRoot)
                 {
                     return _curio;
                 }
             }
             private set
             {
-                lock(lockobj)
+                lock(syncRoot)
                 {
                     _curio = value;
                 }
@@ -83,7 +86,8 @@ namespace CSRefactorCurio
        
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            CurioSolution = new CurioExplorerViewModel();
+
+            CurioSolution = new CurioExplorerSolution();
             Instance = this;
 
             await this.RegisterCommandsAsync();
@@ -98,103 +102,46 @@ namespace CSRefactorCurio
                 LoadProject();
             }
 
-            dte.Events.SolutionEvents.Opened += SolutionEvents_Opened;
-            dte.Events.SolutionEvents.BeforeClosing += SolutionEvents_BeforeClosing;
-            dte.Events.SolutionItemsEvents.ItemAdded += SolutionItemsEvents_ItemAdded;
-            dte.Events.SolutionItemsEvents.ItemRenamed += SolutionItemsEvents_ItemRenamed;
-            dte.Events.SolutionItemsEvents.ItemRemoved += SolutionItemsEvents_ItemRemoved;
-            dte.Events.DocumentEvents.DocumentSaved += DocumentEvents_DocumentSaved;
-        }
-
-        private void DocumentEvents_DocumentSaved(EnvDTE.Document Document)
-        {
-        }
-
-        private void SolutionItemsEvents_ItemRemoved(EnvDTE.ProjectItem ProjectItem)
-        {
-            LoadProject();
-        }
-
-        private void SolutionItemsEvents_ItemRenamed(EnvDTE.ProjectItem ProjectItem, string OldName)
-        {
-            LoadProject();
-        }
-
-        private void SolutionItemsEvents_ItemAdded(EnvDTE.ProjectItem ProjectItem)
-        {
-            LoadProject();
+            await base.InitializeAsync(cancellationToken, progress);
         }
 
         protected override async Task OnAfterPackageLoadedAsync(CancellationToken cancellationToken)
         {
+            Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += SolutionEvents_OnAfterOpenSolution;
+            Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnBeforeCloseSolution += SolutionEvents_OnBeforeCloseSolution;
+            
             await base.OnAfterPackageLoadedAsync(cancellationToken);
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
-            if (dte.Solution is object && dte.Solution.IsOpen)
-            {
-                LoadProject();
-            }
         }
 
-        EnvDTE.Solution currSln = null;
-        
-        public async Task RefreshProjectAsync(bool reload = true)
+        private void SolutionEvents_OnAfterOpenSolution(object sender, OpenSolutionEventArgs e)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
-            if (!reload && dte.Solution == currSln) return;
-            currSln = (EnvDTE.Solution)dte.Solution;
-
-            CurioSolution.Projects.Clear();
-            CurioSolution.Solution = currSln;
-
-            foreach (EnvDTE.Project item in (IEnumerable)dte.Solution.Projects)
-            {
-                if (item.FullName.ToLower().EndsWith(".csproj"))
-                {
-                    CurioSolution.Projects.Add(new CurioProject(item.FullName, item));
-                }
-            }
-
-            //var ctrl = FindToolWindow();
-            //if (ctrl != null) ctrl.DataContext = CurioSolution;
+            LoadProject();
         }
 
-        private void LoadProject()
-        {            
-            _ = RefreshProjectAsync(false);
-        }
-
-        private void SolutionEvents_BeforeClosing()
+        private void SolutionEvents_OnBeforeCloseSolution(object sender, EventArgs e)
         {
             currSln = null;
             CurioSolution.Projects.Clear();
         }
 
-        private void SolutionEvents_Opened()
+        public async Task RefreshSolutionAsync(bool reload = true)
         {
-            LoadProject();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            lock (syncRoot)
+            {
+                EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+                if (!reload && dte.Solution == currSln) return;
+                currSln = (EnvDTE.Solution)dte.Solution;
+               
+                CurioSolution.LoadFromDTE(dte);
+            }
         }
 
-        //CurioExplorer FindToolWindow()
-        //{
-        //    try
-        //    {
-        //        var twp = (CurioExplorerToolWindow.Pane)FindToolWindow(typeof(CurioExplorerToolWindow.Pane), 0, true);
-
-        //        var ctrl = twp.Content as CurioExplorer;
-        //        return ctrl;
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-        //}
-
-
+        private void LoadProject()
+        {            
+            _ = RefreshSolutionAsync(false);
+        }
     }
 }

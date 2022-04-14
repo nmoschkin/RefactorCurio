@@ -1,18 +1,13 @@
 ﻿
 using CSRefactorCurio;
 
-using DataTools.CSTools;
 using DataTools.Desktop;
 using DataTools.Observable;
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace DataTools.CSTools
@@ -20,8 +15,10 @@ namespace DataTools.CSTools
 
     public enum ElementType
     {
+        SolutionFolder,
         Project,
         Directory,
+        Namespace,
         File,
         Marker
     }
@@ -35,7 +32,6 @@ namespace DataTools.CSTools
 
     }
 
-
     public interface IProjectNode : IProjectElement
     {
         ObservableCollection<IProjectElement> Children { get; }
@@ -48,11 +44,43 @@ namespace DataTools.CSTools
         IPropertiesContainer Properties { get; }
     }
 
-    public class CurioProject : ObservableBase, IProjectHost
+    public class SolutionFolder : ObservableBase, IProjectNode
+    {
+        private string title;
+        
+        private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
+        
+        public SolutionFolder(string title)
+        {
+            this.title = title;
+        }
+
+        public ObservableCollection<IProjectElement> Children
+        {
+            get => children;
+            protected set
+            {
+                SetProperty(ref children, value);
+            }
+        }
+
+        public string Title
+        {
+            get => title;
+            protected set
+            {
+                SetProperty(ref title, value);
+            }
+        }
+
+        public ElementType ElementType => ElementType.SolutionFolder;
+    }
+
+    public class CurioProject : ObservableBase, IProjectHost, IDisposable
     {
         private string projectRoot = "";
         private string projectFile = "";
-        
+
         private EnvDTE.Project _project;
         private PropertiesContainer properties;
         private FSMonitor monitor;
@@ -154,11 +182,11 @@ namespace DataTools.CSTools
             var frame = xml.GetElementsByTagName("TargetFrameworkVersion");
             if (frame != null && frame.Count > 0)
             {
-                isframe = true;  
+                isframe = true;
             }
 
             var compiles = xml.GetElementsByTagName("Compile");
-            
+
             var incs = new List<string>();
             var excs = new List<string>();
 
@@ -212,29 +240,33 @@ namespace DataTools.CSTools
 
         public CurioProject(string filename, EnvDTE.Project nativeProject)
         {
-            _project = nativeProject;            
+            _project = nativeProject;
             PopulateProjectProperties();
 
             if (filename == null || !File.Exists(filename)) throw new FileNotFoundException();
 
             ProjectRoot = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "");
             ProjectFile = Path.GetFileName(filename);
+            
+            monitor = new FSMonitor(ProjectRoot, nativeProject.DTE.MainWindow.HWnd);
 
-            monitor = new FSMonitor(ProjectRoot);
             monitor.WatchNotifyChange += Monitor_WatchNotifyChange;
 
             ReloadProject();
             monitor.Watch();
         }
 
-        ~CurioProject()
-        {
-            monitor.Dispose();
-        }
-
         private void Monitor_WatchNotifyChange(object sender, FSMonitorEventArgs e)
-        {            
-            ReloadProject();
+        {
+            var efn = e.Info.Filename.ToLower();
+            if (efn.EndsWith(".csproj"))
+            {
+                ReloadProject();
+            }
+            else if (efn.EndsWith(".cs"))
+            {
+                RootFolder.ProcessChangeEvent(e.Info);
+            }
         }
 
         public ElementType ElementType => ElementType.Project;
@@ -244,5 +276,18 @@ namespace DataTools.CSTools
             return Title;
         }
 
+        public void Dispose()
+        {
+            ((IDisposable)monitor).Dispose();
+            monitor = null; 
+        }
+
+        ~CurioProject()
+        {
+            monitor?.Dispose();
+        }
+
     }
+
+
 }

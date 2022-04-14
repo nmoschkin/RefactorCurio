@@ -52,7 +52,7 @@ namespace DataTools.CSTools
 
     }
 
-    public class MarkerFile
+    public class RenderedFile
     {
         public int PreambleBegin { get; set; }
 
@@ -68,7 +68,7 @@ namespace DataTools.CSTools
 
     public class Marker
     {
-        public MarkerFile File { get; set; }
+        public RenderedFile RenderedFile { get; set; }
 
         public int StartLine { get; set; }
 
@@ -114,7 +114,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public static OutputFile NewFile(string path, MarkerFile file, string[] lines, bool sepDirs, CSCodeParser parser = null)
+        public static OutputFile NewFile(string path, RenderedFile file, string[] lines, bool sepDirs, CSCodeParser parser = null)
         {
             return NewFile(path, file.Markers[0].Kind, file.Markers[0].Name, FormatOutputText(file.Markers, lines, file.PreambleEnd, file.PreambleBegin), sepDirs, parser);
         }
@@ -246,8 +246,8 @@ namespace DataTools.CSTools
 
         protected int preambleTo = 0;
 
-        protected List<Marker> markers = null;
-        protected MarkerFile mfile = null;
+        protected List<Marker> markers = new List<Marker>();
+        protected RenderedFile mfile = null;
 
         protected List<string> lastErrors = new List<string>();
 
@@ -291,6 +291,11 @@ namespace DataTools.CSTools
             OutputPath = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "\\");
 
             Parse(File.ReadAllText(filename));
+        }
+
+        public void Refresh()
+        {
+            Parse(File.ReadAllText(Filename));
         }
 
         protected CSCodeParser()
@@ -371,7 +376,7 @@ namespace DataTools.CSTools
 
                 if (mlist.Count == 0) continue;
                 seen.AddRange(mlist);
-                var mf = new MarkerFile()
+                var mf = new RenderedFile()
                 {
                     Lines = mfile.Lines,
                     Markers = mlist,
@@ -395,6 +400,11 @@ namespace DataTools.CSTools
 
         public virtual string[] Lines => lines;
 
+        public override string ToString()
+        {
+            return Filename;
+        }
+
         protected virtual bool Parse(string text)
         {
             ParseSuccess = false;
@@ -406,18 +416,18 @@ namespace DataTools.CSTools
             {
                 markers = ParseCSCodeFile(text);
 
-                var cf = new MarkerFile()
+                var cf = new RenderedFile()
                 {
                     PreambleBegin = 0,
                     PreambleEnd = preambleTo,
-                    Markers = markers
+                    Markers = markers ?? new List<Marker>()
                 };
 
                 mfile = cf;
 
                 foreach (var marker in markers)
                 {
-                    marker.File = cf;
+                    marker.RenderedFile = cf;
                 }
 
                 ParseSuccess = true;

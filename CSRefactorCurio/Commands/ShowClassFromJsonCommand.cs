@@ -41,7 +41,7 @@ namespace CSRefactorCurio
 
             if (CSRefectorCurioPackage.Instance.CurioSolution.Solution == null)
             {
-                await CSRefectorCurioPackage.Instance.RefreshProjectAsync(true);
+                await CSRefectorCurioPackage.Instance.RefreshSolutionAsync(true);
             }
 
             var dte = (EnvDTE.DTE)ToolkitPackage.GetGlobalService(typeof(EnvDTE.DTE));
@@ -71,7 +71,7 @@ namespace CSRefactorCurio
             CurioProject testproj = null;
 
             if (proj != null)
-                testproj = CSRefectorCurioPackage.Instance.CurioSolution.Projects.Where((p) => p.NativeProject.Equals(proj)).FirstOrDefault();
+                testproj = (CurioProject)CSRefectorCurioPackage.Instance.CurioSolution.Projects.Where((p) => ((CurioProject)p).NativeProject.Equals(proj)).FirstOrDefault();
 
             JsonOptionsDialog dlg;
             

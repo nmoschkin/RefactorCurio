@@ -101,7 +101,7 @@ namespace CSRefactorCurio.ViewModels
         {
             foreach (var p in CSRefectorCurioPackage.Instance.CurioSolution.Projects)
             {
-                projects.Add(p);
+                projects.Add((CurioProject)p);
             }
 
             okCommand = new OwnedCommand(this, (o) =>

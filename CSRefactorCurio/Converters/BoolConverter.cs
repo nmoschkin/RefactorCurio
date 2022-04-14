@@ -146,7 +146,48 @@ namespace CSRefactorCurio.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            switch (Mode)
+            {
+                case BoolConverterModes.InverseBool:
+                    if (value is bool b) return !b;
+                    else throw new InvalidCastException();
+
+                case BoolConverterModes.Visibility:
+
+                    if (value is Visibility b2)
+                    {
+                        if (b2 == Visibility.Visible)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    break;
+
+                case BoolConverterModes.InverseVisibility:
+
+                    if (value is Visibility b3)
+                    {
+                        if (b3 == HiddenVisibility)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    break;
+
+                default:
+                    return false;
+
+            }
+
+            return false;
         }
     }
 }

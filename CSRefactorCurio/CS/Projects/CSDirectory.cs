@@ -1,7 +1,9 @@
 ﻿
 using DataTools.CSTools;
+using DataTools.Desktop;
 using DataTools.MathTools;
 using DataTools.Observable;
+using DataTools.SortedLists;
 
 using System;
 using System.Collections.Generic;
@@ -39,6 +41,31 @@ namespace DataTools.CSTools
         {
             get => children;
             private set => children = value; 
+        }
+
+        public string Rename(string newName)
+        {
+            var oldname = Filename;
+
+            if (File.Exists(Filename))
+            {
+                try
+                {
+                    File.Move(Filename, newName);
+                    Filename = System.IO.Path.GetFullPath(newName);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            return oldname;
+        }
+
+        internal void RenameEvent(string newName)
+        {
+            Filename = newName;
         }
 
         public string Title
@@ -79,17 +106,31 @@ namespace DataTools.CSTools
             return cf;
         }
 
+        public void AddMarker(CSMarker marker)
+        {
+            if (!children.Contains(marker)) children.Add(marker);
+            if (!markers.Contains(marker)) markers.Add(marker);
+        }
+
+        public bool RemoveMarker(CSMarker marker)
+        {
+            return markers.Remove(marker) || children.Remove(marker);
+        }
+
         protected override bool Parse(string text)
         {
             children.Clear();
             if (base.Parse(text) && markers != null)
             {
-                foreach(var marker in markers)
+                int i, c = markers.Count;
+                for (i = 0; i < c; i++)
                 {
+                    var marker = markers[i];    
                     var mnew = new CSMarker();
                     ObjectMerge.MergeObjects(marker, mnew);
 
                     children.Add(mnew);
+                    markers[i] = mnew;
                 }
 
                 return true;
@@ -236,23 +277,150 @@ namespace DataTools.CSTools
             return ns.Distinct().ToList();
         }
 
-        public CSDirectory FindDirectory(string path)
+        public bool RemovePath(string path)
         {
-
-            var fp = System.IO.Path.GetFullPath(path).ToLower();
-
-            if (path.ToLower() == fp) return this;
-
-            foreach (var item in Directories)
+            var obj = Find(path);
+            if (obj is IProjectElement e)
             {
-                var result = item.FindDirectory(path);
-                if (result != null) return result;
+                return Remove(e);
+            }
+
+            return false;
+        }
+
+        public bool Remove(IProjectElement item)
+        {
+            if (item is IProjectNode node)
+            {
+                if (children.Contains(node))
+                {
+                    children.Remove(node);
+                    if (node is CSDirectory dir)
+                    {
+                        directories.Remove(dir);
+                    }                    
+                    else if (node is CSCodeFile file)
+                    {
+                        files.Remove(file);
+                    }
+
+                    return true;
+                }
+
+                foreach (var dir in directories)
+                {
+                    if (dir.Remove(item)) return true;
+                }
+            }
+            else if (item is CSMarker child)
+            {
+                foreach (IProjectNode pnode in children)
+                {
+                    if (pnode.Children.Contains(item))
+                    {
+                        if (pnode is CSCodeFile file)
+                        {
+                            file.RemoveMarker(child);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public void ProcessChangeEvent(FileNotifyInfo info)
+        {
+            switch (info.Action)
+            {
+                case FileActions.Added:
+                    Find(info.Filename, true);
+                    break;
+
+                case FileActions.Removed:
+                    RemovePath(info.Filename);
+                    break;
+
+                case FileActions.RenamedOldName:
+                    var obj = Find(info.Filename);
+                    if (obj != null)
+                    {
+                        if (obj is CSCodeFile file)
+                        {
+                            file.RenameEvent(info.NewName);
+                        }
+                        else if (obj is CSDirectory dir)
+                        {
+                            dir.path = info.NewName;
+                        }
+                    }
+                    break;
+
+                case FileActions.Modified:
+                    var fobj = FindFile(info.Filename);
+                    if (fobj != null)
+                    {
+                        fobj.Refresh();
+                    }
+                    break;
+
+            }
+        }
+
+        public IProjectElement Find(string path, bool create = false)
+        {
+            if (Directory.Exists(path))
+            {
+                return FindDirectory(path, create);
+            }
+            else if (File.Exists(path))
+            {
+                return FindFile(path, create);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public CSDirectory FindDirectory(string path, bool create = false)
+        {
+            var fp = System.IO.Path.GetFullPath(path).ToLower();
+            var mp = this.path.ToLower();
+
+            if (mp == fp) return this;
+
+            if (fp.StartsWith(mp))
+            {
+                foreach (var item in Directories)
+                {
+                    var result = item.FindDirectory(path);
+                    if (result != null) return result;
+                }
+
+                if (create)
+                {
+                    var tp = path.Substring(mp.Length);
+                    if (!tp.Contains(System.IO.Path.DirectorySeparatorChar))
+                    {
+                        var newdir = new CSDirectory(Project, path, this);
+                        
+                        directories.Add(newdir);
+                        children.Add(newdir);
+
+                        Sort();
+
+                        return newdir;
+                    }
+                }
+
             }
 
             return null;
         }
 
-        public CSCodeFile FindFile(string filename)
+        public CSCodeFile FindFile(string filename, bool create = false)
         {
             var fp = System.IO.Path.GetFullPath(filename).ToLower();
 
@@ -266,11 +434,20 @@ namespace DataTools.CSTools
                     var fnpart2 = System.IO.Path.GetFileName(file.Filename).ToLower();
                     if (fnpart2 == fnpart) return file;
                 }
+
+                if (create)
+                {
+                    var csnew = CSCodeFile.LoadFromFile(filename);                    
+                    files.Add(csnew);
+                    children.Add(csnew);
+
+                    Sort();
+                    return csnew;
+                }
             }
 
             foreach (var dir in Directories)
             {
-
                 var cf = dir.FindFile(filename);
                 if (cf != null) return cf;  
             }
@@ -347,15 +524,38 @@ namespace DataTools.CSTools
 
             Children.Clear();
 
+            foreach (var item2 in outdirs)
+            {
+                Children.Add(item2);
+            }
+
             foreach (var item1 in outfiles)
             {
                 Children.Add(item1);
             }
 
-            foreach (var item2 in outdirs)
+        }
+
+        public void Sort(bool descending = false)
+        {
+            var m = descending ? -1 : 1;
+
+            QuickSort.Sort(children, (a, b) =>
             {
-                Children.Add(item2);
-            }
+                if (a.ElementType == ElementType.Directory && b.ElementType != ElementType.Directory) return -1 * m;
+                else if (a.ElementType != ElementType.Directory && b.ElementType == ElementType.Directory) return 1 * m;
+                else return string.Compare(a.Title, b.Title) * m;
+            });
+
+            QuickSort.Sort(directories, (a, b) =>
+            {
+                return string.Compare(a.Title, b.Title);
+            });
+
+            QuickSort.Sort(files, (a, b) =>
+            {
+                return string.Compare(a.Title, b.Title);
+            });
 
         }
 
@@ -377,6 +577,11 @@ namespace DataTools.CSTools
 
             namespaces = p;
             OnPropertyChanged(nameof(Namespaces));
+        }
+
+        public override string ToString()
+        {
+            return Title;
         }
 
     }

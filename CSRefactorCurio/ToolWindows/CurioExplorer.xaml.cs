@@ -8,7 +8,11 @@ namespace CSRefactorCurio
         public CurioExplorer()
         {
             InitializeComponent();
-            DataContext = CSRefectorCurioPackage.Instance.CurioSolution;
+
+            lock (CSRefectorCurioPackage.SyncRoot)
+            {
+                DataContext = CSRefectorCurioPackage.Instance.CurioSolution;
+            }
         }
 
     }
