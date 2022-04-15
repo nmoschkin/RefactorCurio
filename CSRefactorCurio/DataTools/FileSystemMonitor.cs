@@ -401,7 +401,7 @@ namespace DataTools.Desktop
             {
                 if (ptr == IntPtr.Zero)
                     return 0;
-                return ptr.IntAt(2L);
+                return ptr.IntAt(2L) / 2;
             }
         }
 
@@ -417,7 +417,7 @@ namespace DataTools.Desktop
             {
                 if (ptr == IntPtr.Zero || FilenameLength == 0)
                     return null;
-                return ptr.GetString(12L, FilenameLength);
+                return ptr.GetString(12L);
             }
         }
 

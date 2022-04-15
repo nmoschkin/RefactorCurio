@@ -1,23 +1,21 @@
 ﻿// ************************************************* ''
-// DataTools C# Native Utility Library For Windows 
+// DataTools C# Native Utility Library For Windows
 // Adapted for C#/Xamarin
 //
 // Module: TextTools
 //         Text processing and managling library.
-// 
+//
 // Copyright (C) 2011-2015, 2019 Nathan Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
+// Licensed Under the MIT License
 // ************************************************* ''
 
-using System;
-using System.Text;
-
-using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Reflection;
+using System.Text;
 
 namespace DataTools.Text
 {
@@ -28,7 +26,6 @@ namespace DataTools.Text
     [Flags]
     public enum MatchCondition
     {
-
         /// <summary>
         /// The match must be exact
         /// </summary>
@@ -36,7 +33,7 @@ namespace DataTools.Text
         Exact = 0x0,
 
         /// <summary>
-        /// The match must be exact up until the length of the 
+        /// The match must be exact up until the length of the
         /// requested expression (if it is shorter than the matched index)
         /// </summary>
         /// <remarks></remarks>
@@ -120,7 +117,6 @@ namespace DataTools.Text
     /// </summary>
     public static class TextTools
     {
-
         /// <summary>
         /// All allowed mathematical characters.
         /// </summary>
@@ -151,7 +147,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public const string UrlAllowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
 
-
         /// <summary>
         /// Compares a string to many other strings.
         /// </summary>
@@ -160,7 +155,6 @@ namespace DataTools.Text
         /// <returns>True if found</returns>
         public static bool MultiComp(string v, string[] comp)
         {
-
             foreach (string x in comp)
             {
                 if (x == v) return true;
@@ -177,16 +171,13 @@ namespace DataTools.Text
         /// <returns>True if found</returns>
         public static bool MultiComp(char v, char[] comp)
         {
-
             foreach (char x in comp)
             {
                 if (x == v) return true;
             }
 
-
             return false;
         }
-
 
         /// <summary>
         /// Trim all public, writable, instance string properties in a class object.
@@ -195,9 +186,7 @@ namespace DataTools.Text
         /// <param name="trimChars">Optional trim characters</param>
         public static void ClassTrimTool(object obj, char[] trimChars = null)
         {
-
             if (obj == null || obj.GetType().IsClass == false) throw new ArgumentException();
-
 
             PropertyInfo[] props = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
 
@@ -240,7 +229,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string[] Split(string Scan, string Separator, bool SkipQuote = false, bool Unescape = false, char QuoteChar = '"', char EscapeChar = '\\', bool Unquote = false, bool WithToken = false, bool WithTokenIn = false)
         {
-
             int i = 0;
             int f = 0;
 
@@ -324,10 +312,8 @@ namespace DataTools.Text
 
                         if (chrs[i] == sep[f])
                             i++;
-
                         else break;
                     }
-
 
                     if (f == e + 1)
                     {
@@ -351,7 +337,6 @@ namespace DataTools.Text
 
                         d++;
                         i--;
-
                     }
                     else
                     {
@@ -366,7 +351,6 @@ namespace DataTools.Text
                     chOut[g] = chrs[i];
                     g++;
                 }
-
             }
 
             if (g != 0)
@@ -385,7 +369,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static bool IsAllNumbers(string value)
         {
-
             char[] ch = value.ToCharArray();
             int i, c = ch.Length - 1;
 
@@ -470,7 +453,6 @@ namespace DataTools.Text
 
             for (i = 0; i <= j; i++)
             {
-
                 if ((i == 0) && (modifiers & (NoSpaceModifiers.FirstToLower | NoSpaceModifiers.FirstToUpper)) != 0 && (exclusions.IndexOf(subject[i]) == -1))
                 {
                     switch (modifiers)
@@ -479,12 +461,12 @@ namespace DataTools.Text
                             ch[e] = char.ToUpper(subject[i]);
 
                             break;
+
                         case NoSpaceModifiers.FirstToLower:
                             ch[e] = char.ToLower(subject[i]);
 
                             break;
                     }
-
                 }
 
                 if (exclusions.IndexOf(subject[i]) != -1)
@@ -530,11 +512,9 @@ namespace DataTools.Text
                     ch[e] = subject[i];
                     e += 1;
                 }
-
             }
 
             return new string(ch);
-
         }
 
         /// <summary>
@@ -603,7 +583,7 @@ namespace DataTools.Text
         /// <param name="currStr">The current string that has been assembled so far.</param>
         /// <param name="currPos">The current position in the string that we have assembled so far.</param>
         /// <returns>An integer value indicating the state of the search:<br />
-        /// <br />0 - The string is not matched, and the string cannot be built from the combination of characters that have been passed. 
+        /// <br />0 - The string is not matched, and the string cannot be built from the combination of characters that have been passed.
         /// <br />1 - The string is matched, but not yet complete.
         /// <br />2 - The string is completely matched.
         /// </returns>
@@ -655,7 +635,6 @@ namespace DataTools.Text
                     return 1;
                 }
             }
-
         }
 
         /// <summary>
@@ -703,7 +682,7 @@ namespace DataTools.Text
 
                     if (!string.IsNullOrEmpty(qs))
                     {
-                        sb.Append(qs);  
+                        sb.Append(qs);
                     }
                     if (qstart != null && qstop != null)
                     {
@@ -715,7 +694,7 @@ namespace DataTools.Text
                         break;
                     }
                 }
-                else 
+                else
                 {
                     s1test = RunBy(start, c, ref rb1Str, ref rb1Pos);
 
@@ -739,7 +718,7 @@ namespace DataTools.Text
                         level++;
                         continue;
                     }
-                    else 
+                    else
                     {
                         s2test = RunBy(stop, c, ref rb2Str, ref rb2Pos);
 
@@ -748,7 +727,6 @@ namespace DataTools.Text
                             level--;
                             if (level == 0)
                             {
-
                                 idxStop = i;
                                 //if (withDelimiters)
                                 //{
@@ -785,7 +763,6 @@ namespace DataTools.Text
 
             return sb.ToString();
         }
-
 
         /// <summary>
         /// Finds the text between two characters.
@@ -840,7 +817,7 @@ namespace DataTools.Text
                         break;
                     }
                 }
-                else 
+                else
                 {
                     if (c == start)
                     {
@@ -864,7 +841,7 @@ namespace DataTools.Text
                         }
                     }
                 }
-                
+
                 if (inSpan)
                 {
                     sb.Append(c);
@@ -888,6 +865,193 @@ namespace DataTools.Text
         /// <summary>
         /// Function to retrieve a quote from a string of data.
         /// </summary>
+        /// <param name="input">The string characters to scan.</param>
+        /// <param name="index">The position to begin scanning.</param>
+        /// <param name="startPos">
+        /// The returned start position of the quoted string.<br/><br />
+        /// if <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately after the quote character.
+        /// </param>
+        /// <param name="endPos">
+        /// The returned end position of the quoted string.<br/><br />
+        /// If <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately before the quote character.
+        /// </param>
+        /// <param name="interpolationChar">The character that denotes the start of an interpolated string (usually '$')</param>
+        /// <param name="literalChar">>The character that denotes the start of a literal string (usually '@')</param>
+        /// <param name="interpolationBegin">The character the signals the start of code inside of an interpolated string.</param>
+        /// <param name="interpolationEnd">The character the signals the end of code inside of an interpolated string.</param>
+        /// <param name="quoteChar">The quote character to use.</param>
+        /// <param name="escChar">The escape character to use.</param>
+        /// <param name="withQuotes">Return the string in quotes.</param>
+        /// <param name="throwException">True to throw a <see cref="SyntaxErrorException"/> if an unterminated quoted string is found.</param>
+        /// <returns>The requested string, or an empty string if no string is found.</returns>
+        /// <remarks>
+        /// The quote character must be: exactly one before, exactly at, or anywhere after the location specified by 'index'.<br /><br />
+        /// Any text outside of the first discovered quoted string is discarded.<br /><br />
+        /// If <paramref name="withQuotes"/> is true, then the escape characters are returned, verbatim. Otherwise, they are discarded.
+        /// </remarks>
+        /// <exception cref="SyntaxErrorException">If <paramref name="throwException"/> is true, then this error is thrown if the quoted string is unterminated.</exception>
+        ///
+        public static string QuoteFromHere(char[] input, int index, ref int line, out int? startPos, out int? endPos, char interpolationChar, char literalChar, char interpolationBegin, char interpolationEnd, char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
+        {
+            int i = index, c = input.Length;
+            var sb = new StringBuilder();
+
+            startPos = null;
+            endPos = null;
+
+            while (i < c && input[i] != quoteChar)
+            {
+                i++;
+            }
+
+            if (i >= c)
+            {
+                return null;
+            }
+
+            if (input[i] == quoteChar)
+            {
+                startPos = i;
+                if (withQuotes) sb.Append(input[i]);
+
+                if (i > c - 1)
+                {
+                    if (throwException)
+                        throw new SyntaxErrorException("Quote at end of file.");
+                    else return null;
+                }
+
+                bool inLiteral = false;
+                bool inInterpolation = false;
+                int interpolationLevel = 0;
+
+                List<bool> quoteOpen = null;
+                List<bool> interpolationLiteral = null;
+
+                if (i > 0 && input[i - 1] == literalChar) inLiteral = true;
+                if (i > 0 && input[i - 1] == interpolationChar)
+                {
+                    inInterpolation = true;
+                    quoteOpen = new List<bool>();
+                    interpolationLiteral = new List<bool>();
+                    quoteOpen.Add(true);
+                    interpolationLiteral.Add(false);
+                }
+
+                for (int j = i + 1; j < c; j++)
+                {
+                    sb.Append(input[j]);
+
+                    if (inInterpolation && input[j] == interpolationBegin)
+                    {
+                        interpolationLevel++;
+                        quoteOpen.Add(false);
+                        interpolationLiteral.Add(false);
+                    }
+                    else if (inInterpolation && input[j] == interpolationEnd)
+                    {
+                        if (!quoteOpen[interpolationLevel])
+                        {
+                            quoteOpen.RemoveAt(interpolationLevel);
+                            interpolationLiteral.RemoveAt(interpolationLevel);
+
+                            interpolationLevel--;
+                        }
+                    }
+                    else if (input[j] == '\n')
+                    {
+                        int oline = line;
+
+                        line++;
+                        j++;
+                        if (j < c) sb.Append(input[j]);
+
+                        continue;
+                    }
+                    if (!inLiteral && input[j] == escChar)
+                    {
+                        if (inInterpolation)
+                        {
+                            if (quoteOpen[interpolationLevel])
+                            {
+                                j++;
+                                if (j < c) sb.Append(input[j]);
+
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            j++;
+                            if (j < c) sb.Append(input[j]);
+
+                            continue;
+                        }
+                    }
+                    else if (input[j] == quoteChar)
+                    {
+                        if (inInterpolation)
+                        {
+                            if (interpolationLiteral[interpolationLevel] && j < c - 1)
+                            {
+                                if (input[j + 1] == quoteChar)
+                                {
+                                    j++;
+                                    if (j < c) sb.Append(input[j]);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                quoteOpen[interpolationLevel] = !quoteOpen[interpolationLevel];
+                                if (quoteOpen[0] == false)
+                                {
+                                    i = j;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (inLiteral)
+                            {
+                                if (j < c - 1)
+                                {
+                                    if (input[j + 1] == quoteChar)
+                                    {
+                                        j++;
+                                        if (j < c) sb.Append(input[j]);
+                                        continue;
+                                    }
+                                }
+
+                                i = j;
+                                break;
+                            }
+                            else
+                            {
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (i < c)
+                {
+                    endPos = i;
+                    if (!withQuotes) sb.Remove(sb.Length - 1, 1);
+
+                    return sb.ToString();
+                }
+            }
+            
+            return null;
+        }
+
+        /// <summary>
+        /// Function to retrieve a quote from a string of data.
+        /// </summary>
         /// <param name="value">The string to scan.</param>
         /// <param name="index">The position to begin scanning.</param>
         /// <param name="startPos">
@@ -896,7 +1060,7 @@ namespace DataTools.Text
         /// </param>
         /// <param name="endPos">
         /// The returned end position of the quoted string.<br/><br />
-        /// If <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately before the quote character. 
+        /// If <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately before the quote character.
         /// </param>
         /// <param name="quoteChar">The quote character to use.</param>
         /// <param name="escChar">The escape character to use.</param>
@@ -909,7 +1073,7 @@ namespace DataTools.Text
         /// If <paramref name="withQuotes"/> is true, then the escape characters are returned, verbatim. Otherwise, they are discarded.
         /// </remarks>
         /// <exception cref="SyntaxErrorException">If <paramref name="throwException"/> is true, then this error is thrown if the quoted string is unterminated.</exception>
-        /// 
+        ///
         public static string QuoteFromHere(string value, int index, out int? startPos, out int? endPos, char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
         {
             char[] buffIn = value.ToCharArray();
@@ -943,7 +1107,7 @@ namespace DataTools.Text
                 else
                 {
                     if (i < c - 1)
-                    {                        
+                    {
                         if ((buffIn[i] == escChar) && (buffIn[i + 1] == quoteChar))
                         {
                             if (withQuotes) sb.Append(escChar);
@@ -979,7 +1143,6 @@ namespace DataTools.Text
 
                     sb.Append(buffIn[i]);
                 }
-
             }
 
             if (throwException && startPos != null && endPos == null)
@@ -1056,7 +1219,6 @@ namespace DataTools.Text
         {
             // ERROR: Not supported in C#: OnErrorStatement
 
-
             // as efficiently as possible
             char[] c = null;
             int a = 0;
@@ -1082,10 +1244,8 @@ namespace DataTools.Text
 
             d = new char[b + 1];
 
-
             for (a = 0; a <= b; a++)
             {
-
                 if ((RemoveComments == true))
                 {
                     j = cmt.Length - 1;
@@ -1150,12 +1310,10 @@ namespace DataTools.Text
                         }
                     }
                 }
-
             }
 
             Array.Resize(ref d, p);
             return new string(d);
-
         }
 
         public static string JustNumbers(string value, bool justDigits = false)
@@ -1227,7 +1385,6 @@ namespace DataTools.Text
                     }
                 }
 
-
                 if (t)
                 {
                     if (scan.IndexOf(sn[i]) >= 0)
@@ -1281,7 +1438,7 @@ namespace DataTools.Text
         {
             var chars = value.ToCharArray();
             var sb = new StringBuilder();
-            
+
             foreach (var ch in chars)
             {
                 if (char.IsDigit(ch))
@@ -1300,14 +1457,14 @@ namespace DataTools.Text
         /// <returns>An numeric primitive (either a Long or a Double).</returns>
         /// <remarks></remarks>
         public static double? FVal(string value)
-        {            
+        {
             double o;
 
             value = value.Trim();
             if (value.Contains(" "))
             {
                 var sp = value.Split(' ');
-                value = sp[0];  
+                value = sp[0];
             }
 
             if (value.Length < 2)
@@ -1358,9 +1515,7 @@ namespace DataTools.Text
                 return (double)o;
 
             return null;
-
         }
-
 
         /// <summary>
         /// Escape text for use in a CSV file.
@@ -1383,7 +1538,6 @@ namespace DataTools.Text
             {
                 switch (b[i])
                 {
-
                     case '\"':
                         sb.Append("\"\"");
                         break;
@@ -1391,14 +1545,11 @@ namespace DataTools.Text
                     default:
                         sb.Append(b[i]);
                         break;
-
                 }
             }
 
             return sb.ToString();
-
         }
-
 
         /// <summary>
         /// Escape text for use in a Json file.
@@ -1408,7 +1559,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string TextEscapeJson(string s)
         {
-
             char[] b;
             int i;
 
@@ -1420,8 +1570,6 @@ namespace DataTools.Text
 
             for (i = 0; i < b.Length; i++)
             {
-
-
                 if (i < b.Length - 1)
                 {
                     if ((b[i] == '\\') && (b[i + 1] == '\"'))
@@ -1441,7 +1589,6 @@ namespace DataTools.Text
             }
 
             return sOut.ToString();
-
         }
 
         /// <summary>
@@ -1459,7 +1606,6 @@ namespace DataTools.Text
             {
                 i = subj.IndexOf(search);
                 if (i != -1) subj = subj.Replace(search, replace);
-
             } while (i != -1);
 
             return subj;
@@ -1491,11 +1637,9 @@ namespace DataTools.Text
                         sOut.Append("\r\n");
                     sOut.Append(st[l]);
                 }
-
             }
 
             return sOut.ToString();
-
         }
 
         /// <summary>
@@ -1522,7 +1666,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string OneSpace(string input, string spaceChars = " ", bool PreserveQuotedText = true, char quoteChar = '\"', char escapeChar = '\\', bool Quick = true)
         {
-
             int a = 0;
             int b = 0;
 
@@ -1583,12 +1726,10 @@ namespace DataTools.Text
                             iQ = true;
                         }
                     }
-
                 }
             }
 
             return varOut.ToString();
-
         }
 
         public static string Bracket(string szText, ref int startIndex, ref int newIndex, ref string ErrorText)
@@ -1661,9 +1802,7 @@ namespace DataTools.Text
 
                     newIndex = ch.Length;
                     return szText.Substring(startIndex);
-
                 }
-
 
                 for (n = i; n <= c; n++)
                 {
@@ -1686,7 +1825,6 @@ namespace DataTools.Text
                             break; // TODO: might not be correct. Was : Exit For
                         }
                     }
-
                 }
 
                 if (bc != 0)
@@ -1701,14 +1839,12 @@ namespace DataTools.Text
                 startIndex = i;
 
                 return sOut;
-
             }
             catch (Exception ex)
             {
                 ErrorText = ex.Message;
                 return null;
             }
-
         }
 
         /// <summary>
@@ -1723,7 +1859,6 @@ namespace DataTools.Text
             string et = null;
             int i = 0, j = 0;
             return Bracket(szText, ref i, ref j, BracketPair, ref et);
-
         }
 
         /// <summary>
@@ -1776,7 +1911,6 @@ namespace DataTools.Text
             if (NoStickyChars == null)
                 NoStickyChars = "";
 
-
             for (i = 0; i <= c; i++)
             {
                 if ((sp[i] == '\"'))
@@ -1790,10 +1924,8 @@ namespace DataTools.Text
                         inqs = !inqs;
                 }
 
-
                 if (!inq && !inqs && Operators.IndexOf(sp[i]) != -1)
                 {
-
                     if ((i > 0) && (Operators.IndexOf(sp[i - 1]) != -1) && (NoStickyChars.IndexOf(sp[i]) == -1) && (NoStickyChars.IndexOf(sp[i - 1]) == -1))
                     {
                         if ((StickyCharsRight.IndexOf(sp[i - 1]) <= -1))
@@ -1817,19 +1949,15 @@ namespace DataTools.Text
                     {
                         s += " ";
                     }
-
                 }
                 else
                 {
                     s += sp[i];
                 }
-
             }
 
             return (OneSpace(s, SepChars)).Trim();
-
         }
-
 
         /// <summary>
         /// Strips out everything else from a string and returns only the numbers.
@@ -1885,8 +2013,6 @@ namespace DataTools.Text
             return sb.ToString();
         }
 
-
-
         /// <summary>
         /// Returns all words in a string as an array of strings.
         /// </summary>
@@ -1924,7 +2050,7 @@ namespace DataTools.Text
                     if (char.IsWhiteSpace(ch))
                     {
                         //if (ch != '\r' && ch != '\n')
-                            SepChars += ch;
+                        SepChars += ch;
                     }
                 }
             }
@@ -1955,7 +2081,6 @@ namespace DataTools.Text
 
             SepChars = SepChars.Substring(1);
 
-
             for (i = 0; i <= c; i++)
             {
                 stwork = Words(stout[i], SepChars, null, SkipQuotes, Unescape, qc, ec);
@@ -1968,11 +2093,9 @@ namespace DataTools.Text
                 n = stwork2.Length;
                 Array.Resize(ref stwork2, n + stwork.Length);
                 Array.Copy(stwork, 0, stwork2, n, stwork.Length);
-
             }
 
             return stwork2;
-
         }
 
         /// <summary>
@@ -2028,7 +2151,6 @@ namespace DataTools.Text
                     xTot = 0;
 
                     continue;
-
                 }
                 else if ((xTot + st[i].Length) > Cols)
                 {
@@ -2047,7 +2169,6 @@ namespace DataTools.Text
                     xTot++;
                     sOut += " ";
                 }
-
             }
 
             return sOut;
@@ -2089,11 +2210,10 @@ namespace DataTools.Text
             {
                 return prefix + s;
             }
-
         }
 
         /// <summary>
-        /// Determines of a number can be parsed in hexadecimal 
+        /// Determines of a number can be parsed in hexadecimal
         /// (quick version, does not accept &amp;H or 0x, use IsHex() to parse those strings).
         /// </summary>
         /// <param name="input">Input string to scan.</param>
@@ -2102,7 +2222,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static bool IsHexQ(string input, ref int value)
         {
-
             string hx = "0123456789ABCDEFabcdef";
             int i = 0;
             int c = input.Length - 1;
@@ -2120,7 +2239,7 @@ namespace DataTools.Text
         }
 
         /// <summary>
-        /// Determines of a number can be parsed in hexadecimal 
+        /// Determines of a number can be parsed in hexadecimal
         /// (quick version, does not accept &amp;H or 0x, use IsHex() to parse those strings).
         /// </summary>
         /// <param name="input">Input string to scan.</param>
@@ -2141,7 +2260,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static bool IsHex(string hin, ref int value)
         {
-
             char[] b = null;
             int i = 0;
 
@@ -2159,7 +2277,6 @@ namespace DataTools.Text
             {
                 switch (b[i])
                 {
-
                     case 'a':
                     case 'A':
                     case 'b':
@@ -2198,7 +2315,6 @@ namespace DataTools.Text
             }
 
             return c;
-
         }
 
         /// <summary>
@@ -2259,7 +2375,6 @@ namespace DataTools.Text
                     {
                         iQ = true;
                     }
-
                 }
             }
 
@@ -2327,7 +2442,7 @@ namespace DataTools.Text
             bool lastWasChar = false;
 
             StringBuilder sb = new StringBuilder(c * 2);
-            
+
             for (i = 0; i < c; i++)
             {
                 if (sepBy && seps.Contains(ch[i]))
@@ -2337,7 +2452,7 @@ namespace DataTools.Text
                         lastWasSeperator = true;
                         sb.Append(sepChar);
                     }
-                    
+
                     continue;
                 }
                 else if (ch[i] == sepChar)
@@ -2347,7 +2462,7 @@ namespace DataTools.Text
                         lastWasSeperator = true;
                         sb.Append(sepChar);
                     }
-                    
+
                     continue;
                 }
 
@@ -2455,9 +2570,8 @@ namespace DataTools.Text
                                 varOut.Append(char.ToLower(input[a]));
                             else
                                 varOut.Append(char.ToUpper(input[a]));
-
                         }
-                        else 
+                        else
                         {
                             varOut.Append(char.ToLower(input[a]));
                         }
@@ -2470,7 +2584,6 @@ namespace DataTools.Text
                             iQ = true;
                         }
                     }
-
                 }
             }
 
@@ -2499,7 +2612,7 @@ namespace DataTools.Text
 
                 if (toks.Length != 4) return 0;
 
-                for (int i = 3; i >= 0; i--) 
+                for (int i = 3; i >= 0; i--)
                 {
                     output = (output << 8) | int.Parse(toks[i]);
                 }
@@ -2510,8 +2623,6 @@ namespace DataTools.Text
             {
                 return 0;
             }
-            
-
         }
 
         /// <summary>
@@ -2532,7 +2643,6 @@ namespace DataTools.Text
 
             return output;
         }
-
 
         /// <summary>
         /// Concats all strings in a string array into one string.
@@ -2557,9 +2667,7 @@ namespace DataTools.Text
             }
 
             return sb.ToString();
-
         }
-
 
         /// <summary>
         /// Filters text using odd pairs of characters, when the beginning and end bounds have different constituents.
@@ -2583,7 +2691,6 @@ namespace DataTools.Text
             bool e = false;
 
             // ERROR: Not supported in C#: OnErrorStatement
-
 
             if ((FilterPair.Length == 0))
                 FilterPair = "\"";
@@ -2655,14 +2762,11 @@ namespace DataTools.Text
                     else
                     {
                         lnOut[m] += c[i];
-
                     }
-
                 }
             }
 
             return lnOut;
-
         }
 
         /// <summary>
@@ -2782,7 +2886,6 @@ namespace DataTools.Text
             {
                 return Math.Round(fs, round) + " " + nom;
             }
-
         }
 
         /// <summary>
@@ -2842,7 +2945,6 @@ namespace DataTools.Text
                     nom = "b/s";
                     // wow.
                 }
-
             }
             else
             {
@@ -2888,7 +2990,6 @@ namespace DataTools.Text
                     nom = "b/s";
                     // wow.
                 }
-
             }
 
             if (format != null)
@@ -2899,7 +3000,6 @@ namespace DataTools.Text
             {
                 return System.Math.Round(fs, 2) + " " + nom;
             }
-
         }
 
         /// <summary>
@@ -2910,7 +3010,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string UrlEncode(string input)
         {
-
             char[] chrs = input.ToCharArray();
             byte[] asc = null;
             string sOut = "";
@@ -2919,7 +3018,6 @@ namespace DataTools.Text
             int c = 0;
 
             c = chrs.Length - 1;
-
 
             for (i = 0; i <= c; i++)
             {
@@ -2939,7 +3037,6 @@ namespace DataTools.Text
             }
 
             return sOut;
-
         }
 
         /// <summary>
@@ -2950,7 +3047,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string UrlDecode(string input)
         {
-
             if (input.IndexOf("%") == -1)
                 return input;
 
@@ -2995,8 +3091,6 @@ namespace DataTools.Text
             bool flags = false;
             if (hfta != null) flags = true;
 
-            
-
             if (flags)
             {
                 var sb = new StringBuilder();
@@ -3005,7 +3099,7 @@ namespace DataTools.Text
                 foreach (var f in fs)
                 {
                     var x = (T)f.GetValue(null);
-                    
+
                     if (x.GetHashCode() == 0) continue;
 
                     if (val.HasFlag(x))
@@ -3022,12 +3116,10 @@ namespace DataTools.Text
                         {
                             sb.Append(x.ToString());
                         }
-
                     }
                 }
 
                 return sb.ToString();
-
             }
             else
             {
@@ -3049,12 +3141,10 @@ namespace DataTools.Text
                     }
                 }
             }
-            
+
             return val.ToString();
-            
         }
     }
-
 
     public static class StringExtensions
     {
@@ -3076,8 +3166,5 @@ namespace DataTools.Text
         {
             return TextTools.Split(Scan, Separator, SkipQuote, Unescape, QuoteChar, EscapeChar, Unquote, WithToken, WithTokenIn);
         }
-
-   }
-
-
+    }
 }

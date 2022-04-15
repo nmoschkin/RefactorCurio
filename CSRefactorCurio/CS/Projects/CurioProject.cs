@@ -258,12 +258,12 @@ namespace DataTools.CSTools
 
         private void Monitor_WatchNotifyChange(object sender, FSMonitorEventArgs e)
         {
-            var efn = e.Info.Filename.ToLower();
+            var efn = ProjectRoot + "\\" + e.Info.Filename.ToLower();
             if (efn.EndsWith(".csproj"))
             {
                 ReloadProject();
             }
-            else if (efn.EndsWith(".cs"))
+            else if (efn.EndsWith(".cs") || (efn.Contains(".cs") && efn.Contains("TMP")))
             {
                 RootFolder.ProcessChangeEvent(e.Info);
             }

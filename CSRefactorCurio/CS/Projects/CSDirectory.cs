@@ -332,33 +332,41 @@ namespace DataTools.CSTools
 
         public void ProcessChangeEvent(FileNotifyInfo info)
         {
+            var s = this.Project.ProjectRoot + "\\" + info.Filename;
+
             switch (info.Action)
             {
                 case FileActions.Added:
-                    Find(info.Filename, true);
+                    Find(s, true);
                     break;
 
                 case FileActions.Removed:
-                    RemovePath(info.Filename);
+                    RemovePath(s);
                     break;
 
                 case FileActions.RenamedOldName:
-                    var obj = Find(info.Filename);
+                    var obj = Find(this.Project.ProjectRoot + "\\" + info.OldName);
                     if (obj != null)
                     {
+
                         if (obj is CSCodeFile file)
                         {
-                            file.RenameEvent(info.NewName);
+                            if (File.Exists(file.Filename)) file.Refresh();
+
+                            if (!info.NewName.EndsWith("TMP"))
+                            {
+                                file.RenameEvent(this.Project.ProjectRoot + "\\" + info.NewName);
+                            }
                         }
                         else if (obj is CSDirectory dir)
                         {
-                            dir.path = info.NewName;
+                            dir.path = this.Project.ProjectRoot + "\\" + info.NewName;
                         }
                     }
                     break;
 
                 case FileActions.Modified:
-                    var fobj = FindFile(info.Filename);
+                    var fobj = FindFile(s);
                     if (fobj != null)
                     {
                         fobj.Refresh();

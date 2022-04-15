@@ -480,15 +480,18 @@ namespace DataTools.CSTools
 
             int startLine2 = 0;
             int endLine2 = 0;
-            int startPos2, endPos2;
-
+            int startPos2 = 0, endPos2 = 0;
+            bool marker2 = false;
             bool firstNs = true;
             int lreal = 0;
             int pre = 0;
-            var reg = new Regex(@"^\s*(.+)\s+(\w+)\s*(\(|\{)\s*(.+)\s*(\)|\})");
+            var reg = new Regex(@"^(.+)\s+(\w+)$");
+            var reg2 = new Regex(@"^(.+)\s+(\w+)\s*(\(|\})(.+)(\(|\})$");
+            var reggen = new Regex(@"^(.+)\s+(\w+)<(.+)>$");
 
             List<Marker> markers = new List<Marker>();
             Marker mark;
+            Marker mark2 = null;
 
             char[] input = text.ToCharArray();
 
@@ -598,126 +601,134 @@ namespace DataTools.CSTools
                 // Quotes 
                 if (input[i] == '\"')
                 {
-                    if (i > c - 1) throw new SyntaxErrorException("Quote at end of file.");
-                    var sbtemp = new StringBuilder();
-                    sbtemp.Append(input[i]);
-                    bool inlit = false;
-                    bool intrans = false;
-                    bool atrans = false;
-                    int transl = 0;
-                    List<bool> qtrans = null;
-                    List<bool> translit = null;
+                    var sbtemp = TextTools.QuoteFromHere(input, i, ref line, out int? steepPos, out int? eepPos, '$', '@', '{', '}');
 
-                    if (i > 0 && input[i - 1] == '@') inlit = true;
-                    if (i > 0 && input[i - 1] == '$')
+                    if (eepPos != null)
                     {
-                        intrans = true;
-                        qtrans = new List<bool>();
-                        translit = new List<bool>();
-                        qtrans.Add(true);
-                        translit.Add(false);
+                        i = (int)eepPos;
+                        continue;
                     }
 
-                    for (j = i + 1; j < c; j++)
-                    {
-                        sbtemp.Append(input[j]);
+                    //if (i > c - 1) throw new SyntaxErrorException("Quote at end of file.");
+                    //var sbtemp = new StringBuilder();
+                    //sbtemp.Append(input[i]);
+                    //bool inlit = false;
+                    //bool intrans = false;
+                    //bool atrans = false;
+                    //int transl = 0;
+                    //List<bool> qtrans = null;
+                    //List<bool> translit = null;
 
-                        if (intrans && input[j] == '{')
-                        {
-                            transl++;
-                            qtrans.Add(false);
-                            translit.Add(false);
-                        }
-                        else if (intrans && input[j] == '}')
-                        {
-                            if (!qtrans[transl])
-                            {
-                                qtrans.RemoveAt(transl);
-                                translit.RemoveAt(transl);
+                    //if (i > 0 && input[i - 1] == '@') inlit = true;
+                    //if (i > 0 && input[i - 1] == '$')
+                    //{
+                    //    intrans = true;
+                    //    qtrans = new List<bool>();
+                    //    translit = new List<bool>();
+                    //    qtrans.Add(true);
+                    //    translit.Add(false);
+                    //}
 
-                                transl--;
-                            }
-                        }
-                        else if (input[j] == '\n')
-                        {
-                            int oline = line;
-                            //throw new SyntaxErrorException();
-                            line++;
-                            j++;
-                            linestart = j;
-                            if (line >= totalLines) throw new SyntaxErrorException($"No closed quotes found for quote starting at line {oline}");
-                            continue;
-                        }
-                        if (!inlit && input[j] == '\\')
-                        {
-                            if (intrans)
-                            {
-                                if (qtrans[transl])
-                                {
-                                    j += 1;
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                j += 1;
-                                continue;
-                            }
-                        }
-                        else if (input[j] == '\"')
-                        {
-                            if (intrans)
-                            {
-                                if (translit[transl] && j < c - 1)
-                                {
-                                    if (input[j + 1] == '\"')
-                                    {
-                                        j++;
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
-                                    qtrans[transl] = !qtrans[transl];
-                                    if (qtrans[0] == false)
-                                    {
-                                        i = j;
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                //if (input[j - 1] != '\\')
-                                //{
-                                //    // end of the string
-                                //    i = j;
-                                //    break;
-                                //}
+                    //for (j = i + 1; j < c; j++)
+                    //{
+                    //    sbtemp.Append(input[j]);
 
-                                if (inlit)
-                                {
-                                    if (j < c - 1)
-                                    {
-                                        if (input[j + 1] == '\"')
-                                        {
-                                            j++;
-                                            continue;
-                                        }
-                                    }
+                    //    if (intrans && input[j] == '{')
+                    //    {
+                    //        transl++;
+                    //        qtrans.Add(false);
+                    //        translit.Add(false);
+                    //    }
+                    //    else if (intrans && input[j] == '}')
+                    //    {
+                    //        if (!qtrans[transl])
+                    //        {
+                    //            qtrans.RemoveAt(transl);
+                    //            translit.RemoveAt(transl);
 
-                                    i = j;
-                                    break;
-                                }
-                                else
-                                {
-                                    i = j;
-                                    break;
-                                }
+                    //            transl--;
+                    //        }
+                    //    }
+                    //    else if (input[j] == '\n')
+                    //    {
+                    //        int oline = line;
+                    //        //throw new SyntaxErrorException();
+                    //        line++;
+                    //        j++;
+                    //        linestart = j;
+                    //        if (line >= totalLines) throw new SyntaxErrorException($"No closed quotes found for quote starting at line {oline}");
+                    //        continue;
+                    //    }
+                    //    if (!inlit && input[j] == '\\')
+                    //    {
+                    //        if (intrans)
+                    //        {
+                    //            if (qtrans[transl])
+                    //            {
+                    //                j += 1;
+                    //                continue;
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            j += 1;
+                    //            continue;
+                    //        }
+                    //    }
+                    //    else if (input[j] == '\"')
+                    //    {
+                    //        if (intrans)
+                    //        {
+                    //            if (translit[transl] && j < c - 1)
+                    //            {
+                    //                if (input[j + 1] == '\"')
+                    //                {
+                    //                    j++;
+                    //                    continue;
+                    //                }
+                    //            }
+                    //            else
+                    //            {
+                    //                qtrans[transl] = !qtrans[transl];
+                    //                if (qtrans[0] == false)
+                    //                {
+                    //                    i = j;
+                    //                    break;
+                    //                }
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            //if (input[j - 1] != '\\')
+                    //            //{
+                    //            //    // end of the string
+                    //            //    i = j;
+                    //            //    break;
+                    //            //}
 
-                            }
-                        }
-                    }
+                    //            if (inlit)
+                    //            {
+                    //                if (j < c - 1)
+                    //                {
+                    //                    if (input[j + 1] == '\"')
+                    //                    {
+                    //                        j++;
+                    //                        continue;
+                    //                    }
+                    //                }
+
+                    //                i = j;
+                    //                break;
+                    //            }
+                    //            else
+                    //            {
+                    //                i = j;
+                    //                break;
+                    //            }
+
+                    //        }
+                    //    }
+                    //}
 
                     Console.WriteLine($"{sbtemp} Line: {line}");
 
@@ -748,15 +759,52 @@ namespace DataTools.CSTools
 
                 if (inthing && !indelg)
                 {
+                    if (input[i] == ';' && mark2 != null)
+                    {
+                        
+                        if (i + 1 > startPos2)
+                            startPos2 = i + 1;
+
+                        mark2.EndLine = line;
+                    }
 
                     if (input[i] == '{')
                     {
                         level++;
+                        if (level == startL + 1)
+                        {
+                            startPos2 = i + 1;
+                            startLine2 = line;
+                        }
+                        else if (level == startL + 2)
+                        {
+                            var scan = new string(input, startPos2, i - startPos2).Replace("\n", "").Replace("\r", "").Trim();
+
+                            var regcheck = reg.Match(scan);
+                            var regcheck2 = reg2.Match(scan);
+
+                            marker2 = true;
+                            mark2 = new Marker();
+                            mark2.StartLine = line;
+                            mark2.Namespace = namesp;
+                            if (regcheck != null && regcheck.Success)
+                            {
+
+
+
+                            }
+
+                        }
                     }
                     else if (input[i] == '}')
                     {
                         level--;
-                        if (level == startL)
+                        if (level == startL + 1)
+                        {
+                            marker2 = false;
+                            startPos2 = i + 1;
+                        }
+                        else if (level == startL)
                         {
                             endPos = i;
                             endLine = line;
