@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using DataTools.MathTools;
 using System.Diagnostics.Contracts;
+using DataTools.SortedLists;
+using DataTools.Observable;
+using Microsoft.Build.Framework.XamlTypes;
 
 namespace DataTools.CSTools
 {
@@ -205,6 +208,7 @@ namespace DataTools.CSTools
         /// <param name="deep">Deeply copy the item by making a new collection for and copies of the children.</param>
         /// <typeparam name="T">The type of object to create, must be creatable.</typeparam>
         /// <returns>A new object based on this one.</returns>
+        /// <remarks>Implementations should make note of when and where they cannot fulfill the <paramref name="deep"/> contract.</remarks>
         T Clone<T>(bool deep) where T : IMarker, new();
     
     }
@@ -213,7 +217,7 @@ namespace DataTools.CSTools
     /// Abstract base that imlements <see cref="IMarker"/>.
     /// </summary>
     /// <typeparam name="TElem">The type of <see cref="IMarker"/> that will be used.</typeparam>
-    /// <typeparam name="TList">The type of list that will contain the markers.</typeparam>
+    /// <typeparam name="TList">The type of list that will contain child markers.</typeparam>
     public abstract class MarkerBase<TElem, TList> : IMarker<TElem, TList> 
         where TElem : IMarker, new() 
         where TList : IMarkerList<TElem>, new()
@@ -239,6 +243,7 @@ namespace DataTools.CSTools
 
             if (r is MarkerBase<TElem, TList> newItem)
             {
+                // the ideal situation!  a common ancester (this class)
                 ObjectMerge.MergeObjects(this, newItem);
 
                 if (!deep) return r;
@@ -253,24 +258,37 @@ namespace DataTools.CSTools
                 return r;
             }
 
+            // the less ideal situation...
+
+            // This is a pretty open interface with many setters, and since we can't copy the object as a descendant 
+            // because we don't know from whence the object comes, we can invoke its interface members, instead.
             foreach (var pi in pis)
             {                
-                if (!pi.CanWrite) continue;
-
                 object gp = null;
+
+                // try to get the interface property.
                 var iis = typeof(IMarker).GetProperty(pi.Name);
                 
-                if (iis != null)
+                if (iis != null && iis.CanWrite)
                 {
                     gp  = iis.GetValue(this, null);
                 }
                 else
                 {
+                    // we can try to see if this works.  
+
+                    // the only reason to exhaustively check for common ancestry
+                    // is to throw an argument exception, and that will happen, regardless.
+                   
+                    if (!pi.CanWrite) continue;
+
+                    // if it breaks, you'll know not to do that again.
                     gp = pi.GetValue(this);
                 }
 
                 if (gp != null)
                 {
+                    // create a list the hard way
                     if (deep && (pi.Name == nameof(IMarker.Children) && gp is IMarkerList gpList))
                     {
                         if (!(pi.GetValue(r) is object))
@@ -325,14 +343,7 @@ namespace DataTools.CSTools
 
             foreach (var item in markers)
             {
-                if (item is MarkerBase<TElem, TList> mbItem && mbItem.Clone<T>(true) is TElem cloned)
-                {
-                    newItem.Children.Add(cloned);
-                }
-                else
-                {
-                    newItem.Children.Add(item.Clone<TElem>(true));
-                }
+                newItem.Children.Add(item.Clone<TElem>(true));
             }
 
             return newItem;
@@ -452,6 +463,11 @@ namespace DataTools.CSTools
 
     }
 
+    /// <summary>
+    /// Base class for a strongly-typed, self-applying filter rule.
+    /// </summary>
+    /// <typeparam name="TElem">The <see cref="IMarker"/> element type.</typeparam>
+    /// <typeparam name="TList">The <see cref="IMarkerList{TElem}"/> type.</typeparam>
     public abstract class MarkerFilterRule<TElem, TList> : MarkerFilterRule where TElem: IMarker, new() where TList: IMarkerList<TElem>, new()  
     {
         /// <summary>
@@ -460,6 +476,32 @@ namespace DataTools.CSTools
         /// <param name="items">The items to filter.</param>
         /// <returns>A filtered list of items.</returns>
         public abstract TList ApplyFilter(TList items);
+    }
+
+
+    /// <summary>
+    /// Base class for a strongly-typed, self-applying sort filter.
+    /// </summary>
+    /// <typeparam name="TElem">The <see cref="IMarker"/> element type.</typeparam>
+    /// <typeparam name="TList">The <see cref="IMarkerList{TElem}"/> type.</typeparam>
+    public abstract class SortFilterRule<TElem, TList> : MarkerFilterRule<TElem, TList>, IComparer<TElem> where TElem: IMarker, new() where TList: IMarkerList<TElem>, new()
+    {
+        public abstract int Compare(TElem x, TElem y);
+
+        public override TList ApplyFilter(TList items)
+        {
+            var newItems = new TList();
+            foreach (var item in items)
+            {
+                if (IsValid(item))
+                {
+                    newItems.Add(item);
+                }
+            }
+
+            QuickSort.Sort(newItems, Compare);
+            return newItems;
+        }
     }
 
     /// <summary>
@@ -591,14 +633,161 @@ namespace DataTools.CSTools
         }
     }
 
-    
+    /// <summary>
+    /// A simple and open chained filter rule for strongly typed filters.
+    /// </summary>
+    public class MarkerFilterRuleChain<TElem, TList> : MarkerFilterRule<TElem, TList>
+        where TList : IMarkerList<TElem>, new()
+        where TElem : IMarker<TElem, TList>, new()
+    {
+        private List<MarkerFilterRule<TElem, TList>> rules;
+
+        /// <summary>
+        /// Gets or sets the rule chain that will be used to validate items.
+        /// </summary>
+        public virtual List<MarkerFilterRule<TElem, TList>> RuleChain
+        {
+            get => rules;
+            set => rules = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the kind of chain (pass all or pass any).
+        /// </summary>
+        public virtual FilterChainKind FilterChainKind { get; set; } = FilterChainKind.PassAll;
+
+        /// <summary>
+        /// Create a new marker rule chain.
+        /// </summary>
+        public MarkerFilterRuleChain()
+        {
+            rules = new List<MarkerFilterRule<TElem, TList>>();
+        }
+
+        /// <summary>
+        /// Create a new marker rule chain from the specified initial starting values.
+        /// </summary>
+        /// <param name="rules">The initial starting values.</param>
+        public MarkerFilterRuleChain(IEnumerable<MarkerFilterRule<TElem, TList>> rules)
+        {
+            this.rules = new List<MarkerFilterRule<TElem, TList>>(rules);
+        }
+
+        /// <summary>
+        /// Runs each element in the rule chain, in enumeration order.
+        /// </summary>
+        /// <param name="item">The item to test.</param>
+        /// <returns>True if the item passes, otherwise false.</returns>
+        public override bool IsValid(IMarker item)
+        {
+            if (FilterChainKind == FilterChainKind.PassAll)
+            {
+                foreach (var rule in rules)
+                {
+                    if (!rule.IsValid(item)) return false;
+                }
+
+                return true;
+            }
+            else if (FilterChainKind == FilterChainKind.PassAny)
+            {
+                foreach (var rule in rules)
+                {
+                    if (rule.IsValid(item)) return true;
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Runs each filter in succession, using the results of the previous filter in the chain to run the next filter in the chain.
+        /// </summary>
+        /// <param name="items">The final list of items.</param>
+        /// <returns></returns>
+        public override TList ApplyFilter(TList items)
+        {
+            TList result = items;
+
+            foreach (var rule in rules)
+            {
+                result = rule.ApplyFilter(result);
+            }
+
+            return result;
+        }
+    }
+
+
+    /// <summary>
+    /// A simple and open chained filter rule for strongly typed filters.
+    /// </summary>
+    public abstract class FixedFilterRuleChain<TElem, TList> : MarkerFilterRule<TElem, TList>
+        where TList : IMarkerList<TElem>, new()
+        where TElem : IMarker<TElem, TList>, new()
+    {
+        MarkerFilterRuleChain<TElem, TList> filterChain;
+
+        /// <summary>
+        /// Gets the kind of filter chain (validate any or validate all).
+        /// </summary>
+        public abstract FilterChainKind FilterChainKind { get; }
+
+        /// <summary>
+        /// Provide the filter chain.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract IEnumerable<MarkerFilterRule<TElem, TList>> ProvideFilterChain();
+        
+        /// <summary>
+        /// Create a new fixed filter rule chain.
+        /// </summary>
+        public FixedFilterRuleChain()
+        {
+            filterChain = new MarkerFilterRuleChain<TElem, TList>();
+            filterChain.FilterChainKind = FilterChainKind;
+
+            var newRules = ProvideFilterChain();
+
+            foreach (var rule in newRules)
+            {
+                filterChain.RuleChain.Add(rule);
+            }
+        }
+
+        /// <summary>
+        /// Runs each element in the rule chain, in enumeration order.
+        /// </summary>
+        /// <param name="item">The item to test.</param>
+        /// <returns>True if the item passes, otherwise false.</returns>
+        public override bool IsValid(IMarker item)
+        {
+            return filterChain.IsValid(item);
+        }
+
+        /// <summary>
+        /// Runs each filter in succession, using the results of the previous filter in the chain to run the next filter in the chain.
+        /// </summary>
+        /// <param name="items">The final list of items.</param>
+        /// <returns></returns>
+        public override TList ApplyFilter(TList items)
+        {
+            return filterChain.ApplyFilter(items);
+        }
+
+    }
+
 
     /// <summary>
     /// Interface for an object that works with filter rules to filter <see cref="IMarker"/> items.
     /// </summary>
     /// <typeparam name="TElem">The <see cref="IMarker"/> to filter.</typeparam>
     /// <typeparam name="TList">The <see cref="IMarker{TElem, TList}"/>.</typeparam>
-    public class MarkerFilter<TElem, TList> where TList : IMarkerList<TElem>, new() where TElem : IMarker<TElem, TList>, new()
+    public class MarkerFilter<TElem, TList> 
+        where TList : IMarkerList<TElem>, new() 
+        where TElem : IMarker<TElem, TList>, new()
     {
         /// <summary>
         /// Apply the given rule, return a new list of items based on the specified rule.
@@ -613,7 +802,7 @@ namespace DataTools.CSTools
         /// </remarks>
         public virtual TList ApplyFilter(TList items, MarkerFilterRule rule, bool recursiveForSimpleRules = true)
         {
-            
+            // strong rules have their own filtering.
             if (rule is MarkerFilterRule<TElem, TList> strongRule)
             {
                 return ApplyFilter(items, strongRule);
@@ -648,7 +837,50 @@ namespace DataTools.CSTools
         }
     }
 
+    /// <summary>
+    /// A base class for providing a system for filtering <see cref="IMarker"/> items.
+    /// </summary>
+    /// <typeparam name="TElem">The type of <see cref="IMarker"/> item.</typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+    /// <typeparam name="TFilter">The type of <see cref="MarkerFilter{TElem, TList}"/>.</typeparam>
+    public interface IMarkerFilterProvider<TElem, TList, TFilter> 
+        where TList : IMarkerList<TElem>, new()
+        where TElem : IMarker<TElem, TList>, new()
+        where TFilter : MarkerFilter<TElem, TList>, new()
+    {
+        
+        TList FilteredItems { get; }
 
+        /// <summary>
+        /// Gets the filter engine currently being used by the filter provider
+        /// </summary>
+        TFilter Filter { get; }
 
+        /// <summary>
+        /// Provides a filter based on the given element context.
+        /// </summary>
+        /// <param name="items">The list to provide the filter for.</param>
+        /// <returns></returns>
+        MarkerFilterRule ProvideFilterRule(TList items);
+
+        /// <summary>
+        /// Run the filter on the given list of items.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns>A new list of items that have been filtered.</returns>
+        TList RunFilters(TList items);
+
+    }
+
+    /// <summary>
+    /// A base class for providing a system for filtering <see cref="IMarker"/> items using the default <see cref="MarkerFilter{TElem, TList}"/> engine..
+    /// </summary>
+    /// <typeparam name="TElem">The type of <see cref="IMarker"/> item.</typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+    public interface IMarkerFilterProvider<TElem, TList> : IMarkerFilterProvider<TElem, TList, MarkerFilter<TElem, TList>>
+        where TList : IMarkerList<TElem>, new()
+        where TElem : IMarker<TElem, TList>, new()
+    {
+    }
 
 }

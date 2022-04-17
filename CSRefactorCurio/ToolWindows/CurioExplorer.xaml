@@ -181,7 +181,7 @@
 
                 <HierarchicalDataTemplate
                     DataType="{x:Type mod:CSCodeFile}"
-                    ItemsSource="{Binding Children}"
+                    ItemsSource="{Binding FilteredItems}"
                     >
                     <Grid>
                         <Grid.ColumnDefinitions>

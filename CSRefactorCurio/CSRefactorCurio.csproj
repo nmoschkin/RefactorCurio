@@ -58,9 +58,10 @@
     <Compile Include="Commands\ShowClassFromJsonFileCommand.cs" />
     <Compile Include="Converters\BoolConverter.cs" />
     <Compile Include="CS\Code\CSCodeParser.cs" />
+    <Compile Include="CS\Code\FilterRules.cs" />
     <Compile Include="CS\Code\MarkerKind.cs" />
     <Compile Include="CS\Code\MarkerList.cs" />
-    <Compile Include="CS\Code\Markers.cs" />
+    <Compile Include="CS\Code\MarkerBases.cs" />
     <Compile Include="CS\Projects\CSDirectory.cs" />
     <Compile Include="CS\Projects\CSNamespace.cs" />
     <Compile Include="CS\Projects\CurioProject.cs" />

@@ -45,9 +45,11 @@ namespace DataTools.CSTools
         }
     }
 
-    public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged
+    public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private ObservableMarkerList<CSMarker> filteredChildren = new ObservableMarkerList<CSMarker>();
 
         private string title;
 
@@ -57,10 +59,43 @@ namespace DataTools.CSTools
 
         IList IProjectNode.Children => children;
 
-        public ObservableMarkerList<CSMarker> Children
+        public MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>>();
+
+        public virtual ObservableMarkerList<CSMarker> FilteredItems
+        {
+            get => filteredChildren;
+            protected set
+            {
+                if (filteredChildren != value)
+                {
+                    filteredChildren = value;
+                    OnPropertyChanged();
+                }
+                
+            }
+        }
+        public virtual ObservableMarkerList<CSMarker> Children
         {
             get => children;
-            private set => children = value; 
+            protected set
+            {
+                if (children != value)
+                {
+                    children = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public MarkerFilterRule ProvideFilterRule(ObservableMarkerList<CSMarker> items)
+        {
+            return new CSFileChain<CSMarker, ObservableMarkerList<CSMarker>>();
+        }
+
+        public ObservableMarkerList<CSMarker> RunFilters(ObservableMarkerList<CSMarker> items)
+        {
+            FilteredItems = Filter.ApplyFilter(items, ProvideFilterRule(items));
+            return FilteredItems;
         }
 
         public string Rename(string newName)
@@ -96,7 +131,7 @@ namespace DataTools.CSTools
                 if (title != value)
                 {
                     title = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -114,9 +149,14 @@ namespace DataTools.CSTools
                         Title = System.IO.Path.GetFileName(value);
                     }
 
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Filename)));
+                    OnPropertyChanged();
                 }
             }
+        }
+
+        protected void OnPropertyChanged([CallerMemberName]string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         new public static CSCodeFile LoadFromFile(string path)
@@ -147,6 +187,7 @@ namespace DataTools.CSTools
 
             return false;
         }
+
     }
 
     public class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>

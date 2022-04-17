@@ -15,13 +15,27 @@ using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace DataTools.CSTools
 {
-    
+    /// <summary>
+    /// Code Parser Output File
+    /// </summary>
+    /// <typeparam name="TElem"></typeparam>
+    /// <typeparam name="TList"></typeparam>
     public class OutputFile<TElem, TList> where TElem: IMarker, new() where TList : IMarkerList<TElem>, new()
     {
+        /// <summary>
+        /// The text of the new file.
+        /// </summary>
         public string Text { get; set; }
 
+        /// <summary>
+        /// The name of the saved file.
+        /// </summary>
         public string Filename { get; set; }
 
+        /// <summary>
+        /// Write the file.
+        /// </summary>
+        /// <returns></returns>
         public bool Write()
         {
             try
@@ -38,6 +52,17 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Create a new file from the given parameters.
+        /// </summary>
+        /// <typeparam name="TI">The type of <see cref="IMarker"/></typeparam>
+        /// <typeparam name="TL">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+        /// <param name="path">The path of the new file.</param>
+        /// <param name="file">The <see cref="RenderedFile{TElem, TList}"/> information.</param>
+        /// <param name="lines">The original file split into lines.</param>
+        /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
+        /// <param name="parser">The code parser instance.</param>
+        /// <returns>A new output file.</returns>
         public static OutputFile<TI, TL> NewFile<TI, TL>(string path, RenderedFile<TI, TL> file, string[] lines, bool sepDirs, CSCodeParser<TI, TL> parser = null) where TI: IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
         {
             return NewFile<TI, TL>(path, file.Markers[0].Kind, file.Markers[0].Name, FormatOutputText<TI, TL>(file.Markers, lines, file.PreambleEnd, file.PreambleBegin), sepDirs, parser);
