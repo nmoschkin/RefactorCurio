@@ -3,6 +3,7 @@ using DataTools.Observable;
 using DataTools.SortedLists;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -11,7 +12,10 @@ using System.Threading.Tasks;
 
 namespace DataTools.CSTools
 {
-    public class CSNamespace : ObservableBase, IProjectNode
+    /// <summary>
+    /// A CS Refactor Curio Solution Namespace
+    /// </summary>
+    public class CSNamespace : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
         private string name;
         private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
@@ -22,7 +26,13 @@ namespace DataTools.CSTools
 
         private CSNamespace parent;
         
+        IList IProjectNode.Children => children;
+
+        public ElementType ChildType => ElementType.SolutionFolder | ElementType.Namespace;
         
+        /// <summary>
+        /// Gets the observable collection of code elements that are at home in this namespace.
+        /// </summary>
         public ObservableCollection<CSMarker> Markers
         {
             get => markers;
@@ -32,6 +42,9 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Gets the observable collection of child <see cref="CSNamespace"/> objects.
+        /// </summary>
         public ObservableCollection<CSNamespace> Namespaces
         {
             get => namespaces;
@@ -41,11 +54,24 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Generate a namespace map from the specified project.
+        /// </summary>
+        /// <param name="project">The project to generate the namespace map for.</param>
+        /// <param name="namespaces">Optional namespace dictionary.</param>
+        /// <returns>A new <see cref="ObservableCollection{T}"/> of <see cref="IProjectElement"/> objects.</returns>
         public static ObservableCollection<IProjectElement> NamespacesFromProject(CurioProject project, Dictionary<string, CSNamespace> namespaces = null)
         {
             return NamespacesFromProjects(new[] { project }, namespaces);
         }
-                
+
+
+        /// <summary>
+        /// Generate a namespace map from the specified projects.
+        /// </summary>
+        /// <param name="projects">The projects to generate the namespace map for.</param>
+        /// <param name="namespaces">Optional namespace dictionary.</param>
+        /// <returns>A new <see cref="ObservableCollection{T}"/> of <see cref="IProjectElement"/> objects.</returns>
         public static ObservableCollection<IProjectElement> NamespacesFromProjects(IEnumerable<CurioProject> projects, Dictionary<string, CSNamespace> namespaces = null)
         {
             namespaces ??= new Dictionary<string, CSNamespace>();
@@ -59,7 +85,13 @@ namespace DataTools.CSTools
             return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.Parent == null));
         }
 
-        private static CSNamespace EnsureNamespace(string name, Dictionary<string, CSNamespace> namespaces)
+        /// <summary>
+        /// Ensure that a dictionary map of namespaces has the specified namespace element, creating it if necessary.
+        /// </summary>
+        /// <param name="name">The fully qualified namespace.</param>
+        /// <param name="namespaces">The namespace map.</param>
+        /// <returns>The found/created namespace.</returns>
+        protected static CSNamespace EnsureNamespace(string name, Dictionary<string, CSNamespace> namespaces)
         {
             var ns = name.Split('.');
             int c = ns.Length;
@@ -92,6 +124,10 @@ namespace DataTools.CSTools
             return lvn;
         }
 
+        /// <summary>
+        /// Sort the namespace map in place.
+        /// </summary>
+        /// <param name="descending">Sort in descending order.</param>
         public void Sort(bool descending = false)
         {
             var m = descending ? -1 : 1;    
@@ -115,7 +151,12 @@ namespace DataTools.CSTools
 
         }
 
-        private static void NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces)
+        /// <summary>
+        /// Get the namespaces for the specified node.
+        /// </summary>
+        /// <param name="node">The directory/node to map.</param>
+        /// <param name="namespaces">The current namespace map.</param>
+        protected static void NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces)
         {
             foreach (var file in node.Files) 
             {
@@ -139,17 +180,26 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Gets the namespace name.
+        /// </summary>
         public string Name
         {
             get => name;
-            set
+            protected set
             {
                 SetProperty(ref name, value);
             }
         }
 
+        /// <summary>
+        /// Gets the parent namespace, or null if this is a root namespace.
+        /// </summary>
         public CSNamespace Parent => parent;
 
+        /// <summary>
+        /// Gets the child objects (either namespaces or markers).
+        /// </summary>
         public ObservableCollection<IProjectElement> Children
         {
             get => children;
@@ -159,12 +209,23 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Create a new namespace with the specified name and optional parent.
+        /// </summary>
+        /// <param name="name">Fully qualified namespace.</param>
+        /// <param name="parent">Parent</param>
         public CSNamespace(string name, CSNamespace parent = null)
         {
             this.name = name;
             this.parent = parent;
         }
 
+        /// <summary>
+        /// Create a new namespace with the specified name, initial children and optional parent.
+        /// </summary>
+        /// <param name="items">The initial children.</param>
+        /// <param name="name">Fully qualified namespace.</param>
+        /// <param name="parent">Parent</param>
         public CSNamespace(string name, IEnumerable<IProjectElement> items, CSNamespace parent = null) : this(name, parent)
         {
             foreach (var item in items)

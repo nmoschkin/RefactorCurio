@@ -57,6 +57,5 @@ namespace DataTools.MathTools
             }
 
         }
-
     }
 }

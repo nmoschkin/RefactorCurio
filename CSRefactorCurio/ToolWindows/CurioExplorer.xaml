@@ -5,6 +5,7 @@
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:glob="clr-namespace:CSRefactorCurio.Globalization"
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mod="clr-namespace:DataTools.CSTools"
@@ -226,6 +227,39 @@
                 </DataTemplate>
 
             </TreeView.Resources>
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <ContextMenu.Resources />
+
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <imaging:CrispImage
+                                    Width="16"
+                                    Height="16"
+                                    Margin="2"
+                                    Moniker="{x:Static catalog:KnownMonikers.BuildSolution}"
+                                    />
+
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Text="{glob:Translate ResourceKey=MI_BUILD_SOLUTION}"
+                                    />
+
+                            </Grid>
+
+                        </MenuItem.Header>
+                    </MenuItem>
+
+
+                </ContextMenu>
+            </TreeView.ContextMenu>
         </TreeView>
     </Grid>
 </UserControl>

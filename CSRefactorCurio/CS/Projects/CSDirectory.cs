@@ -6,38 +6,58 @@ using DataTools.Observable;
 using DataTools.SortedLists;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DataTools.CSTools
 {
 
-    public class CSMarker : Marker, IProjectElement
+    public class CSMarker : MarkerBase<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>
     {
-        public ElementType ElementType => ElementType.Marker;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public string Title
+        public override ObservableMarkerList<CSMarker> Children 
+        { 
+            get => base.Children;
+            set
+            {
+                if (base.Children != value)
+                {
+                    base.Children = value;
+                    OnPropertyChanged();
+                }
+            }
+        
+        }
+
+
+        protected void OnPropertyChanged([CallerMemberName]string propertyName = null)
         {
-            get => this.Name;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
-    public class CSCodeFile : CSCodeParser, IProjectNode, INotifyPropertyChanged
+    public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string title;
 
-        private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
+        private ObservableMarkerList<CSMarker> children = new ObservableMarkerList<CSMarker>();
         public ElementType ElementType => ElementType.File;
+        public ElementType ChildType => ElementType.Marker;
 
-        public ObservableCollection<IProjectElement> Children
+        IList IProjectNode.Children => children;
+
+        public ObservableMarkerList<CSMarker> Children
         {
             get => children;
             private set => children = value; 
@@ -122,17 +142,6 @@ namespace DataTools.CSTools
             children.Clear();
             if (base.Parse(text) && markers != null)
             {
-                int i, c = markers.Count;
-                for (i = 0; i < c; i++)
-                {
-                    var marker = markers[i];    
-                    var mnew = new CSMarker();
-                    ObjectMerge.MergeObjects(marker, mnew);
-
-                    children.Add(mnew);
-                    markers[i] = mnew;
-                }
-
                 return true;
             }
 
@@ -140,7 +149,7 @@ namespace DataTools.CSTools
         }
     }
 
-    public class CSDirectory : ObservableBase, IProjectNode
+    public class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
 
         private WeakReference<CSDirectory> parent = null;
@@ -157,6 +166,9 @@ namespace DataTools.CSTools
         private List<string> namespaces;
 
         public ElementType ElementType => ElementType.Directory;
+        public ElementType ChildType => ElementType.File;
+
+        IList IProjectNode.Children => children;
 
         public string Title
         {
@@ -332,7 +344,7 @@ namespace DataTools.CSTools
 
         public void ProcessChangeEvent(FileNotifyInfo info)
         {
-            var s = this.Project.ProjectRoot + "\\" + info.Filename;
+            var s = this.Project.ProjectRootPath + "\\" + info.Filename;
 
             switch (info.Action)
             {
@@ -345,7 +357,7 @@ namespace DataTools.CSTools
                     break;
 
                 case FileActions.RenamedOldName:
-                    var obj = Find(this.Project.ProjectRoot + "\\" + info.OldName);
+                    var obj = Find(this.Project.ProjectRootPath + "\\" + info.OldName);
                     if (obj != null)
                     {
 
@@ -355,12 +367,12 @@ namespace DataTools.CSTools
 
                             if (!info.NewName.EndsWith("TMP"))
                             {
-                                file.RenameEvent(this.Project.ProjectRoot + "\\" + info.NewName);
+                                file.RenameEvent(this.Project.ProjectRootPath + "\\" + info.NewName);
                             }
                         }
                         else if (obj is CSDirectory dir)
                         {
-                            dir.path = this.Project.ProjectRoot + "\\" + info.NewName;
+                            dir.path = this.Project.ProjectRootPath + "\\" + info.NewName;
                         }
                     }
                     break;
@@ -467,7 +479,7 @@ namespace DataTools.CSTools
         {
             var p = Project;
             var isf = p.IsFrameworkProject;
-            var rt = p.ProjectRoot;
+            var rt = p.ProjectRootPath;
 
             if (p == null) return;  
 

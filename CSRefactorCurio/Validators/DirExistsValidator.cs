@@ -28,7 +28,7 @@ namespace CSRefactorCurio.Validators
                 }
                 else
                 {
-                    if (s.ToLower().StartsWith(Project.ProjectRoot.ToLower()))
+                    if (s.ToLower().StartsWith(Project.ProjectRootPath.ToLower()))
                     {
                         return Directory.Exists(s) ? ValidationResult.ValidResult : new ValidationResult(false, $"Directory '{s}' does not exist.");
                     }

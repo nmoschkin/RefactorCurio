@@ -91,7 +91,7 @@ namespace CSRefactorCurio.ViewModels
                     if (SetProperty(ref project, value))
                     {
                         ActiveNamespaces = new ObservableCollection<string>(project.Namespaces);
-                        Directory = project.ProjectRoot;
+                        Directory = project.ProjectRootPath;
                     }
                 }
             }

@@ -28,11 +28,11 @@ namespace DataTools.CSTools
 
         public bool RunMSBuild(CurioProject project)
         {
-            var cmd = $"\"{project.ProjectRoot}\\{project.ProjectFile}\" -t:Rebuild /property:Configuration=Debug /property:Platform=\"AnyCPU\"";
+            var cmd = $"\"{project.ProjectRootPath}\\{project.ProjectFile}\" -t:Rebuild /property:Configuration=Debug /property:Platform=\"AnyCPU\"";
 
             var proc = new Process();
 
-            proc.StartInfo.WorkingDirectory = project.ProjectRoot;
+            proc.StartInfo.WorkingDirectory = project.ProjectRootPath;
             proc.StartInfo.FileName = msBuild;
             proc.StartInfo.Arguments = cmd;
             proc.StartInfo.CreateNoWindow = false;
