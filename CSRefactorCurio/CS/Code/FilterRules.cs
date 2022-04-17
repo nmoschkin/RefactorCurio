@@ -29,13 +29,20 @@ namespace DataTools.CSTools
                     foreach (var subitem in item.Children)
                     {
                         if (((IList<MarkerKind>)SortKindOrder).Contains(subitem.Kind))
-                            rl.Add(subitem);
+                        {
+                            rl.Add(subitem.Clone<TElem>(false));
+                        }
                     }
                 }
                 else if (((IList<MarkerKind>)SortKindOrder).Contains(item.Kind))
                 {
-                    rl.Add(item);
+                    rl.Add(item.Clone<TElem>(false));
                 }
+            }
+
+            foreach (var item in rl)
+            {
+                item.Children = ApplyFilter(item.Children);
             }
 
             return base.ApplyFilter(rl);
@@ -51,24 +58,19 @@ namespace DataTools.CSTools
             MarkerKind.Record,
             MarkerKind.Struct,
             MarkerKind.Enum,
+            MarkerKind.Const,
             MarkerKind.Delegate,
+            MarkerKind.Constructor,
+            MarkerKind.Destructor,
+            MarkerKind.Method,
+            MarkerKind.Property,
+            MarkerKind.Field,
+            MarkerKind.Event,
         };
 
         public override bool IsValid(IMarker item)
         {
-            switch (item.Kind)
-            {
-                case MarkerKind.Interface:
-                case MarkerKind.Class:
-                case MarkerKind.Record:
-                case MarkerKind.Struct:
-                case MarkerKind.Enum:
-                case MarkerKind.Delegate:
-                    return true;
-
-                default:
-                    return false;
-            }
+            return ((IList<MarkerKind>)SortKindOrder).Contains(item.Kind);
         }
 
         public bool Descending
@@ -93,7 +95,13 @@ namespace DataTools.CSTools
             {
                 var sk = SortKindOrder as IList<MarkerKind>;
 
-                return (sk.IndexOf(x.Kind) - sk.IndexOf(y.Kind)) * m;
+                var a = sk.IndexOf(x.Kind);
+                var b = sk.IndexOf(y.Kind);
+
+                if (a < b) return -1 * m;
+                if (a > b) return 1 * m;
+
+                return 0;
             }
             
         }
@@ -124,7 +132,14 @@ namespace DataTools.CSTools
             {
                 if (IsValid(p1item))
                 {
-                    l.Add(p1item.Clone<TElem>(false));
+                    var cItem = p1item.Clone<TElem>(false);
+
+                    if ((cItem.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
+                    {
+                        cItem.Children = new TList();
+                    }
+
+                    l.Add(cItem);
                 }
             }
 
@@ -133,19 +148,32 @@ namespace DataTools.CSTools
             for (i = 0; i < c; i++) 
             {
                 var p2item = l[i];
-                var l2 = new TList();
 
+                if ((p2item.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
+                {
+                    p2item.Children = new TList();
+                }
+
+                var l2 = new TList();
+                
                 foreach (var child in p2item.Children)
                 {
                     if (IsValid(child))
                     {
-                        l2.Add(child.Clone<TElem>(false));
+                        var cItem = child.Clone<TElem>(false);
+                        
+                        if ((cItem.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
+                        {
+                            cItem.Children = new TList();
+                        }
+
+                        l2.Add(cItem);
                     }
                 }
 
-                if (l2.Count == 1)
+                if (p2item.Kind == MarkerKind.Consolidation)
                 {
-                    l[i] = l2[0];
+                    l[i] = l2.Last();
                 }
 
                 l[i].Children = ApplyFilter(l[i].Children);

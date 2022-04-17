@@ -9,6 +9,7 @@ using System.Diagnostics.Contracts;
 using DataTools.SortedLists;
 using DataTools.Observable;
 using Microsoft.Build.Framework.XamlTypes;
+using System.Text.RegularExpressions;
 
 namespace DataTools.CSTools
 {
@@ -188,6 +189,11 @@ namespace DataTools.CSTools
         string Name { get; set; }
 
         /// <summary>
+        /// If applicable, gets the data type of the element.
+        /// </summary>
+        string DataType { get; set; }
+
+        /// <summary>
         /// If applicable, the generic type parameters of this element.
         /// </summary>
         string Generics { get; set; }
@@ -223,6 +229,9 @@ namespace DataTools.CSTools
         where TList : IMarkerList<TElem>, new()
     {
         protected TList markers = new TList();
+        protected string scanHit;
+        protected string name;
+        protected MarkerKind kind;
 
         /// <summary>
         /// Create a shallow copy of this marker as a <see cref="MarkerBase{TElem, TList}"/> instance.
@@ -354,6 +363,33 @@ namespace DataTools.CSTools
             return Clone();
         }
 
+        private void ScanForDataType()
+        {
+            if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(ScanHit)) return;
+
+            switch (kind)
+            {
+                case MarkerKind.Method:
+                case MarkerKind.Property:
+                case MarkerKind.Field:
+                case MarkerKind.Event:
+                case MarkerKind.Const:
+                case MarkerKind.Delegate:
+                    break;
+
+                default:
+                    return;
+            }
+
+            var re = new Regex(@"^.*\w+?\s+?([A-Za-z_@][A-Za-z_0-9@\<\>\(\) ]+)\s+" + Name);
+
+            var m = re.Match(ScanHit);
+            if (m.Success)
+            {
+                DataType = m.Groups[1].Value;
+            }
+        }
+
         public virtual AccessModifiers AccessModifiers { get; set; }
 
         public virtual bool IsVirtual { get; set; }
@@ -374,7 +410,38 @@ namespace DataTools.CSTools
 
         public virtual string Content { get; set; }
 
-        public virtual string ScanHit { get; set; }
+        public virtual string ScanHit
+        {
+            get => scanHit;
+            set
+            {
+                if (scanHit != value)
+                {
+                    scanHit = value;
+                    if (scanHit.StartsWith("=")) kind = MarkerKind.Code;
+                    if (scanHit != null && name != null)
+                    {
+                        ScanForDataType();
+                    }
+                }
+            }
+        }
+        public virtual string Name
+        {
+            get => name;
+            set
+            {
+                if (name != value)
+                {
+                    name = value;
+                    
+                    if (scanHit != null && name != null)
+                    {
+                        ScanForDataType();
+                    }
+                }
+            }
+        }
 
         public virtual string MethodParamsString { get; set; }
 
@@ -392,9 +459,25 @@ namespace DataTools.CSTools
 
         public virtual int EndColumn { get; set; }
 
-        public virtual MarkerKind Kind { get; set; }
+        public virtual MarkerKind Kind
+        {
+            get => kind;
+            set
+            {
+                if (kind != value)
+                {
+                    kind = value;
 
-        public virtual string Name { get; set; }
+                    if (scanHit != null && name != null)
+                    {
+                        ScanForDataType();
+                    }
+
+                }
+            }
+        }
+
+        public virtual string DataType { get; set; }
 
         public virtual string Generics { get; set; }
 
@@ -402,7 +485,43 @@ namespace DataTools.CSTools
 
         public virtual string Title
         {
-            get => this.Name + (this.Generics ?? "");
+            get
+            {
+                var sb = new StringBuilder();
+
+                if (!string.IsNullOrEmpty(DataType))
+                {
+                    sb.Append(DataType + " ");
+                }
+                
+                sb.Append(Name);
+
+                if (!string.IsNullOrEmpty(Generics))
+                {
+                    sb.Append(Generics);
+                }
+
+                if (!string.IsNullOrEmpty(MethodParamsString))
+                {
+                    sb.Append("(" + MethodParamsString + ")");
+                }
+                else
+                {
+                    switch (kind)
+                    {
+                        case MarkerKind.Method:
+                        case MarkerKind.Constructor:
+                        case MarkerKind.Destructor:
+                            sb.Append("()");
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                return sb.ToString();
+            }
         }
 
         public virtual ElementType ElementType => ElementType.Marker;

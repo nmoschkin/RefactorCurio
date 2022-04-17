@@ -49,15 +49,18 @@ namespace DataTools.CSTools
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private ObservableMarkerList<CSMarker> filteredChildren = new ObservableMarkerList<CSMarker>();
+        private ObservableMarkerList<CSMarker> filteredChildren;
 
         private string title;
-
-        private ObservableMarkerList<CSMarker> children = new ObservableMarkerList<CSMarker>();
+        
+        CSFileChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSFileChain<CSMarker, ObservableMarkerList<CSMarker>>();
+ 
         public ElementType ElementType => ElementType.File;
         public ElementType ChildType => ElementType.Marker;
 
-        IList IProjectNode.Children => children;
+        IList IProjectNode.Children => markers;
+
+        bool nocolnotify = false;
 
         public MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>>();
 
@@ -74,14 +77,26 @@ namespace DataTools.CSTools
                 
             }
         }
+
         public virtual ObservableMarkerList<CSMarker> Children
         {
-            get => children;
+            get => markers;
             protected set
             {
-                if (children != value)
+                if (markers != value)
                 {
-                    children = value;
+                    if (markers != null)
+                    {
+                        markers.CollectionChanged -= OnChildrenChanged;
+                    }
+                    markers = value;
+                    if (markers != null)
+                    {
+                        markers.CollectionChanged += OnChildrenChanged;
+                    }
+
+                    RunFilters(markers);
+
                     OnPropertyChanged();
                 }
             }
@@ -89,7 +104,7 @@ namespace DataTools.CSTools
 
         public MarkerFilterRule ProvideFilterRule(ObservableMarkerList<CSMarker> items)
         {
-            return new CSFileChain<CSMarker, ObservableMarkerList<CSMarker>>();
+            return fileChain; 
         }
 
         public ObservableMarkerList<CSMarker> RunFilters(ObservableMarkerList<CSMarker> items)
@@ -165,29 +180,42 @@ namespace DataTools.CSTools
             cf.LoadFile(path);
             return cf;
         }
-
+        
         public void AddMarker(CSMarker marker)
         {
-            if (!children.Contains(marker)) children.Add(marker);
             if (!markers.Contains(marker)) markers.Add(marker);
         }
 
         public bool RemoveMarker(CSMarker marker)
         {
-            return markers.Remove(marker) || children.Remove(marker);
+            return markers.Remove(marker);
         }
 
         protected override bool Parse(string text)
         {
-            children.Clear();
+            markers.Clear();
+            nocolnotify = true;
+
             if (base.Parse(text) && markers != null)
             {
+                RunFilters(markers);
+                nocolnotify = false;
                 return true;
             }
 
+            nocolnotify = false;
             return false;
         }
 
+        public CSCodeFile()
+        {
+            markers.CollectionChanged += OnChildrenChanged;
+        }
+
+        private void OnChildrenChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (!nocolnotify) RunFilters(markers);
+        }
     }
 
     public class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
@@ -556,7 +584,11 @@ namespace DataTools.CSTools
                     var parser = CSCodeFile.LoadFromFile(f);
                     outfiles.Add(parser);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    var b = new MessageBox();
+                    b.ShowError(ex.Message, ex.StackTrace);
+                }
             }
 
             Files = new ObservableCollection<CSCodeFile>(outfiles);

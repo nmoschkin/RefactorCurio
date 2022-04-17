@@ -79,7 +79,7 @@ namespace DataTools.CSTools
             foreach (var project in projects)
             {
                 var root = project.RootFolder;
-                NamespacesFromNode(root, namespaces);
+                NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title);
             }
 
             return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.Parent == null));
@@ -91,8 +91,10 @@ namespace DataTools.CSTools
         /// <param name="name">The fully qualified namespace.</param>
         /// <param name="namespaces">The namespace map.</param>
         /// <returns>The found/created namespace.</returns>
-        protected static CSNamespace EnsureNamespace(string name, Dictionary<string, CSNamespace> namespaces)
+        protected static CSNamespace EnsureNamespace(string name, Dictionary<string, CSNamespace> namespaces, string defaultNamespace)
         {
+            name ??= defaultNamespace;
+
             var ns = name.Split('.');
             int c = ns.Length;
             var sb = new StringBuilder();
@@ -156,13 +158,13 @@ namespace DataTools.CSTools
         /// </summary>
         /// <param name="node">The directory/node to map.</param>
         /// <param name="namespaces">The current namespace map.</param>
-        protected static void NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces)
+        protected static void NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace)
         {
             foreach (var file in node.Files) 
             {
                 foreach (CSMarker cls in file.Children)
                 {
-                    var ns = EnsureNamespace(cls.Namespace, namespaces);
+                    var ns = EnsureNamespace(cls.Namespace, namespaces, defaultNamespace);
 
                     if (ns != null)
                     {
@@ -176,7 +178,7 @@ namespace DataTools.CSTools
 
             foreach (var dir in node.Directories)
             {
-                NamespacesFromNode(dir, namespaces);
+                NamespacesFromNode(dir, namespaces, defaultNamespace);
             }
         }
 

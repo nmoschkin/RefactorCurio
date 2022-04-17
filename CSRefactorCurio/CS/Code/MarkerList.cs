@@ -42,7 +42,20 @@ namespace DataTools.CSTools
     /// <typeparam name="TElem">The <see cref="IMarker"/></typeparam>
     public class MarkerList<TElem> : Collection<TElem>, IMarkerList<TElem> where TElem : IMarker
     {
+        protected List<TElem> List { get; }
 
+        public MarkerList()
+        {
+            List = base.Items as List<TElem>;
+        }
+
+        public MarkerList(IEnumerable<TElem> items) : this()
+        {
+            foreach (var item in items)
+            {
+                base.Add(item);
+            }
+        }
     }
 
     /// <summary>
@@ -107,6 +120,14 @@ namespace DataTools.CSTools
 
             return pass;
         }
+
+        public ObservableMarkerList() : base()
+        {
+        }
+
+        public ObservableMarkerList(IEnumerable<TElem> items) : base(items)
+        {
+        }        
 
         /// <summary>
         /// Raise <see cref="INotifyPropertyChanged.PropertyChanged"/>.

@@ -57,6 +57,7 @@
     <Compile Include="Commands\ShowClassFromJsonCommand.cs" />
     <Compile Include="Commands\ShowClassFromJsonFileCommand.cs" />
     <Compile Include="Converters\BoolConverter.cs" />
+    <Compile Include="Converters\MarkerKindToMonikerConverter.cs" />
     <Compile Include="CS\Code\CSCodeParser.cs" />
     <Compile Include="CS\Code\FilterRules.cs" />
     <Compile Include="CS\Code\MarkerKind.cs" />

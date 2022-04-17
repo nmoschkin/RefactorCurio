@@ -64,6 +64,8 @@
 
             <TreeView.Resources>
 
+                <conv:MarkerKindToMonikerConverter x:Key="convMon" />
+
                 <Style
                     x:Key="ExpandingImageStyle"
                     TargetType="{x:Type imaging:CrispImage}"
@@ -204,7 +206,10 @@
                     </Grid>
                 </HierarchicalDataTemplate>
 
-                <DataTemplate DataType="{x:Type mod:CSMarker}">
+                <HierarchicalDataTemplate
+                    DataType="{x:Type mod:CSMarker}"
+                    ItemsSource="{Binding Children}"
+                    >
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -215,7 +220,7 @@
                             Width="16"
                             Height="16"
                             Margin="2"
-                            Moniker="{x:Static catalog:KnownMonikers.Class}"
+                            Moniker="{Binding Kind, Converter={StaticResource convMon}}"
                             />
 
                         <TextBlock
@@ -224,7 +229,7 @@
                             Text="{Binding Title}"
                             />
                     </Grid>
-                </DataTemplate>
+                </HierarchicalDataTemplate>
 
             </TreeView.Resources>
             <TreeView.ContextMenu>

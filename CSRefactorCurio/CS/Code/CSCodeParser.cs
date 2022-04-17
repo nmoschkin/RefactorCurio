@@ -194,6 +194,8 @@ namespace DataTools.CSTools
         protected string[] lines = null;
         protected string text = null;
 
+        protected object SyncRoot { get; } = new object();
+
         protected int preambleTo = 0;
 
         protected TList markers = new TList();
@@ -417,486 +419,495 @@ namespace DataTools.CSTools
         protected virtual TList ParseCSCodeFile(char[] chars)
         {
 
-            int i, j, c = chars.Length;
-
-            TList markers = new TList();
-            TElem currMarker = default;
-            var strack = new Stack<MarkerKind>();
-            var stack = new Stack<TElem>();
-            var listStack = new Stack<TList>();
-
-            StringBuilder cw = new StringBuilder();
-
-            StringBuilder sb;
-
-            int startPos = 0;
-            int scanStartPos = 0;
-
-            int startLine = 0;
-
-            int currLine = 0;
-
-            int currLevel = 0;
-
-            string currNS = "";
-
-            int pre = -1;
-
-            Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
-
-            patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
-            patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
-            patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
-            patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
-            patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-            patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-            patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
-            patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
-            patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
-            patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
-            patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
-            patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
-            patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
-            patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
-            patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
-            patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
-            patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
-            patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
-            patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
-            patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
-            patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
-            patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
-
-            Regex genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
-
-            Regex currCons = null;
-            Regex currDecons = null;
-
-            string currName = null;
-            MarkerKind currPatt = MarkerKind.Unknown;
-
-            Dictionary<string, bool> activas = new Dictionary<string, bool>();
-
-            activas.Add("public", false);
-            activas.Add("internal", false);
-            activas.Add("protected", false);
-            activas.Add("private", true);
-            activas.Add("static", false);
-            activas.Add("extern", false);
-            activas.Add("abstract", false);
-            activas.Add("virtual", false);
-            activas.Add("override", false);
-            activas.Add("new", false);
-            activas.Add("readonly", false);
-
-            for (i = 0; i < c; i++)
+            lock (SyncRoot)
             {
-                if (chars[i] == '\n')
-                {
-                    currLine++;
-                }
-                else if (chars[i] == '\'')
-                {
-                    TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, quoteChar: '\'', withQuotes: true);
-                    i = (int)ept;
-                }
-                else if (chars[i] == '\"')
-                {
-                    TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, withQuotes: true);
-                    i = (int)ept;
-                }
-                else if (chars[i] == ';' || (chars[i] == ',' && currPatt == MarkerKind.Enum))
-                {
-                    var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
+                int i, j, c = chars.Length;
 
-                    currMarker = new TElem
+                TList markers = new TList();
+                TElem currMarker = default;
+                var strack = new Stack<MarkerKind>();
+                var stack = new Stack<TElem>();
+                var listStack = new Stack<TList>();
+
+                StringBuilder cw = new StringBuilder();
+
+                StringBuilder sb;
+
+                int startPos = 0;
+                int scanStartPos = 0;
+
+                int startLine = 0;
+
+                int currLine = 0;
+
+                int currLevel = 0;
+
+                string currNS = "";
+
+                int pre = -1;
+
+                Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
+
+                patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
+                patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
+                patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
+                patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
+                patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
+                patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
+                patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
+                patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
+                patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
+                patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+                patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+                patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
+                patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
+                patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
+                patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
+                patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
+                patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
+                patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
+                patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
+                patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
+                patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
+                patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
+                patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
+                patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
+                patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
+                patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
+                patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
+                patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
+                patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
+                patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
+                patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
+                patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
+                patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
+                patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
+                patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
+
+                Regex genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
+
+                Regex currCons = null;
+                Regex currDecons = null;
+
+                string currName = null;
+                MarkerKind currPatt = MarkerKind.Code;
+
+                Dictionary<string, bool> activas = new Dictionary<string, bool>();
+
+                activas.Add("public", false);
+                activas.Add("internal", false);
+                activas.Add("protected", false);
+                activas.Add("private", true);
+                activas.Add("static", false);
+                activas.Add("extern", false);
+                activas.Add("abstract", false);
+                activas.Add("virtual", false);
+                activas.Add("override", false);
+                activas.Add("new", false);
+                activas.Add("readonly", false);
+
+                for (i = 0; i < c; i++)
+                {
+                    if (chars[i] == '\n')
                     {
-                        Namespace = currNS,
-                        StartPos = startPos,
-                        StartLine = startLine,
-                        StartColumn = ColumnFromHere(chars, startPos),
-                        EndPos = i,
-                        EndLine = currLine,
-                        EndColumn = ColumnFromHere(chars, i),
-                        Content = new string(chars, startPos, i - startPos + 1),
-                        ScanHit = lookback
-                    };
-
-                    currMarker.IsAbstract = activas["abstract"];
-                    currMarker.IsVirtual = activas["virtual"];
-                    currMarker.IsStatic = activas["static"];
-                    currMarker.IsExtern = activas["extern"];
-                    currMarker.IsOverride = activas["override"];
-                    currMarker.IsNew = activas["new"];
-
-                    markers.Add(currMarker);
-                    ResetActivas(activas);
-
-                    foreach (var kvp in patterns)
-                    {
-                        var result = kvp.Value.Match(lookback);
-
-                        if (result.Success)
-                        {
-                            if (kvp.Key == MarkerKind.EnumValue && currPatt != MarkerKind.Enum) continue;
-
-                            currMarker.Kind = kvp.Key;
-                            currMarker.Name = result.Groups[1].Value;
-
-                            break;
-                        }
+                        currLine++;
                     }
-
-                    scanStartPos = startPos = i + 1;
-                    if (i < c - 1 && chars[i + 1] == '\n')
+                    else if (chars[i] == '\'')
                     {
-                        startLine = currLine + 1;
+                        TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, quoteChar: '\'', withQuotes: true);
+                        i = (int)ept;
                     }
-                    else
+                    else if (chars[i] == '\"')
                     {
-                        startLine = currLine;
+                        TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, withQuotes: true);
+                        i = (int)ept;
                     }
-                }
-                else if (chars[i] == '{')
-                {
-                    ++currLevel;
-
-                    strack.Push(currPatt);
-
-                    var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
-                    Match cons = currCons?.Match(lookback) ?? null;
-                    Match ops = patterns[MarkerKind.Operator].Match(lookback);
-                    if (cons != null && cons.Success && !ops.Success)
+                    else if (chars[i] == ';' || (chars[i] == ',' && currPatt == MarkerKind.Enum))
                     {
+                        var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
+
                         currMarker = new TElem
                         {
-                            StartPos = startPos,
                             Namespace = currNS,
+                            StartPos = startPos,
                             StartLine = startLine,
                             StartColumn = ColumnFromHere(chars, startPos),
-                            Kind = MarkerKind.Constructor,
-                            Name = currName,
-                            AccessModifiers = ActivasToAccessModifiers(activas),
+                            EndPos = i,
+                            EndLine = currLine,
+                            EndColumn = ColumnFromHere(chars, i),
+                            Content = new string(chars, startPos, i - startPos + 1),
                             ScanHit = lookback
                         };
 
-                        currPatt = MarkerKind.Constructor;
-                        markers.Add(currMarker);
-                    }
-                    else
-                    {
-                        cons = currDecons?.Match(lookback) ?? null;
+                        currMarker.IsAbstract = activas["abstract"];
+                        currMarker.IsVirtual = activas["virtual"];
+                        currMarker.IsStatic = activas["static"];
+                        currMarker.IsExtern = activas["extern"];
+                        currMarker.IsOverride = activas["override"];
+                        currMarker.IsNew = activas["new"];
 
-                        if (cons != null && cons.Success)
+                        markers.Add(currMarker);
+                        ResetActivas(activas);
+
+                        foreach (var kvp in patterns)
+                        {
+                            var result = kvp.Value.Match(lookback);
+
+                            if (result.Success)
+                            {
+                                if (kvp.Key == MarkerKind.EnumValue && currPatt != MarkerKind.Enum) continue;
+
+                                currMarker.Kind = kvp.Key;
+                                currMarker.Name = result.Groups[1].Value;
+
+                                break;
+                            }
+                        }
+
+                        if ((!currMarker.IsAbstract && currMarker.Kind == MarkerKind.Method) || ((currPatt & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel))
+                        {
+                            currMarker.Kind = MarkerKind.Code;
+                        }
+
+                        scanStartPos = startPos = i + 1;
+                        if (i < c - 1 && chars[i + 1] == '\n')
+                        {
+                            startLine = currLine + 1;
+                        }
+                        else
+                        {
+                            startLine = currLine;
+                        }
+                    }
+                    else if (chars[i] == '{')
+                    {
+                        ++currLevel;
+
+                        strack.Push(currPatt);
+
+                        var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
+                        Match cons = currCons?.Match(lookback) ?? null;
+                        Match ops = patterns[MarkerKind.Operator].Match(lookback);
+                        if (cons != null && cons.Success && !ops.Success)
                         {
                             currMarker = new TElem
                             {
-                                Namespace = currNS,
                                 StartPos = startPos,
+                                Namespace = currNS,
                                 StartLine = startLine,
                                 StartColumn = ColumnFromHere(chars, startPos),
-                                Kind = MarkerKind.Destructor,
+                                Kind = MarkerKind.Constructor,
                                 Name = currName,
+                                AccessModifiers = ActivasToAccessModifiers(activas),
                                 ScanHit = lookback
                             };
 
-                            currPatt = MarkerKind.Destructor;
+                            currPatt = MarkerKind.Constructor;
                             markers.Add(currMarker);
                         }
                         else
                         {
-                            foreach (var kvp in patterns)
-                            {
-                                var result = kvp.Value.Match(lookback);
+                            cons = currDecons?.Match(lookback) ?? null;
 
-                                if (result.Success)
+                            if (cons != null && cons.Success)
+                            {
+                                currMarker = new TElem
                                 {
-                                    if (kvp.Key == MarkerKind.EnumValue && currPatt != MarkerKind.Enum) continue;
+                                    Namespace = currNS,
+                                    StartPos = startPos,
+                                    StartLine = startLine,
+                                    StartColumn = ColumnFromHere(chars, startPos),
+                                    Kind = MarkerKind.Destructor,
+                                    Name = currName,
+                                    ScanHit = lookback
+                                };
 
-                                    currMarker = new TElem
-                                    {
-                                        Namespace = currNS,
-                                        StartPos = startPos,
-                                        StartLine = startLine,
-                                        StartColumn = ColumnFromHere(chars, startPos),
-                                        Kind = kvp.Key,
-                                        Name = result.Groups[1].Value,
-                                        ScanHit = lookback
-                                    };
-
-                                    currPatt = kvp.Key;
-
-                                    if (kvp.Key == MarkerKind.Namespace)
-                                    {
-                                        currNS = result.Groups[1].Value;
-                                        currMarker.Namespace = currNS;
-                                        if (pre == -1)
-                                        {
-                                            pre = startPos - 1;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        currMarker.AccessModifiers = ActivasToAccessModifiers(activas);
-
-                                        currMarker.IsAbstract = activas["abstract"];
-                                        currMarker.IsVirtual = activas["virtual"];
-                                        currMarker.IsStatic = activas["static"];
-                                        currMarker.IsExtern = activas["extern"];
-                                        currMarker.IsOverride = activas["override"];
-                                        currMarker.IsNew = activas["new"];
-
-
-                                        var genScan = genericPatt.Match(lookback);
-                                        if (genScan.Success)
-                                        {
-                                            if (genScan.Groups[1].Value == currMarker.Name)
-                                            {
-                                                currMarker.Generics = $"<{genScan.Groups[2].Value}>";
-                                            }
-                                        }
-                                    }
-
-                                    markers.Add(currMarker);
-
-                                    if (currPatt == MarkerKind.Class || currPatt == MarkerKind.Struct || currPatt == MarkerKind.Record)
-                                    {
-                                        currName = currMarker.Name;
-
-                                        currCons = new Regex($"^.*{currMarker.Name}\\s*\\(.*\\).*$");
-                                        currDecons = new Regex($"^.*\\~{currMarker.Name}\\s*\\(\\)$");
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    ResetActivas(activas);
-
-                    stack.Push(currMarker);
-                    listStack.Push(markers);
-                    markers = new TList();
-
-                    scanStartPos = startPos = i + 1;
-                    if (i < c - 1 && chars[i + 1] == '\n')
-                    {
-                        startLine = currLine + 1;
-                    }
-                    else
-                    {
-                        startLine = currLine;
-                    }
-                }
-                else if (chars[i] == '}')
-                {
-                    if (currPatt == MarkerKind.Enum)
-                    {
-                        var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
-                        var testEnum = patterns[MarkerKind.EnumValue].Match(lookback);
-
-                        if (testEnum.Success)
-                        {
-                            currMarker = new TElem
-                            {
-                                Namespace = currNS,
-                                StartPos = startPos,
-                                StartLine = startLine,
-                                StartColumn = ColumnFromHere(chars, startPos),
-                                EndPos = i - 1,
-                                EndLine = currLine,
-                                EndColumn = ColumnFromHere(chars, i - 1),
-                                Content = new string(chars, startPos, i - startPos),
-                                ScanHit = lookback,
-                                Name = testEnum.Groups[1].Value
-                            };
-
-                            currMarker.Kind = MarkerKind.EnumValue;
-                            currMarker.IsAbstract = activas["abstract"];
-                            currMarker.IsVirtual = activas["virtual"];
-                            currMarker.IsStatic = activas["static"];
-                            currMarker.IsExtern = activas["extern"];
-                            currMarker.IsOverride = activas["override"];
-                            currMarker.IsNew = activas["new"];
-
-                            markers.Add(currMarker);
-                            ResetActivas(activas);
-                        }
-                    }
-
-
-                    --currLevel;
-                    currPatt = strack.Pop();
-
-                    currMarker = stack.Pop();
-
-                    if (currMarker != null)
-                    {
-                        currMarker.EndPos = i;
-                        currMarker.EndLine = currLine;
-                        currMarker.EndColumn = ColumnFromHere(chars, i);
-                        currMarker.Content = new string(chars, currMarker.StartPos, currMarker.EndPos - currMarker.StartPos + 1);
-                    }
-
-                    currMarker.Children = markers;
-                    markers = listStack.Pop();
-
-                    scanStartPos = startPos = i + 1;
-                    if (i < c - 1 && chars[i + 1] == '\n')
-                    {
-                        startLine = currLine + 1;
-                    }
-                    else
-                    {
-                        startLine = currLine;
-                    }
-                    ResetActivas(activas);
-
-                }
-                else if ((i < c - 1) && (chars[i] == '/' && chars[i + 1] == '/'))
-                {
-                    currMarker = new TElem()
-                    {
-                        StartColumn = ColumnFromHere(chars, i),
-                        StartLine = currLine,
-                        StartPos = i,
-                        Namespace = currNS
-                    };
-
-                    sb = new StringBuilder();
-
-                    sb.Append(chars[i]);
-                    sb.Append(chars[i + 1]);
-
-                    bool docs = false;
-                    for (j = i + 2; j < c; j++)
-                    {
-                        if (j == i + 2 && chars[j] == '/')
-                        {
-                            docs = true;
-                        }
-                        sb.Append(chars[j]);
-
-                        if (chars[j] == '\n')
-                        {
-                            currMarker.EndColumn = ColumnFromHere(chars, j - 1);
-                            currMarker.EndLine = currLine;
-                            currMarker.EndPos = j - 1;
-                            currMarker.Content = sb.ToString();
-                            currMarker.Kind = docs ? MarkerKind.XMLDoc : MarkerKind.LineComment;
-
-                            markers.Add(currMarker);
-
-                            currLine++;
-
-                            if (docs)
-                            {
-                                startPos = scanStartPos = j + 1;
-                                startLine = currLine;
-                            }
-                            break;
-                        }
-
-                    }
-
-                    if (j >= c) break;
-                    i = j;
-                }
-                else if ((i < c - 3) && (chars[i] == '/' && chars[i + 1] == '*'))
-                {
-                    currMarker = new TElem()
-                    {
-                        StartColumn = ColumnFromHere(chars, i),
-                        StartLine = currLine,
-                        StartPos = i,
-                        Namespace = currNS
-
-                    };
-
-                    sb = new StringBuilder();
-
-                    sb.Append(chars[i]);
-                    sb.Append(chars[i + 1]);
-
-                    for (j = i + 2; j < c; j++)
-                    {
-                        sb.Append(chars[j]);
-
-                        if (j < c - 1 && chars[j] == '*' && chars[j + 1] == '/')
-                        {
-                            sb.Append('/');
-
-                            currMarker.EndColumn = ColumnFromHere(chars, j + 1);
-                            currMarker.EndLine = currLine;
-                            currMarker.EndPos = j + 1;
-                            currMarker.Content = sb.ToString();
-                            currMarker.Kind = MarkerKind.BlockComment;
-
-                            markers.Add(currMarker);
-
-                            scanStartPos = j + 2;
-                            if (i < c - 2 && chars[i + 2] == '\n')
-                            {
-                                startLine = currLine + 1;
+                                currPatt = MarkerKind.Destructor;
+                                markers.Add(currMarker);
                             }
                             else
                             {
-                                startLine = currLine;
+                                foreach (var kvp in patterns)
+                                {
+                                    var result = kvp.Value.Match(lookback);
+
+                                    if (result.Success)
+                                    {
+                                        if (kvp.Key == MarkerKind.EnumValue && currPatt != MarkerKind.Enum) continue;
+
+                                        currMarker = new TElem
+                                        {
+                                            Namespace = currNS,
+                                            StartPos = startPos,
+                                            StartLine = startLine,
+                                            StartColumn = ColumnFromHere(chars, startPos),
+                                            Kind = kvp.Key,
+                                            Name = result.Groups[1].Value,
+                                            ScanHit = lookback
+                                        };
+
+                                        currPatt = kvp.Key;
+
+                                        if (kvp.Key == MarkerKind.Namespace)
+                                        {
+                                            currNS = result.Groups[1].Value;
+                                            currMarker.Namespace = currNS;
+                                            if (pre == -1)
+                                            {
+                                                pre = startPos - 1;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            currMarker.AccessModifiers = ActivasToAccessModifiers(activas);
+
+                                            currMarker.IsAbstract = activas["abstract"];
+                                            currMarker.IsVirtual = activas["virtual"];
+                                            currMarker.IsStatic = activas["static"];
+                                            currMarker.IsExtern = activas["extern"];
+                                            currMarker.IsOverride = activas["override"];
+                                            currMarker.IsNew = activas["new"];
+
+
+                                            var genScan = genericPatt.Match(lookback);
+                                            if (genScan.Success)
+                                            {
+                                                if (genScan.Groups[1].Value == currMarker.Name)
+                                                {
+                                                    currMarker.Generics = $"<{genScan.Groups[2].Value}>";
+                                                }
+                                            }
+                                        }
+
+                                        markers.Add(currMarker);
+
+                                        if (currPatt == MarkerKind.Class || currPatt == MarkerKind.Struct || currPatt == MarkerKind.Record)
+                                        {
+                                            currName = currMarker.Name;
+
+                                            currCons = new Regex($"^.*{currMarker.Name}\\s*\\(.*\\).*$");
+                                            currDecons = new Regex($"^.*\\~{currMarker.Name}\\s*\\(\\)$");
+                                        }
+
+                                        break;
+                                    }
+                                }
                             }
-                            break;
                         }
-                        else if (chars[j] == '\n')
+
+                        ResetActivas(activas);
+
+                        stack.Push(currMarker);
+                        listStack.Push(markers);
+                        markers = new TList();
+
+                        scanStartPos = startPos = i + 1;
+                        if (i < c - 1 && chars[i + 1] == '\n')
                         {
-                            currLine++;
-
-                            continue;
+                            startLine = currLine + 1;
                         }
-
+                        else
+                        {
+                            startLine = currLine;
+                        }
                     }
-
-                    if (j >= c) break;
-                    i = j;
-                }
-                else if (char.IsLetter(chars[i]))
-                {
-                    cw.Append(chars[i]);
-                }
-                else
-                {
-                    if (cw.Length > 0)
+                    else if (chars[i] == '}')
                     {
-                        var cword = cw.ToString();
-
-                        if (activas.ContainsKey(cword))
+                        if (currPatt == MarkerKind.Enum)
                         {
-                            activas[cword] = true;
+                            var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
+                            var testEnum = patterns[MarkerKind.EnumValue].Match(lookback);
+
+                            if (testEnum.Success)
+                            {
+                                currMarker = new TElem
+                                {
+                                    Namespace = currNS,
+                                    StartPos = startPos,
+                                    StartLine = startLine,
+                                    StartColumn = ColumnFromHere(chars, startPos),
+                                    EndPos = i - 1,
+                                    EndLine = currLine,
+                                    EndColumn = ColumnFromHere(chars, i - 1),
+                                    Content = new string(chars, startPos, i - startPos),
+                                    Kind = MarkerKind.EnumValue,
+                                    Name = testEnum.Groups[1].Value,
+                                    IsAbstract = activas["abstract"],
+                                    IsVirtual = activas["virtual"],
+                                    IsStatic = activas["static"],
+                                    IsExtern = activas["extern"],
+                                    IsOverride = activas["override"],
+                                    IsNew = activas["new"],
+                                    ScanHit = lookback,
+                                };
+                                
+                                markers.Add(currMarker);
+                                ResetActivas(activas);
+                            }
                         }
-                        cw.Clear();
+
+
+                        --currLevel;
+                        currPatt = strack.Pop();
+
+                        currMarker = stack.Pop();
+
+                        if (currMarker != null)
+                        {
+                            currMarker.EndPos = i;
+                            currMarker.EndLine = currLine;
+                            currMarker.EndColumn = ColumnFromHere(chars, i);
+                            currMarker.Content = new string(chars, currMarker.StartPos, currMarker.EndPos - currMarker.StartPos + 1);
+                        }
+
+                        currMarker.Children = markers;
+                        markers = listStack.Pop();
+
+                        scanStartPos = startPos = i + 1;
+                        if (i < c - 1 && chars[i + 1] == '\n')
+                        {
+                            startLine = currLine + 1;
+                        }
+                        else
+                        {
+                            startLine = currLine;
+                        }
+                        ResetActivas(activas);
+
+                    }
+                    else if ((i < c - 1) && (chars[i] == '/' && chars[i + 1] == '/'))
+                    {
+                        currMarker = new TElem()
+                        {
+                            StartColumn = ColumnFromHere(chars, i),
+                            StartLine = currLine,
+                            StartPos = i,
+                            Namespace = currNS
+                        };
+
+                        sb = new StringBuilder();
+
+                        sb.Append(chars[i]);
+                        sb.Append(chars[i + 1]);
+
+                        bool docs = false;
+                        for (j = i + 2; j < c; j++)
+                        {
+                            if (j == i + 2 && chars[j] == '/')
+                            {
+                                docs = true;
+                            }
+                            sb.Append(chars[j]);
+
+                            if (chars[j] == '\n')
+                            {
+                                currMarker.EndColumn = ColumnFromHere(chars, j - 1);
+                                currMarker.EndLine = currLine;
+                                currMarker.EndPos = j - 1;
+                                currMarker.Content = sb.ToString();
+                                currMarker.Kind = docs ? MarkerKind.XMLDoc : MarkerKind.LineComment;
+
+                                markers.Add(currMarker);
+
+                                currLine++;
+
+                                if (docs)
+                                {
+                                    startPos = scanStartPos = j + 1;
+                                    startLine = currLine;
+                                }
+                                break;
+                            }
+
+                        }
+
+                        if (j >= c) break;
+                        i = j;
+                    }
+                    else if ((i < c - 3) && (chars[i] == '/' && chars[i + 1] == '*'))
+                    {
+                        currMarker = new TElem()
+                        {
+                            StartColumn = ColumnFromHere(chars, i),
+                            StartLine = currLine,
+                            StartPos = i,
+                            Namespace = currNS
+
+                        };
+
+                        sb = new StringBuilder();
+
+                        sb.Append(chars[i]);
+                        sb.Append(chars[i + 1]);
+
+                        for (j = i + 2; j < c; j++)
+                        {
+                            sb.Append(chars[j]);
+
+                            if (j < c - 1 && chars[j] == '*' && chars[j + 1] == '/')
+                            {
+                                sb.Append('/');
+
+                                currMarker.EndColumn = ColumnFromHere(chars, j + 1);
+                                currMarker.EndLine = currLine;
+                                currMarker.EndPos = j + 1;
+                                currMarker.Content = sb.ToString();
+                                currMarker.Kind = MarkerKind.BlockComment;
+
+                                markers.Add(currMarker);
+
+                                scanStartPos = j + 2;
+                                if (i < c - 2 && chars[i + 2] == '\n')
+                                {
+                                    startLine = currLine + 1;
+                                }
+                                else
+                                {
+                                    startLine = currLine;
+                                }
+                                break;
+                            }
+                            else if (chars[j] == '\n')
+                            {
+                                currLine++;
+
+                                continue;
+                            }
+
+                        }
+
+                        if (j >= c) break;
+                        i = j;
+                    }
+                    else if (char.IsLetter(chars[i]))
+                    {
+                        cw.Append(chars[i]);
+                    }
+                    else
+                    {
+                        if (cw.Length > 0)
+                        {
+                            var cword = cw.ToString();
+
+                            if (activas.ContainsKey(cword))
+                            {
+                                activas[cword] = true;
+                            }
+                            cw.Clear();
+                        }
                     }
                 }
+
+                preambleTo = pre;
+                PostScanTasks(markers);
+
+                return markers;
+
             }
 
-            preambleTo = pre;
-            PostScanTasks(markers);
-
-            return markers;
         }
 
-        private void PostScanTasks(TList markers) 
+        private void PostScanTasks(TList markers)
         {
             int c = markers.Count;
             int i;
@@ -904,7 +915,6 @@ namespace DataTools.CSTools
             for (i = 0; i < c; i++)
             {
                 if (markers[i].Children != null) PostScanTasks(markers[i].Children);
-
 
                 if (i < c - 1)
                 {
@@ -972,7 +982,7 @@ namespace DataTools.CSTools
                             mknew.EndLine = markers[i].EndLine;
                             mknew.EndColumn = markers[i].EndColumn;
 
-                            mknew.Kind = markers[i].Kind;
+                            mknew.Kind = MarkerKind.Consolidation;
                             mknew.Name = markers[i].Name;
                             mknew.ScanHit = markers[i].ScanHit;
                             mknew.Generics = markers[i].Generics;
@@ -1067,7 +1077,7 @@ namespace DataTools.CSTools
 
         protected virtual void ResetActivas(Dictionary<string, bool> activas)
         {
-            var keys = activas.Keys;
+            var keys = activas.Keys.ToList();
             foreach (var key in keys)
             {
                 activas[key] = false;
