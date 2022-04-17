@@ -65,6 +65,7 @@ namespace DataTools.CSTools
             MarkerKind.Method,
             MarkerKind.Property,
             MarkerKind.Field,
+            MarkerKind.EnumValue,
             MarkerKind.Event,
         };
 

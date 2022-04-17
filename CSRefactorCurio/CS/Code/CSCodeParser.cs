@@ -564,7 +564,7 @@ namespace DataTools.CSTools
                             }
                         }
 
-                        if ((!currMarker.IsAbstract && currMarker.Kind == MarkerKind.Method) || ((currPatt & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel))
+                        if (((!currMarker.IsAbstract && currMarker.Kind == MarkerKind.Method) || ((currPatt & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)) && (currPatt != MarkerKind.Interface && currPatt != MarkerKind.Enum))
                         {
                             currMarker.Kind = MarkerKind.Code;
                         }
