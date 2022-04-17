@@ -102,6 +102,7 @@ namespace CSRefactorCurio
                 LoadProject();
             }
 
+            var p = new PropertiesContainer(dte.get_Properties("FontsAndColors", "TextEditor"));
             await base.InitializeAsync(cancellationToken, progress);
         }
 
@@ -142,6 +143,7 @@ namespace CSRefactorCurio
         private void LoadProject()
         {            
             _ = RefreshSolutionAsync(false);
+           
         }
     }
 }

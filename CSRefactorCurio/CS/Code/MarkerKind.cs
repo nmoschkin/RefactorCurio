@@ -255,6 +255,12 @@ namespace DataTools.CSTools
         BlockComment = 0x27,
 
         /// <summary>
+        /// Attribute or Decorator
+        /// </summary>
+        [Description("Attribute or Decorator")]
+        Attribute = 0x28,
+
+        /// <summary>
         /// Custom 1
         /// </summary>
         [Description("Custom 1")]

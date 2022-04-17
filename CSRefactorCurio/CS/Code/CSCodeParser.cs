@@ -7,11 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 using DataTools.SortedLists;
 using DataTools.Text;
 
 using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudio.LocalLogger;
+using Microsoft.VisualStudio.RemoteSettings;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace DataTools.CSTools
 {
@@ -191,6 +195,10 @@ namespace DataTools.CSTools
 
     public class CSCodeParser<TElem, TList> where TElem : IMarker<TElem, TList>, new() where TList : IMarkerList<TElem>, new()
     {
+
+        protected static Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
+        protected static Regex genericPatt;
+
         protected string[] lines = null;
         protected string text = null;
 
@@ -206,7 +214,51 @@ namespace DataTools.CSTools
         protected string filename = null;
 
         protected string[] outputFiles = new string[0];
-                
+
+
+        static CSCodeParser()
+        {
+
+
+            patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
+            patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
+            patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
+            patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
+            patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
+            patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
+            patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
+            patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
+            patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
+            patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
+            patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
+            patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
+            patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
+            patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
+            patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
+            patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
+            patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
+            patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
+            patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
+            patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
+            patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
+            patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
+            patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
+
+            genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
+        }
+
         public virtual string OutputPath { get; set; } = Directory.GetCurrentDirectory();
 
         public virtual string[] OutputFiles => outputFiles;
@@ -438,53 +490,13 @@ namespace DataTools.CSTools
 
                 int startLine = 0;
 
-                int currLine = 0;
+                int currLine = 1;
 
                 int currLevel = 0;
 
                 string currNS = "";
 
                 int pre = -1;
-
-                Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
-
-                patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
-                patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
-                patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
-                patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
-                patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
-                patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
-                patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
-                patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
-                patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
-                patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-                patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-                patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
-                patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
-                patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
-                patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
-                patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
-                patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
-                patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
-                patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
-                patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
-                patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
-                patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
-                patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
-                patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
-                patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
-                patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
-                patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
-                patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
-                patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
-                patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
-                patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
-                patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
-                patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
-                patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
-                patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
-
-                Regex genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
 
                 Regex currCons = null;
                 Regex currDecons = null;
@@ -493,6 +505,8 @@ namespace DataTools.CSTools
                 MarkerKind currPatt = MarkerKind.Code;
 
                 Dictionary<string, bool> activas = new Dictionary<string, bool>();
+
+                List<string> attrs = null;
 
                 activas.Add("public", false);
                 activas.Add("internal", false);
@@ -505,6 +519,7 @@ namespace DataTools.CSTools
                 activas.Add("override", false);
                 activas.Add("new", false);
                 activas.Add("readonly", false);
+                activas.Add("async", false);
 
                 for (i = 0; i < c; i++)
                 {
@@ -522,10 +537,30 @@ namespace DataTools.CSTools
                         TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, withQuotes: true);
                         i = (int)ept;
                     }
+                    else if (chars[i] == '[')
+                    {
+                        var sl = currLine;
+                        var lookahead = TextTools.TextBetween(chars, i, ref currLine, '[', ']', out int? spt, out int? ept, withDelimiters: true);
+                        
+                        if (lookahead == null) continue;
+                        
+                        if (!Regex.IsMatch(lookahead, @"\[\s*[\w\d._@]+\s*\(?.*?\)?\]"))
+                        {
+                            i = (int)ept;
+                            continue;
+                        }
+
+                        if (attrs == null) attrs = new List<string>();
+                        attrs.Add(lookahead);
+
+                        i = (int)ept;
+                        scanStartPos = i + 1;
+                    }
+
                     else if (chars[i] == ';' || (chars[i] == ',' && currPatt == MarkerKind.Enum))
                     {
                         var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
-
+                        
                         currMarker = new TElem
                         {
                             Namespace = currNS,
@@ -536,7 +571,9 @@ namespace DataTools.CSTools
                             EndLine = currLine,
                             EndColumn = ColumnFromHere(chars, i),
                             Content = new string(chars, startPos, i - startPos + 1),
-                            ScanHit = lookback
+                            Level = currLevel,
+                            ScanHit = lookback,
+                            Attributes = attrs
                         };
 
                         currMarker.IsAbstract = activas["abstract"];
@@ -544,14 +581,16 @@ namespace DataTools.CSTools
                         currMarker.IsStatic = activas["static"];
                         currMarker.IsExtern = activas["extern"];
                         currMarker.IsOverride = activas["override"];
+                        currMarker.IsAsync = activas["async"];
                         currMarker.IsNew = activas["new"];
 
                         markers.Add(currMarker);
                         ResetActivas(activas);
-
+                        var lb = RemoveWhere(lookback);
+                        
                         foreach (var kvp in patterns)
                         {
-                            var result = kvp.Value.Match(lookback);
+                            var result = kvp.Value.Match(lb);
 
                             if (result.Success)
                             {
@@ -568,8 +607,13 @@ namespace DataTools.CSTools
                         {
                             currMarker.Kind = MarkerKind.Code;
                         }
+                        else if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate)
+                        {
+                            TypeAndMethodParse(lookback, currMarker);
+                        }
 
                         scanStartPos = startPos = i + 1;
+                        
                         if (i < c - 1 && chars[i + 1] == '\n')
                         {
                             startLine = currLine + 1;
@@ -578,6 +622,7 @@ namespace DataTools.CSTools
                         {
                             startLine = currLine;
                         }
+                        attrs = null;
                     }
                     else if (chars[i] == '{')
                     {
@@ -588,6 +633,8 @@ namespace DataTools.CSTools
                         var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
                         Match cons = currCons?.Match(lookback) ?? null;
                         Match ops = patterns[MarkerKind.Operator].Match(lookback);
+                        var lb = RemoveWhere(lookback);
+
                         if (cons != null && cons.Success && !ops.Success)
                         {
                             currMarker = new TElem
@@ -599,7 +646,9 @@ namespace DataTools.CSTools
                                 Kind = MarkerKind.Constructor,
                                 Name = currName,
                                 AccessModifiers = ActivasToAccessModifiers(activas),
-                                ScanHit = lookback
+                                Level = currLevel,
+                                ScanHit = lookback,
+                                Attributes = attrs
                             };
 
                             currPatt = MarkerKind.Constructor;
@@ -619,7 +668,9 @@ namespace DataTools.CSTools
                                     StartColumn = ColumnFromHere(chars, startPos),
                                     Kind = MarkerKind.Destructor,
                                     Name = currName,
-                                    ScanHit = lookback
+                                    Level = currLevel,
+                                    ScanHit = lookback,
+                                    Attributes = attrs
                                 };
 
                                 currPatt = MarkerKind.Destructor;
@@ -629,7 +680,7 @@ namespace DataTools.CSTools
                             {
                                 foreach (var kvp in patterns)
                                 {
-                                    var result = kvp.Value.Match(lookback);
+                                    var result = kvp.Value.Match(lb);
 
                                     if (result.Success)
                                     {
@@ -643,8 +694,15 @@ namespace DataTools.CSTools
                                             StartColumn = ColumnFromHere(chars, startPos),
                                             Kind = kvp.Key,
                                             Name = result.Groups[1].Value,
-                                            ScanHit = lookback
+                                            Level = currLevel,
+                                            ScanHit = lookback,
+                                            Attributes = attrs
                                         };
+
+                                        if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate)
+                                        {
+                                            TypeAndMethodParse(lookback, currMarker);
+                                        }
 
                                         currPatt = kvp.Key;
 
@@ -667,6 +725,7 @@ namespace DataTools.CSTools
                                             currMarker.IsExtern = activas["extern"];
                                             currMarker.IsOverride = activas["override"];
                                             currMarker.IsNew = activas["new"];
+                                            currMarker.IsAsync = activas["async"];
 
 
                                             var genScan = genericPatt.Match(lookback);
@@ -710,6 +769,8 @@ namespace DataTools.CSTools
                         {
                             startLine = currLine;
                         }
+
+                        attrs = null;
                     }
                     else if (chars[i] == '}')
                     {
@@ -737,7 +798,9 @@ namespace DataTools.CSTools
                                     IsStatic = activas["static"],
                                     IsExtern = activas["extern"],
                                     IsOverride = activas["override"],
+                                    IsAsync = activas["async"],
                                     IsNew = activas["new"],
+                                    Level = currLevel,
                                     ScanHit = lookback,
                                 };
                                 
@@ -782,6 +845,7 @@ namespace DataTools.CSTools
                             StartColumn = ColumnFromHere(chars, i),
                             StartLine = currLine,
                             StartPos = i,
+                            Level = currLevel,
                             Namespace = currNS
                         };
 
@@ -831,6 +895,7 @@ namespace DataTools.CSTools
                             StartColumn = ColumnFromHere(chars, i),
                             StartLine = currLine,
                             StartPos = i,
+                            Level = currLevel,
                             Namespace = currNS
 
                         };
@@ -905,6 +970,192 @@ namespace DataTools.CSTools
 
             }
 
+        }
+
+        protected static readonly string[] deletes = new string[] { "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new" };
+
+        private bool TypeAndMethodParse(string lookback, TElem marker)
+        {
+            int l = 0, i;
+            var str = lookback;
+            foreach (var s in deletes) str = str.Replace(s, "");
+            str = str.Trim();
+            var w = str.ToCharArray();
+            int c = w.Length;
+
+            var tsb = new StringBuilder();
+            var nsb = new StringBuilder();
+            bool fl = false;
+            bool lww = false;
+            char ch = '\n';
+
+            for (i = 0; i < c; i++)
+            {
+                ch = w[i];
+
+                if (i == 0 && (!char.IsLetter(ch) && ch == '.' && ch == '@' && ch == '_')) throw new SyntaxErrorException();
+
+                if (char.IsLetterOrDigit(ch) || ch == '.' || ch == '@' && ch == '_')
+                {
+                    if (fl) break;
+                    tsb.Append(ch);
+                    lww = true;
+                }
+                else if (ch == '<')
+                {
+                    try 
+                    {
+                        var t = TextTools.TextBetween(w, i, ref l, '<', '>', out int? ax, out int? bx, withDelimiters: true);
+                        if (t != null && bx != null)
+                        {
+                            i = (int)bx;
+                            tsb.Append(t);
+                            fl = true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        lww = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
+                }
+                else if (ch == '(')
+                {
+                    try
+                    {
+                        var t = TextTools.TextBetween(w, i, ref l, '(', ')', out int? ax, out int? bx, withDelimiters: true);
+                        if (t != null && bx != null)
+                        {
+                            i = (int)bx;
+                            tsb.Append(t);
+                            fl = true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        lww = false;
+                    }
+                    catch (Exception ex) 
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
+                }
+                else if (ch == ' ')
+                {
+                    if (lww)
+                    {
+                        i++;
+                        break;
+                    }
+                }
+
+            }
+
+            if (tsb.Length > 0)
+            {
+                marker.DataType = tsb.ToString();
+            }
+            else
+            {
+                return false;
+            }
+
+            for (; i < c; i++)
+            {
+                ch = w[i];
+
+                if (char.IsLetterOrDigit(ch) || ch == '@' && ch == '_')
+                {
+                    nsb.Append(ch);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (nsb.Length > 0)
+            {
+                marker.Name = nsb.ToString();   
+            }
+            else
+            {
+                return false;
+            }
+            if (i < c)
+            {
+                for (; i < c; i++)
+                {
+                    ch = w[i];
+                    while (i < c && char.IsWhiteSpace(ch)) i++;
+                    if (i >= c) return true;
+
+                    if (ch == '(')
+                    {
+                        var parms = TextTools.TextBetween(w, i, ref l, '(', ')', out int? ax, out int? bx, withDelimiters: true);
+                        if (parms != null)
+                        {
+                            marker.MethodParamsString = parms;
+                            if (parms != "()")
+                            {
+                                marker.MethodParams = new List<string>(TextTools.Split(parms.Substring(1, parms.Length - 2), ",", trimResults: true));
+                            }
+                            if (bx != null) i = (int)bx;
+                        }
+                    }
+                    else if (ch == '<')
+                    {
+                        var parms = TextTools.TextBetween(w, i, ref l, '<', '>', out int? ax, out int? bx, withDelimiters: true);
+                        if (parms != null)
+                        {
+                            marker.Generics = parms;
+                            if (bx != null) i = (int)bx;
+                        }
+                    }
+
+                }
+
+            }
+            return true;
+        }
+
+        private string RemoveWhere(string value)
+        {
+            bool io = false;
+
+            int c = value.Length;
+            var sb = new StringBuilder();   
+
+            for (int i = c - 1; i >= 0; i--)
+            {
+                char ch = value[i];
+
+                if (ch == ')') io = true;
+                else if (ch == '(') io = false;
+
+                if (char.IsWhiteSpace(ch))
+                {
+                    sb.Clear();
+                }
+                else
+                {
+                    sb.Insert(0, ch);
+                }
+
+                if (sb.ToString() == "where")
+                {
+                    if (!io) value = value.Substring(0, i);
+                    
+                    sb.Clear();
+                }
+            }
+
+            return value;
         }
 
         private void PostScanTasks(TList markers)
@@ -994,6 +1245,7 @@ namespace DataTools.CSTools
                             mknew.IsExtern = markers[i].IsExtern;
                             mknew.IsOverride = markers[i].IsOverride;
                             mknew.IsNew = markers[i].IsNew;
+                            mknew.IsAsync = markers[i].IsAsync;
 
                             if (markers is List<TElem> l)
                             {
@@ -1015,38 +1267,6 @@ namespace DataTools.CSTools
 
                 }
 
-                if (i < c)
-                {
-                    if ((markers[i].Kind == MarkerKind.Method || markers[i].Kind == MarkerKind.Constructor) && !string.IsNullOrEmpty(markers[i].ScanHit))
-                    {
-                        var re = new Regex(@".* ([A-Za-z0-9_@.]+)(<(.+)>)?.*\s*\((.*)\)\s+?:?.+?");
-                        var re2 = new Regex(@".* ([A-Za-z0-9_@.]+)(<(.+)>)?.*\s*\((.*)\)");
-
-                        var m = re.Match(markers[i].ScanHit);
-
-                        if (m.Success)
-                        {
-                            markers[i].MethodParamsString = m.Groups[m.Groups.Count - 1].Value;
-                            if (!string.IsNullOrEmpty(markers[i].MethodParamsString))
-                            {
-                                markers[i].MethodParams = new List<string>(TextTools.Split(markers[i].MethodParamsString, ",", trimResults: true));
-                            }
-                        }
-                        else
-                        {
-                            m = re2.Match(markers[i].ScanHit);
-
-                            if (m.Success)
-                            {
-                                markers[i].MethodParamsString = m.Groups[m.Groups.Count - 1].Value;
-                                if (!string.IsNullOrEmpty(markers[i].MethodParamsString))
-                                {
-                                    markers[i].MethodParams = new List<string>(TextTools.Split(markers[i].MethodParamsString, ",", trimResults: true));
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
 

@@ -124,6 +124,11 @@ namespace DataTools.CSTools
         bool IsStatic { get; set; }
 
         /// <summary>
+        /// Element is an async method.
+        /// </summary>
+        bool IsAsync { get; set; }
+
+        /// <summary>
         /// Home namespace of this element.
         /// </summary>
         string Namespace { get; set; }
@@ -147,6 +152,12 @@ namespace DataTools.CSTools
         /// If applicable, the list of method parameters.
         /// </summary>
         List<string> MethodParams { get; set; }
+
+
+        /// <summary>
+        /// If applicable, the list of attributes.
+        /// </summary>
+        List<string> Attributes { get; set; }
 
         /// <summary>
         /// The first character position in the original document.
@@ -365,29 +376,43 @@ namespace DataTools.CSTools
 
         private void ScanForDataType()
         {
-            if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(ScanHit)) return;
+            return;
 
-            switch (kind)
-            {
-                case MarkerKind.Method:
-                case MarkerKind.Property:
-                case MarkerKind.Field:
-                case MarkerKind.Event:
-                case MarkerKind.Const:
-                case MarkerKind.Delegate:
-                    break;
+            //if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(ScanHit)) return;
 
-                default:
-                    return;
-            }
+            //switch (kind)
+            //{
+            //    case MarkerKind.Method:
+            //    case MarkerKind.Property:
+            //    case MarkerKind.Field:
+            //    case MarkerKind.Event:
+            //    case MarkerKind.Const:
+            //    case MarkerKind.Delegate:
+            //        break;
 
-            var re = new Regex(@"^.*\w+?\s+?([A-Za-z_@][A-Za-z_0-9@\<\>\(\) ]+)\s+" + Name);
+            //    default:
+            //        return;
+            //}
 
-            var m = re.Match(ScanHit);
-            if (m.Success)
-            {
-                DataType = m.Groups[1].Value;
-            }
+            //var deletes = new string[] { "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new" };
+            //var re = new Regex(@"\[(.+)\]");
+
+            //var sh = ScanHit;
+
+            //sh = re.Replace(sh, "");
+            //re = new Regex(@"\=.+");
+            //sh = re.Replace(sh, "");
+
+            //foreach (var d in deletes) sh = sh.Replace(d, "");
+            //sh = sh.Trim();
+
+            //re = new Regex(@"^(.+)\s+" + Name);
+
+            //var m = re.Match(sh);
+            //if (m.Success)
+            //{
+            //    DataType = m.Groups[1].Value;
+            //}
         }
 
         public virtual AccessModifiers AccessModifiers { get; set; }
@@ -405,6 +430,8 @@ namespace DataTools.CSTools
         public virtual bool IsNew { get; set; }
 
         public virtual bool IsStatic { get; set; }
+
+        public virtual bool IsAsync { get; set; }
 
         public virtual string Namespace { get; set; }
 
@@ -503,7 +530,7 @@ namespace DataTools.CSTools
 
                 if (!string.IsNullOrEmpty(MethodParamsString))
                 {
-                    sb.Append("(" + MethodParamsString + ")");
+                    sb.Append(MethodParamsString);
                 }
                 else
                 {
@@ -526,6 +553,7 @@ namespace DataTools.CSTools
 
         public virtual ElementType ElementType => ElementType.Marker;
         public virtual ElementType ChildType => ElementType.Marker;
+        public virtual List<string> Attributes { get; set; }
 
         public virtual RenderedFile<TElem, TList> ParentFile { get; set; }
 
