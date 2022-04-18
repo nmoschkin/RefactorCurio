@@ -399,7 +399,7 @@ namespace DataTools.CSTools
         /// <param name="parent">Optional parent subfolder within the specified project.</param>
         public CSDirectory(CurioProject project, string path, CSDirectory parent = null)
         {
-            if (parent.Project != null && project != parent.Project) throw new ArgumentException("Parent directory must be a member of the same project being referenced.");
+            if (parent != null && project != parent.Project) throw new ArgumentException("Parent directory must be a member of the same project being referenced.");
 
             files = new ObservableCollection<CSCodeFile>();
             directories = new ObservableCollection<CSDirectory>();
