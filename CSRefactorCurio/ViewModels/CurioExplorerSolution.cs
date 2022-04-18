@@ -4,6 +4,8 @@ using DataTools.Observable;
 
 using EnvDTE80;
 
+using Microsoft.VisualStudio.Shell.Interop;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,12 +13,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace CSRefactorCurio.ViewModels
 {
     internal class CurioExplorerSolution : ObservableBase, ICommandOwner
     {
         private EnvDTE.Solution _sln;
+        private Cursor cursor = Cursors.Arrow;
 
         private ObservableCollection<IProjectElement> projects = new ObservableCollection<IProjectElement>();
         private ObservableCollection<IProjectElement> namespaces = new ObservableCollection<IProjectElement>();
@@ -43,11 +47,13 @@ namespace CSRefactorCurio.ViewModels
 
             clickClasses = new OwnedCommand(this, (o) =>
             {
-                classMode = true;
+                ClassMode = true;
             }, nameof(ClickClasses));
 
         }
         
+
+
         public bool LoadingFlag { get; set; } = false;
 
         public void Clear()
@@ -102,12 +108,12 @@ namespace CSRefactorCurio.ViewModels
             PopulateFrom(Projects, dte.Solution);
 
             LoadingFlag = false;
-            RefreshNamespaces();
+            if (!classMode) RefreshNamespaces();
         }
 
         private void Projects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (!LoadingFlag) RefreshNamespaces();
+            if (!classMode && !LoadingFlag) RefreshNamespaces();
         }
 
         private List<CurioProject> GetAllProjects(IList<IProjectElement> fromList)
@@ -131,16 +137,27 @@ namespace CSRefactorCurio.ViewModels
 
         public void RefreshNamespaces()
         {
+            Cursor = Cursors.Wait;
             namespacesMap.Clear();
-            namespaces = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap);
+            namespaces = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
 
             OnPropertyChanged(nameof(Namespaces));
             if (!classMode) OnPropertyChanged(nameof(CurrentItems));
+            Cursor = null;
         }
 
         public CurioExplorerSolution(EnvDTE.Solution sln) : this()
         {
             _sln = sln;
+        }
+
+        public Cursor Cursor
+        {
+            get => cursor;
+            set
+            {
+                SetProperty(ref cursor, value);
+            }
         }
 
         public bool ClassMode
@@ -150,6 +167,11 @@ namespace CSRefactorCurio.ViewModels
             {
                 if (SetProperty(ref classMode, value))
                 {
+                    if (!classMode)
+                    {
+                        RefreshNamespaces();
+                    }
+
                     OnPropertyChanged(nameof(CurrentItems));
                 }
             }

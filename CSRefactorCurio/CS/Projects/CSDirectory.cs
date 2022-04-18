@@ -66,7 +66,11 @@ namespace DataTools.CSTools
 
         public virtual ObservableMarkerList<CSMarker> FilteredItems
         {
-            get => filteredChildren;
+            get
+            {
+                if ((markers == null || markers.Count == 0) && IsLazyLoad) Refresh();
+                return filteredChildren;
+            }
             protected set
             {
                 if (filteredChildren != value)
@@ -80,7 +84,11 @@ namespace DataTools.CSTools
 
         public virtual ObservableMarkerList<CSMarker> Children
         {
-            get => markers;
+            get
+            {
+                if ((markers == null || markers.Count == 0) && IsLazyLoad) Refresh();
+                return markers;
+            }
             protected set
             {
                 if (markers != value)
@@ -174,10 +182,10 @@ namespace DataTools.CSTools
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        new public static CSCodeFile LoadFromFile(string path)
+        new public static CSCodeFile LoadFromFile(string path, bool lazy)
         {
             var cf = new CSCodeFile();
-            cf.LoadFile(path);
+            cf.LoadFile(path, lazy);
             return cf;
         }
         
@@ -272,6 +280,18 @@ namespace DataTools.CSTools
 
                 return null;
             }
+        }
+
+        public int GetTotalFilesCount()
+        {
+            var count = files.Count;
+
+            foreach (var dir in directories)
+            {
+                count += dir.GetTotalFilesCount();
+            }
+
+            return count;
         }
 
         public ObservableCollection<CSDirectory> Directories
@@ -526,7 +546,8 @@ namespace DataTools.CSTools
 
                 if (create)
                 {
-                    var csnew = CSCodeFile.LoadFromFile(filename);                    
+                    var csnew = CSCodeFile.LoadFromFile(filename, true);
+
                     files.Add(csnew);
                     children.Add(csnew);
 
@@ -581,7 +602,7 @@ namespace DataTools.CSTools
 
                 try
                 {
-                    var parser = CSCodeFile.LoadFromFile(f);
+                    var parser = CSCodeFile.LoadFromFile(f, true);
                     outfiles.Add(parser);
                 }
                 catch (Exception ex)

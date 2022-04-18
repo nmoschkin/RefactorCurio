@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace CSRefactorCurio.ViewModels
+namespace CSRefactorCurio.Helpers
 {
     internal static class BrushHelper
     {
@@ -38,7 +38,7 @@ namespace CSRefactorCurio.ViewModels
         {
             Guid category = themeResourceKey.Category;
             __THEMEDCOLORTYPE colorType = __THEMEDCOLORTYPE.TCT_Foreground;
-           if (themeResourceKey.KeyType == ThemeResourceKeyType.BackgroundColor || themeResourceKey.KeyType == ThemeResourceKeyType.BackgroundBrush)
+            if (themeResourceKey.KeyType == ThemeResourceKeyType.BackgroundColor || themeResourceKey.KeyType == ThemeResourceKeyType.BackgroundBrush)
             {
                 colorType = __THEMEDCOLORTYPE.TCT_Background;
             }
@@ -51,14 +51,25 @@ namespace CSRefactorCurio.ViewModels
         {
             Validate.IsNotNull(vsUIShell, "vsUIShell");
             Validate.IsNotNull(themeResourceKey, "themeResourceKey");
-            
+
             return VsColors.GetThemedWPFColor(vsUIShell, themeResourceKey);
-
-
         }
+
+        public static Color MakeColorFromNumber(int value)
+        {
+            var colorComponents = BitConverter.GetBytes(value);
+            return Color.FromArgb(255/*colorComponents[3]*/, colorComponents[0], colorComponents[1], colorComponents[2]);
+        }
+
+        public static Color MakeColorFromNumber(uint value)
+        {
+            var colorComponents = BitConverter.GetBytes(value);
+            return Color.FromArgb(255/*colorComponents[3]*/, colorComponents[0], colorComponents[1], colorComponents[2]);
+        }
+
         static BrushHelper()
         {
-            IVsUIShell2 uiShell2 = CSRefectorCurioPackage.GetGlobalService(typeof(SVsUIShell)) as IVsUIShell2;
+            IVsUIShell2 uiShell2 = Package.GetGlobalService(typeof(SVsUIShell)) as IVsUIShell2;
             Debug.Assert(uiShell2 != null, "failed to get IVsUIShell2");
         }
     }

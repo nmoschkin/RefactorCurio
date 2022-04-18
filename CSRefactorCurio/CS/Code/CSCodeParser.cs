@@ -275,6 +275,8 @@ namespace DataTools.CSTools
 
         public virtual bool ParseSuccess { get; protected set; } = false;
 
+        public virtual bool IsLazyLoad { get; protected set; } = false; 
+
         public virtual string Filename
         {
             get => filename;
@@ -286,20 +288,28 @@ namespace DataTools.CSTools
             get => lastErrors;
         }
 
-        public virtual void LoadFile(string filename)
+        public virtual void LoadFile(string filename, bool lazy = false)
         {
-            if (!File.Exists(filename)) throw new FileNotFoundException(filename);
+            lock (SyncRoot)
+            {
+                if (!File.Exists(filename)) throw new FileNotFoundException(filename);
 
-            lastErrors = new List<string>();
-            Filename = filename;
-            OutputPath = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "\\");
+                lastErrors = new List<string>();
+                Filename = filename;
+                OutputPath = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "\\");
+                IsLazyLoad = lazy;
 
-            Parse(File.ReadAllText(filename));
+                if (!lazy) Parse(File.ReadAllText(filename));
+            }
         }
 
         public void Refresh()
         {
-            Parse(File.ReadAllText(Filename));
+            lock (SyncRoot)
+            {
+                IsLazyLoad = false;
+                Parse(File.ReadAllText(Filename));
+            }
         }
 
         protected CSCodeParser()
@@ -311,11 +321,11 @@ namespace DataTools.CSTools
             Parse(text);
         }
 
-        public static CSCodeParser<TElem, TList> LoadFromFile(string filename)
+        public static CSCodeParser<TElem, TList> LoadFromFile(string filename, bool lazy = false)
         {
             if (!File.Exists(filename)) throw new FileNotFoundException(filename);
             var res = new CSCodeParser<TElem, TList>();
-            res.LoadFile(filename);
+            res.LoadFile(filename, lazy);
             return res;
         }
 
@@ -422,37 +432,42 @@ namespace DataTools.CSTools
 
         protected virtual bool Parse(string text)
         {
-            ParseSuccess = false;
-
-            this.text = text;
-            this.lines = text.Replace("\r\n", "\n").Split('\n');
-
-            try
+            lock (SyncRoot)
             {
-                markers = ParseCSCodeFile(text.ToCharArray());
+                ParseSuccess = false;
 
-                var cf = new RenderedFile<TElem, TList>()
+                this.text = text;
+                this.lines = text.Replace("\r\n", "\n").Split('\n');
+
+                try
                 {
-                    PreambleBegin = 0,
-                    PreambleEnd = preambleTo,
-                    Markers = markers ?? new TList()
-                };
+                    markers = ParseCSCodeFile(text.ToCharArray());
 
-                mfile = cf;
+                    var cf = new RenderedFile<TElem, TList>()
+                    {
+                        PreambleBegin = 0,
+                        PreambleEnd = preambleTo,
+                        Markers = markers ?? new TList()
+                    };
 
-                foreach (var marker in markers)
+                    mfile = cf;
+
+                    foreach (var marker in markers)
+                    {
+                        SetParentFile(marker, cf);
+                    }
+
+                    ParseSuccess = true;
+                    IsLazyLoad = false;
+                }
+                catch (SyntaxErrorException ex)
                 {
-                    SetParentFile(marker, cf);
+                    lastErrors.Add(ex.Message);
+                    IsLazyLoad = true;
                 }
 
-                ParseSuccess = true;
+                return ParseSuccess;
             }
-            catch (SyntaxErrorException ex)
-            {
-                lastErrors.Add(ex.Message);
-            }
-
-            return ParseSuccess;
         }
 
         protected void SetParentFile(TElem marker, RenderedFile<TElem, TList> file)

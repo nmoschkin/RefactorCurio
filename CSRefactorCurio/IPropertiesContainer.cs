@@ -1,4 +1,6 @@
-﻿using DataTools.Observable;
+﻿using CSRefactorCurio.Helpers;
+
+using DataTools.Observable;
 
 using System;
 using System.Collections;
@@ -6,41 +8,85 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace CSRefactorCurio
 {
+    /// <summary>
+    /// Simple interface for the EnvDTE properties.
+    /// </summary>
     public interface IProperty : INotifyPropertyChanged
     {
         IPropertiesContainer Container { get; }
-        
+
         string Name { get; }
 
         object Value { get; set; }
     }
 
-    public interface IPropertiesContainer : INotifyPropertyChanged, IEnumerable<IProperty>
+    /// <summary>
+    /// Simple interface for the colorable property.
+    /// </summary>
+    public interface IColorableProperty : IProperty
     {
-        object Parent { get; }
+        Color Background { get; }
 
-        IProperty this[string name] { get; }
+        bool Bold { get; }
 
+        Color Foreground { get; }
     }
 
+    /// <summary>
+    /// Simple interface for a property container.
+    /// </summary>
+    public interface IPropertiesContainer
+    {
+        object Parent { get; }
+    }
+
+    /// <summary>
+    /// Simple interface for a property container.
+    /// </summary>
+    public interface IPropertiesContainer<T> : IPropertiesContainer, INotifyPropertyChanged, IEnumerable<T> where T : IProperty
+    {
+        T this[string name] { get; }
+    }
+
+    /// <summary>
+    /// Wraps <see cref="EnvDTE.Property"/>
+    /// </summary>
     public class Property : ObservableBase, IProperty
     {
-        EnvDTE.Property _native;
+        protected EnvDTE.Property _native;
+        protected PropertiesContainer _container = null;
 
         public EnvDTE.Property NativeObject => _native;
 
         public IPropertiesContainer Container { get; }
 
         public string Name => _native.Name;
-        
-        public object Value
+
+        public virtual object Value
         {
-            get => _native.Value;
+            get
+            {
+                if (_native == null) return null;
+                if (_native.Value is EnvDTE.Properties prn)
+                {
+                    if (_container == null)
+                    {
+                        _container = new PropertiesContainer(prn);
+                    }
+
+                    return _container;
+                }
+
+                return _native.Value;
+            }
             set
             {
                 if (_native.Value != value)
@@ -51,7 +97,8 @@ namespace CSRefactorCurio
                 }
             }
         }
-    
+
+
         public Property(IPropertiesContainer parent, EnvDTE.Property native)
         {
             _native = native;
@@ -60,54 +107,55 @@ namespace CSRefactorCurio
 
     }
 
-    public class PropertiesContainer : ObservableBase, IPropertiesContainer, IReadOnlyDictionary<string, IProperty>
+    /// <summary>
+    /// Wraps <see cref="EnvDTE.ColorableItems"/>
+    /// </summary>
+    public class ColorableProperty : ObservableBase, IColorableProperty
     {
-        EnvDTE.Properties _native;
+        protected EnvDTE.ColorableItems _native;
+        protected PropertiesContainer _container = null;
 
-        private Dictionary<string, IProperty> _properties = new Dictionary<string, IProperty>();
+        public EnvDTE.ColorableItems NativeObject => _native;
 
-        public EnvDTE.Properties NativeObject => _native;
+        public IPropertiesContainer Container { get; }
 
-        public object Parent => _native.Parent;
+        public string Name => _native.Name;
 
-        protected Dictionary<string, IProperty> Properties => _properties;
-
-        public IEnumerable<string> Keys => ((IReadOnlyDictionary<string, IProperty>)_properties).Keys;
-
-        public IEnumerable<IProperty> Values => ((IReadOnlyDictionary<string, IProperty>)_properties).Values;
-
-        public int Count => ((IReadOnlyCollection<KeyValuePair<string, IProperty>>)_properties).Count;
-
-        public virtual IProperty this[string name]
+        public Color Background
         {
-            get => _properties[name];
+            get => BrushHelper.MakeColorFromNumber(_native.Background | 0xff000000); 
         }
 
-        public PropertiesContainer(EnvDTE.Solution sln)
+        public bool Bold
         {
-            _native = sln.Properties;
-            Refresh();
+            get => _native.Bold;
         }
 
-        public PropertiesContainer(EnvDTE.Project project)
+        public Color Foreground
         {
-            _native = project.Properties;
-            Refresh();
+            get => BrushHelper.MakeColorFromNumber(_native.Foreground | 0xff000000);
         }
 
-        public PropertiesContainer(EnvDTE.ProjectItem item)
-        {
-            _native = item.Properties;
-            Refresh();
-        }
+        public object Value { get; set; }
 
-        public PropertiesContainer(EnvDTE.Properties native)
+        public ColorableProperty(IPropertiesContainer parent, EnvDTE.ColorableItems native)
         {
             _native = native;
-            Refresh();
+
+            Container = parent;
         }
 
-        public virtual void Refresh()
+    }
+
+    public class PropertiesContainer : PropertiesContainer<EnvDTE.Properties, IProperty>
+    {
+        public PropertiesContainer(object nativeObj) : base(nativeObj, false)
+        {
+        }
+
+        public override object Parent => _native.Parent;
+
+        public override void Refresh()
         {
             foreach (var oldprop in _properties)
             {
@@ -125,13 +173,198 @@ namespace CSRefactorCurio
             }
         }
 
-        private void OnChildPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    }
+
+    public class ColorItems : PropertiesContainer<EnvDTE.FontsAndColorsItems, IColorableProperty>
+    {
+        EnvDTE.DTE dte;
+
+        public static async Task<ColorItems> CreateAsync(bool lazy = true)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            var dte = (EnvDTE.DTE)CSRefactorCurioPackage.GetGlobalService(typeof(EnvDTE.DTE));
+
+            var props = new PropertiesContainer(dte.get_Properties("FontsAndColors", "TextEditor"));
+            return new ColorItems(((Property)props["FontsAndColorsItems"]).NativeObject.Object, lazy);
+        }
+
+        public static ColorItems Create(bool lazy = true)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            var dte = (EnvDTE.DTE)CSRefactorCurioPackage.GetGlobalService(typeof(EnvDTE.DTE));
+
+            var props = new PropertiesContainer(dte.get_Properties("FontsAndColors", "TextEditor"));
+            return new ColorItems(((Property)props["FontsAndColorsItems"]).NativeObject.Object, lazy);
+        }
+
+        public ColorItems(object nativeObj, bool lazy) : base(nativeObj, lazy)
+        {
+            dte = (EnvDTE.DTE)CSRefactorCurioPackage.GetGlobalService(typeof(EnvDTE.DTE));
+            _native = (EnvDTE.FontsAndColorsItems)nativeObj;
+        }
+
+        public override object Parent => dte;
+
+        public override IColorableProperty this[string name]
+        {
+            get => GetCreateSingleItem(name);
+        }
+
+        public virtual void RefreshCurrent()
+        {
+            var keys = Keys.ToList();
+
+            foreach (var key in keys)
+            {
+                if (_properties.TryGetValue(key, out var item))
+                {
+                    item.PropertyChanged -= OnChildPropertyChanged;
+
+                    var prop = _native.Item(key) as EnvDTE.ColorableItems;
+                    var newprop = new ColorableProperty(this, prop);
+                    _properties[key] = newprop;
+                    newprop.PropertyChanged += OnChildPropertyChanged;
+                    OnPropertyChanged(prop.Name);
+                }
+
+            }
+        }
+
+        public override void Refresh()
+        {
+            foreach (var oldprop in _properties)
+            {
+                oldprop.Value.PropertyChanged -= OnChildPropertyChanged;
+            }
+            _properties.Clear();
+
+            foreach (EnvDTE.ColorableItems prop in _native)
+            {
+                var newprop = new ColorableProperty(this, prop);
+                newprop.PropertyChanged += OnChildPropertyChanged;
+
+                _properties.Add(prop.Name, newprop);
+                OnPropertyChanged(prop.Name);
+            }
+        }
+
+        public override bool TryGetValue(string key, out IColorableProperty value)
+        {
+            value = GetCreateSingleItem(key);
+            return value != null;
+        }
+
+        protected IColorableProperty GetCreateSingleItem(string key)
+        {
+            if (_properties.TryGetValue(key, out var item))
+            {
+                return item;
+            }
+            
+            var prop = _native.Item(key) as EnvDTE.ColorableItems;
+
+            if (prop != null)
+            {
+                var newprop = new ColorableProperty(this, prop);
+                newprop.PropertyChanged += OnChildPropertyChanged;
+
+                _properties.Add(prop.Name, newprop);
+                OnPropertyChanged(prop.Name);
+                return newprop;
+            }
+
+            return null;
+
+        }
+
+    }
+
+    /// <summary>
+    /// Wraps <see cref="EnvDTE.Properties"/>
+    /// </summary>
+    public abstract class PropertiesContainer<TNative, TWrap> : ObservableBase, IPropertiesContainer<TWrap>, IReadOnlyDictionary<string, TWrap> where TNative : IEnumerable where TWrap: IProperty
+    {
+
+        protected bool _lazy;
+
+        protected TNative _native;
+
+        protected Dictionary<string, TWrap> _properties = new Dictionary<string, TWrap>();
+
+        protected Dictionary<string, TWrap> Properties => _properties;
+
+        public virtual TNative NativeObject => _native;
+
+        public abstract object Parent { get; }
+
+        public virtual IEnumerable<string> Keys => ((IReadOnlyDictionary<string, TWrap>)_properties).Keys;
+
+        public virtual IEnumerable<TWrap> Values => ((IReadOnlyDictionary<string, TWrap>)_properties).Values;
+
+        public virtual int Count => ((IReadOnlyCollection<KeyValuePair<string, TWrap>>)_properties).Count;
+
+        public virtual bool IsLazyLoad
+        {
+            get => _lazy;
+            protected set => _lazy = value;
+        }
+
+        public virtual TWrap this[string name]
+        {
+            get => _properties[name];
+        }
+
+        protected PropertiesContainer(bool lazy)
+        {
+            _lazy = lazy;
+        }
+
+        public PropertiesContainer(object nativeObj, bool lazy)
+        {
+            _lazy = lazy;
+
+            if (nativeObj is TNative native)
+            {
+                _native = native;
+            }
+            else if (typeof(TNative) == typeof(EnvDTE.Properties))
+            {
+                if (nativeObj is EnvDTE.Solution sln)
+                {
+                    _native = (TNative)sln.Properties;
+                }
+                else if (nativeObj is EnvDTE.Project project)
+                {
+                    _native = (TNative)project.Properties;
+                }
+                else if (nativeObj is EnvDTE.ProjectItem item)
+                {
+                    _native = (TNative)item.Properties;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            if (!_lazy) Refresh();
+        }
+
+        public abstract void Refresh();
+
+        protected virtual void OnChildPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName != nameof(IProperty.Value)) OnPropertyChanged(e.PropertyName);
         }
 
-        public IEnumerator<IProperty> GetEnumerator()
+        public virtual IEnumerator<TWrap> GetEnumerator()
         {
+            if (_lazy && _properties.Count == 0) Refresh();
+
             foreach (var kv in _properties)
             {
                 yield return kv.Value;
@@ -142,28 +375,26 @@ namespace CSRefactorCurio
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach (var kv in _properties)
-            {
-                yield return kv.Value;
-            }
-
-            yield break;
+            return GetEnumerator();
         }
 
-        public bool ContainsKey(string key)
+        public virtual bool ContainsKey(string key)
         {
-            return ((IReadOnlyDictionary<string, IProperty>)_properties).ContainsKey(key);
+            return ((IReadOnlyDictionary<string, TWrap>)_properties).ContainsKey(key);
         }
 
-        public bool TryGetValue(string key, out IProperty value)
+        public virtual bool TryGetValue(string key, out TWrap value)
         {
-            return ((IReadOnlyDictionary<string, IProperty>)_properties).TryGetValue(key, out value);
+            return ((IReadOnlyDictionary<string, TWrap>)_properties).TryGetValue(key, out value);
         }
 
-        IEnumerator<KeyValuePair<string, IProperty>> IEnumerable<KeyValuePair<string, IProperty>>.GetEnumerator()
+        IEnumerator<KeyValuePair<string, TWrap>> IEnumerable<KeyValuePair<string, TWrap>>.GetEnumerator()
         {
-            return ((IEnumerable<KeyValuePair<string, IProperty>>)_properties).GetEnumerator();
+            return ((IEnumerable<KeyValuePair<string, TWrap>>)_properties).GetEnumerator();
         }
     }
+
+
+
 
 }

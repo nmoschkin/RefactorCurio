@@ -9,6 +9,7 @@
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mod="clr-namespace:DataTools.CSTools"
+    xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:sys="mscorlib"
     xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
@@ -19,8 +20,7 @@
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d"
     >
-    <Grid>
-
+    <Grid Cursor="{Binding Cursor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
@@ -63,6 +63,10 @@
             >
 
             <TreeView.Resources>
+
+                <Style TargetType="ToolTip">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ToolWindowBackgroundKey}}" />
+                </Style>
 
                 <conv:MarkerKindToMonikerConverter x:Key="convMon" />
 
@@ -234,6 +238,7 @@
                                 Grid.Column="1"
                                 Margin="0"
                                 Padding="0"
+                                Foreground="{conv:ColorPropertyToBrush Key=type}"
                                 Text="{Binding DataType}"
                                 ToolTip="{Binding}"
                                 />
@@ -250,6 +255,7 @@
                                 Grid.Column="3"
                                 Margin="0"
                                 Padding="0"
+                                Foreground="{conv:ColorPropertyToBrush Key=identifier}"
                                 Text="{Binding Name}"
                                 ToolTip="{Binding}"
                                 />
@@ -266,6 +272,7 @@
                                 Grid.Column="5"
                                 Margin="0"
                                 Padding="0"
+                                Foreground="{conv:ColorPropertyToBrush Key=punctuation}"
                                 Text="{Binding MethodParamsString}"
                                 ToolTip="{Binding}"
                                 />

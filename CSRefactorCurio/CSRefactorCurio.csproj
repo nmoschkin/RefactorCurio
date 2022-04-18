@@ -57,6 +57,7 @@
     <Compile Include="Commands\ShowClassFromJsonCommand.cs" />
     <Compile Include="Commands\ShowClassFromJsonFileCommand.cs" />
     <Compile Include="Converters\BoolConverter.cs" />
+    <Compile Include="Converters\ColorPropertyToBrushExtension.cs" />
     <Compile Include="Converters\MarkerKindToMonikerConverter.cs" />
     <Compile Include="CS\Code\CSCodeParser.cs" />
     <Compile Include="CS\Code\FilterRules.cs" />
@@ -105,7 +106,7 @@
       <DependentUpon>source.extension.vsixmanifest</DependentUpon>
     </Compile>
     <Compile Include="Validators\DirExistsValidator.cs" />
-    <Compile Include="ViewModels\BrushHelper.cs" />
+    <Compile Include="Helpers\BrushHelper.cs" />
     <Compile Include="ViewModels\CurioExplorerSolution.cs" />
     <Compile Include="ViewModels\JSConvertViewModel.cs" />
     <Compile Include="ViewModels\RequestCloseEventArgs.cs" />

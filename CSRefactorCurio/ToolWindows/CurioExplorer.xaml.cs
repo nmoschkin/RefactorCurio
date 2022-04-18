@@ -9,9 +9,9 @@ namespace CSRefactorCurio
         {
             InitializeComponent();
 
-            lock (CSRefectorCurioPackage.SyncRoot)
+            lock (CSRefactorCurioPackage.SyncRoot)
             {
-                DataContext = CSRefectorCurioPackage.Instance.CurioSolution;
+                DataContext = CSRefactorCurioPackage.Instance.CurioSolution;
             }
         }
 

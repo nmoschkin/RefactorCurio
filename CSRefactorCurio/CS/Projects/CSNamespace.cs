@@ -72,14 +72,29 @@ namespace DataTools.CSTools
         /// <param name="projects">The projects to generate the namespace map for.</param>
         /// <param name="namespaces">Optional namespace dictionary.</param>
         /// <returns>A new <see cref="ObservableCollection{T}"/> of <see cref="IProjectElement"/> objects.</returns>
-        public static ObservableCollection<IProjectElement> NamespacesFromProjects(IEnumerable<CurioProject> projects, Dictionary<string, CSNamespace> namespaces = null)
+        public static ObservableCollection<IProjectElement> NamespacesFromProjects(IEnumerable<CurioProject> projects, Dictionary<string, CSNamespace> namespaces = null, EnvDTE.StatusBar statusBar = null)
         {
             namespaces ??= new Dictionary<string, CSNamespace>();
+
+            int tc = 0;
 
             foreach (var project in projects)
             {
                 var root = project.RootFolder;
-                NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title);
+                tc += root.GetTotalFilesCount();
+            }
+
+            int proc = 0;
+            
+            foreach (var project in projects)
+            {
+                var root = project.RootFolder;
+                proc = NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title, statusBar, tc, proc); ;
+            }
+
+            if (statusBar != null)
+            {
+                statusBar.Progress(false);
             }
 
             return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.Parent == null));
@@ -158,11 +173,17 @@ namespace DataTools.CSTools
         /// </summary>
         /// <param name="node">The directory/node to map.</param>
         /// <param name="namespaces">The current namespace map.</param>
-        protected static void NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace)
+        protected static int NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace, EnvDTE.StatusBar statusBar = null, int totalFiles = 0, int processed = 0)
         {
             foreach (var file in node.Files) 
             {
-                foreach (CSMarker cls in file.Children)
+                processed++;
+                if (statusBar != null)
+                {
+                    statusBar.Progress(true, file.Filename, processed, totalFiles);
+                }
+
+                foreach (CSMarker cls in file.FilteredItems)
                 {
                     var ns = EnsureNamespace(cls.Namespace, namespaces, defaultNamespace);
 
@@ -178,8 +199,10 @@ namespace DataTools.CSTools
 
             foreach (var dir in node.Directories)
             {
-                NamespacesFromNode(dir, namespaces, defaultNamespace);
+                processed = NamespacesFromNode(dir, namespaces, defaultNamespace, statusBar, totalFiles, processed);
             }
+
+            return processed;
         }
 
         /// <summary>

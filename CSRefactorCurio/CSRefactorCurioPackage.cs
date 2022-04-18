@@ -17,7 +17,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
-
+using Microsoft.VisualStudio.PlatformUI;
+//Then you get an event 
+ 
 namespace CSRefactorCurio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -35,17 +37,17 @@ namespace CSRefactorCurio
     expression: "SingleSel",
     termNames: new[] { "SingleSel" },
     termValues: new[] { "HierSingleSelectionName:^.+$" })]
-    public sealed class CSRefectorCurioPackage : ToolkitPackage
+    public sealed class CSRefactorCurioPackage : ToolkitPackage
     {
         static object syncRoot = new object();
-        static CSRefectorCurioPackage _package;
+        static CSRefactorCurioPackage _package;
 
         EnvDTE.Solution currSln = null;
         CurioExplorerSolution _curio;
-
+        internal static ColorItems _colors;
         public static object SyncRoot => syncRoot;
 
-        internal static CSRefectorCurioPackage Instance
+        internal static CSRefactorCurioPackage Instance
         {
             get
             {
@@ -102,7 +104,7 @@ namespace CSRefactorCurio
                 LoadProject();
             }
 
-            var p = new PropertiesContainer(dte.get_Properties("FontsAndColors", "TextEditor"));
+            _colors = await ColorItems.CreateAsync();
             await base.InitializeAsync(cancellationToken, progress);
         }
 
@@ -110,8 +112,14 @@ namespace CSRefactorCurio
         {
             Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += SolutionEvents_OnAfterOpenSolution;
             Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnBeforeCloseSolution += SolutionEvents_OnBeforeCloseSolution;
-            
+            VSColorTheme.ThemeChanged += VSColorTheme_ThemeChanged;            
+
             await base.OnAfterPackageLoadedAsync(cancellationToken);
+        }
+
+        private void VSColorTheme_ThemeChanged(ThemeChangedEventArgs e)
+        {            
+            _colors = ColorItems.Create();
         }
 
         private void SolutionEvents_OnAfterOpenSolution(object sender, OpenSolutionEventArgs e)
