@@ -318,6 +318,40 @@
                                     </ToolTip>
                                 </TextBlock.ToolTip>
                             </TextBlock>
+
+                            <TextBlock
+                                Margin="0"
+                                Padding="0"
+                                Foreground="{conv:ColorPropertyToBrush Key=type}"
+                                Text="{Binding Inheritance}"
+                                >
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <Label Content="{Binding Title}" />
+                                            <Label Content="{Binding}" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock
+                                Margin="0"
+                                Padding="0"
+                                Foreground="{conv:ColorPropertyToBrush Key=operator}"
+                                Text="{Binding WhereClause}"
+                                >
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <Label Content="{Binding Title}" />
+                                            <Label Content="{Binding}" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+
                         </StackPanel>
                     </Grid>
                 </HierarchicalDataTemplate>

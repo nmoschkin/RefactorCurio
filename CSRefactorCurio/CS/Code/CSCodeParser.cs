@@ -777,10 +777,11 @@ namespace DataTools.CSTools
                             {
                                 currMarker.Kind = MarkerKind.Code;
                             }
-                            else if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate || currMarker.Kind == MarkerKind.FieldValue)
-                            {
-                                TypeAndMethodParse(lookback, currMarker);
-                            }
+                            //else if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate || currMarker.Kind == MarkerKind.FieldValue)
+                            //{
+                            //    TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
+                            //}
+                            TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
 
                         }
 
@@ -875,10 +876,12 @@ namespace DataTools.CSTools
                                                 Attributes = attrs
                                             };
 
-                                            if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate)
-                                            {
-                                                TypeAndMethodParse(lookback, currMarker);
-                                            }
+                                            TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
+
+                                            //if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate)
+                                            //{
+                                            //    TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
+                                            //}
 
                                             currPatt = kvp.Key;
 
@@ -1020,7 +1023,7 @@ namespace DataTools.CSTools
                         ResetActivas(activas);
 
                     }
-                    else if ((i < c - 1) && (chars[i] == '/' && chars[i + 1] == '/'))
+                    else if ((i < c - 1) && ((chars[i] == '/' && chars[i + 1] == '/') || (chars[i] == '#')))
                     {
                         ms.Remove(ms.Length - 1, 1);
                         ms.Append(' ');
@@ -1164,8 +1167,7 @@ namespace DataTools.CSTools
         /// <summary>
         /// A list of filtered keywords for the C# language.
         /// </summary>
-        private static readonly string[] deletes = new string[] { "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new" };
-
+        private static readonly string[] deletes = new string[] { "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new" };
 
         /// <summary>
         /// Parse the type, name and method parameters from a lookback string.
@@ -1174,11 +1176,13 @@ namespace DataTools.CSTools
         /// <param name="marker">The destination marker.</param>
         /// <returns>True if successful.</returns>
         /// <exception cref="SyntaxErrorException"></exception>
-        private bool TypeAndMethodParse(string lookback, TElem marker)
+        private bool TypeAndMethodParse(string lookback, char[] chars, int start, int stop, TElem marker)
         {
             int l = 0, i;
             var str = lookback;
-            foreach (var s in deletes) str = str.Replace(s, "");
+            if (lookback[0] == '=') return false;
+            IList<string> dels = deletes;
+            List<string> fd = new List<string>();
             str = str.Trim();
             var w = str.ToCharArray();
             int c = w.Length;
@@ -1188,6 +1192,9 @@ namespace DataTools.CSTools
             bool fl = false;
             bool lww = false;
             char ch = '\n';
+
+            bool hasParams = false;
+            bool eii = false;
 
             for (i = 0; i < c; i++)
             {
@@ -1249,8 +1256,16 @@ namespace DataTools.CSTools
                 {
                     if (lww)
                     {
-                        i++;
-                        break;
+                        if (dels.Contains(tsb.ToString()))
+                        {
+                            tsb.Clear();
+                            lww = false;
+                        }
+                        else
+                        {
+                            i++;
+                            break;
+                        }
                     }
                 }
 
@@ -1269,8 +1284,9 @@ namespace DataTools.CSTools
             {
                 ch = w[i];
 
-                if (char.IsLetterOrDigit(ch) || ch == '@' || ch == '_')
+                if (char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || ch == '.')
                 {
+                    //if (ch == '.') eii = true;
                     nsb.Append(ch);
                 }
                 else
@@ -1291,9 +1307,10 @@ namespace DataTools.CSTools
             {
                 for (; i < c; i++)
                 {
-                    ch = w[i];
-                    while (i < c && char.IsWhiteSpace(ch)) i++;
+                    while (i < c && char.IsWhiteSpace(w[i])) i++;
                     if (i >= c) return true;
+
+                    ch = w[i];
 
                     if (ch == '(')
                     {
@@ -1306,6 +1323,9 @@ namespace DataTools.CSTools
                                 marker.MethodParams = new List<string>(TextTools.Split(parms.Substring(1, parms.Length - 2), ",", trimResults: true));
                             }
                             if (bx != null) i = (int)bx;
+                            marker.Kind = MarkerKind.Method;
+                            if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
+                            hasParams = true;
                         }
                     }
                     else if (ch == '<')
@@ -1317,10 +1337,53 @@ namespace DataTools.CSTools
                             if (bx != null) i = (int)bx;
                         }
                     }
+                    else if ((!hasParams) && (i < c - 1) && (w[i] == '=') && (w[i + 1] == '>'))
+                    {
+                        marker.Kind = MarkerKind.Property;
+                        if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
+                        return true;
+                    }
+                    else if (ch == ';' || ch == '=')
+                    {
+                        if (marker.Kind == MarkerKind.Code) marker.Kind = MarkerKind.FieldValue;
+                        if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
+                        return true;
+                    }
+                    else if (ch == ':')
+                    {
+                        break;
+                    }
+                }
+            }
 
+            if (i < c)
+            {
+                str = str.Substring(i).Trim();
+                
+                if (str[0] == ':')
+                {
+                    str = str.Substring(1).Trim();
                 }
 
+                var sp = TextTools.Split(str, "where ");
+
+                if (sp.Length > 1) 
+                {
+                    marker.WhereClause = " where " + sp[1].Trim();
+                    str = sp[0].Trim();
+                }
+
+                marker.Inheritance = " : " + str;
             }
+            else
+            {
+                if (marker.Kind == MarkerKind.Code || marker.Kind == MarkerKind.Field || marker.Kind == MarkerKind.FieldValue)
+                {
+                    marker.Kind = MarkerKind.Property;
+                    if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
+                }
+            }
+
             return true;
         }
 

@@ -260,6 +260,13 @@ namespace DataTools.CSTools
         [Description("Attribute or Decorator")]
         Attribute = 0x28,
 
+
+        /// <summary>
+        /// Explicit Interface Implementation
+        /// </summary>
+        [Description("Attribute or Decorator")]
+        ExplicitImplementation = 0x4000,
+
         /// <summary>
         /// Custom 1
         /// </summary>
