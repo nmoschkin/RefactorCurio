@@ -996,6 +996,9 @@ namespace DataTools.CSTools
         where TFilter : MarkerFilter<TElem, TList>, new()
     {
         
+        /// <summary>
+        /// Gets the list of items after the filters have been applied.
+        /// </summary>
         TList FilteredItems { get; }
 
         /// <summary>

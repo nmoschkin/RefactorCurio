@@ -22,8 +22,8 @@ namespace DataTools.CSTools
     /// <summary>
     /// Code Parser Output File
     /// </summary>
-    /// <typeparam name="TElem"></typeparam>
-    /// <typeparam name="TList"></typeparam>
+    /// <typeparam name="TElem">The type of <see cref="IMarker"/></typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
     public class OutputFile<TElem, TList> where TElem: IMarker, new() where TList : IMarkerList<TElem>, new()
     {
         /// <summary>
@@ -72,6 +72,18 @@ namespace DataTools.CSTools
             return NewFile<TI, TL>(path, file.Markers[0].Kind, file.Markers[0].Name, FormatOutputText<TI, TL>(file.Markers, lines, file.PreambleEnd, file.PreambleBegin), sepDirs, parser);
         }
 
+        /// <summary>
+        /// Create a new file from the given parameters.
+        /// </summary>
+        /// <typeparam name="TI">The type of <see cref="IMarker"/></typeparam>
+        /// <typeparam name="TL">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+        /// <param name="path">The path of the new file.</param>
+        /// <param name="mkind">Specifies the top-level marker kind (for determining the destination folder)</param>
+        /// <param name="name">The name of the new file (without extension)</param>
+        /// <param name="text">The contents of the new file</param>
+        /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
+        /// <param name="cs">An optional reference <see cref="CSCodeParser{TElem, TList}"/> with configuration information.</param>
+        /// <returns>A new output file.</returns>
         public static OutputFile<TI, TL> NewFile<TI, TL>(string path, MarkerKind mkind, string name, string text, bool sepDirs, CSCodeParser<TI, TL> cs = null) where TI : IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
         {
             path = path.Trim().Trim('\\');
@@ -114,7 +126,12 @@ namespace DataTools.CSTools
             }
         }
 
-
+        /// <summary>
+        /// Create a simple <see cref="OutputFile{TElem, TList}"/> instance with just the specified filename and text.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <param name="text">The text.</param>
+        /// <returns></returns>
         public static OutputFile<TElem, TList> NewFile(string filename, string text)
         {
             return new OutputFile<TElem, TList>
@@ -124,6 +141,16 @@ namespace DataTools.CSTools
             };
         }
 
+        /// <summary>
+        /// Format the specified markers into a text for saving to a new class file.
+        /// </summary>
+        /// <typeparam name="TI">The type of <see cref="IMarker"/></typeparam>
+        /// <typeparam name="TL">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+        /// <param name="markers">The markers to format.</param>
+        /// <param name="lines">The lines of the source file.</param>
+        /// <param name="preambleTo">The end position of the common preamble calculated from the source file.</param>
+        /// <param name="preambleFrom">Optional start position of the common preamble.</param>
+        /// <returns>Formatted Code</returns>
         public static string FormatOutputText<TI, TL>(TL markers, string[] lines, int preambleTo = -1, int preambleFrom = 0) where TI : IMarker, new() where TL : IList<TI>, new()
         {
 
@@ -176,6 +203,13 @@ namespace DataTools.CSTools
             return textOut;
         }
 
+        /// <summary>
+        /// Gets the preamble lines.
+        /// </summary>
+        /// <param name="lines">The source lines.</param>
+        /// <param name="preambleTo">End position.</param>
+        /// <param name="preambleFrom">Start Position.</param>
+        /// <returns></returns>
         public static string GetPreamble(string[] lines, int preambleTo, int preambleFrom)
         {
             string s = "";
@@ -193,11 +227,14 @@ namespace DataTools.CSTools
 
     }
 
+    /// <summary>
+    /// C# Code Parser Class
+    /// </summary>
+    /// <typeparam name="TElem">The type of <see cref="IMarker"/></typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
     public class CSCodeParser<TElem, TList> where TElem : IMarker<TElem, TList>, new() where TList : IMarkerList<TElem>, new()
     {
 
-        protected static Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
-        protected static Regex genericPatt;
 
         protected string[] lines = null;
         protected string text = null;
@@ -215,79 +252,74 @@ namespace DataTools.CSTools
 
         protected string[] outputFiles = new string[0];
 
-
-        static CSCodeParser()
-        {
-
-
-            patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
-            patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
-            patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
-            patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
-            patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-            patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-            patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
-            patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
-            patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
-            patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
-            patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
-            patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
-            patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
-            patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
-            patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
-            patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
-            patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
-            patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
-            patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
-            patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
-            patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
-            patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
-
-            genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
-        }
-
+        /// <summary>
+        /// Gets or sets the output path for files generated from this parser.
+        /// </summary>
         public virtual string OutputPath { get; set; } = Directory.GetCurrentDirectory();
 
+        /// <summary>
+        /// Gets the list of output files generated from this parser.
+        /// </summary>
         public virtual string[] OutputFiles => outputFiles;
 
+        /// <summary>
+        /// Gets or sets the 'Interfaces' directory name (default is 'Contracts')
+        /// </summary>
         public virtual string InterfaceDirName { get; set; } = "Contracts";
 
+        /// <summary>
+        /// Gets or sets the 'Classes' directory name (default is none)
+        /// </summary>
         public virtual string ClassDirName { get; set; } = "";
 
+        /// <summary>
+        /// Gets or stets the 'Enums' directory name (default is 'Enums')
+        /// </summary>
         public virtual string EnumDirName { get; set; } = "Enums";
 
+        /// <summary>
+        /// Gets or stets the 'Structs' directory name (default is 'Structs')
+        /// </summary>
         public virtual string StructDirName { get; set; } = "Structs";
 
+        /// <summary>
+        /// Gets or sets a value indicating that files containing different types of objects will go in different subdirectories beneath the selected output directory.
+        /// </summary>
         public virtual bool SeparateDirs { get; set; } = true;
 
+        /// <summary>
+        /// Gets a value indicating if the last parse was successful.
+        /// </summary>
         public virtual bool ParseSuccess { get; protected set; } = false;
 
+        /// <summary>
+        /// Gets a value indicating that the parser loaded the file lazily and has not yet parsed it.
+        /// </summary>
         public virtual bool IsLazyLoad { get; protected set; } = false; 
 
+        /// <summary>
+        /// Gets the name of the original source file.
+        /// </summary>
         public virtual string Filename
         {
             get => filename;
             protected set => filename = value;
         }
 
+        /// <summary>
+        /// Gets a list of the last errors.
+        /// </summary>
         public virtual IReadOnlyList<string> Errors
         {
             get => lastErrors;
         }
 
+        /// <summary>
+        /// Load and optionally parse a C# code file.
+        /// </summary>
+        /// <param name="filename">The valid relative or absolute pathname to the source file.</param>
+        /// <param name="lazy">True to load the file without parsing it.</param>
+        /// <exception cref="FileNotFoundException"></exception>
         public virtual void LoadFile(string filename, bool lazy = false)
         {
             lock (SyncRoot)
@@ -303,6 +335,12 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Reread the file from the disk and reparse its contents.
+        /// </summary>
+        /// <remarks>
+        /// This method will unset <see cref="IsLazyLoad"/>.
+        /// </remarks>
         public void Refresh()
         {
             lock (SyncRoot)
@@ -312,15 +350,29 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Create a new empty code parser.
+        /// </summary>
         protected CSCodeParser()
         {
         }
 
+        /// <summary>
+        /// Create a new code parser from the given source code text.
+        /// </summary>
+        /// <param name="text">The source code text to parse.</param>
         public CSCodeParser(string text)
         {
             Parse(text);
         }
 
+        /// <summary>
+        /// Load and optionally parse a C# code file.
+        /// </summary>
+        /// <param name="filename">The valid relative or absolute pathname to the source file.</param>
+        /// <param name="lazy">True to load the file without parsing it.</param>
+        /// <returns>A new <see cref="CSCodeParser{TElem, TList}"/> or derived object.</returns>
+        /// <exception cref="FileNotFoundException"></exception>
         public static CSCodeParser<TElem, TList> LoadFromFile(string filename, bool lazy = false)
         {
             if (!File.Exists(filename)) throw new FileNotFoundException(filename);
@@ -329,6 +381,13 @@ namespace DataTools.CSTools
             return res;
         }
 
+        /// <summary>
+        /// Write the results of the refactor and reorganized file structure to disk.
+        /// </summary>
+        /// <param name="path">The destination path.</param>
+        /// <param name="separateDirs">True to use separate directories for different item types.</param>
+        /// <returns>True if successful.</returns>
+        /// <exception cref="DirectoryNotFoundException"></exception>
         public virtual bool OutputMarkers(string path = null, bool? separateDirs = null)
         {
             if (separateDirs is bool bo)
@@ -416,13 +475,24 @@ namespace DataTools.CSTools
             return true;
         }
 
+        /// <summary>
+        /// Gets the current list of markers that were parsed from source text.
+        /// </summary>
         public virtual TList Markers => markers;
 
+        /// <summary>
+        /// Gets the end position of the preamble in the source text.
+        /// </summary>
         public virtual int PreambleTo => preambleTo;
 
+        /// <summary>
+        /// Gets the source code text.
+        /// </summary>
         public virtual string Text => text;
 
-
+        /// <summary>
+        /// Gets the source code text broken into lines.
+        /// </summary>
         public virtual string[] Lines => lines;
 
         public override string ToString()
@@ -430,6 +500,11 @@ namespace DataTools.CSTools
             return Filename;
         }
 
+        /// <summary>
+        /// Parse the given C# source code text.
+        /// </summary>
+        /// <param name="text">The C# source code text to parse.</param>
+        /// <returns>True if successful.</returns>
         protected virtual bool Parse(string text)
         {
             lock (SyncRoot)
@@ -441,7 +516,7 @@ namespace DataTools.CSTools
 
                 try
                 {
-                    markers = ParseCSCodeFile(text.ToCharArray());
+                    markers = InternalRawParseCSCode(text.ToCharArray());
 
                     var cf = new RenderedFile<TElem, TList>()
                     {
@@ -470,6 +545,11 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Set the parent <see cref="RenderedFile{TElem, TList}"/> object to the specified marker and its descendents.
+        /// </summary>
+        /// <param name="marker">The marker to modify.</param>
+        /// <param name="file">The parent file object.</param>
         protected void SetParentFile(TElem marker, RenderedFile<TElem, TList> file)
         {
             marker.ParentFile = file;
@@ -483,7 +563,62 @@ namespace DataTools.CSTools
             }
         }
 
-        protected virtual TList ParseCSCodeFile(char[] chars)
+        #region CSharp Code Parsing Internals
+
+        protected static Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
+        protected static Regex genericPatt;
+
+        static CSCodeParser()
+        {
+            patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
+            patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
+            patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
+            patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
+            patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
+            patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
+            patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
+            patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
+            patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
+            patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
+            patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
+            patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
+            patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
+            patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
+            patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
+            patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
+            patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
+            patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
+            patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
+            patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
+            patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
+            patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
+            patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
+            patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
+
+            genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
+        }
+
+
+        /// <summary>
+        /// The actual C# parser engine.
+        /// </summary>
+        /// <param name="chars">The character array to interpret.</param>
+        /// <returns>A list of parsed markers.</returns>
+        /// <remarks>
+        /// Only override this if you really know what you're doing!
+        /// </remarks>
+        protected virtual TList InternalRawParseCSCode(char[] chars)
         {
 
             lock (SyncRoot)
@@ -987,8 +1122,19 @@ namespace DataTools.CSTools
 
         }
 
-        protected static readonly string[] deletes = new string[] { "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new" };
+        /// <summary>
+        /// A list of filtered keywords for the C# language.
+        /// </summary>
+        private static readonly string[] deletes = new string[] { "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new" };
 
+
+        /// <summary>
+        /// Parse the type, name and method parameters from a lookback string.
+        /// </summary>
+        /// <param name="lookback">The string to scan.</param>
+        /// <param name="marker">The destination marker.</param>
+        /// <returns>True if successful.</returns>
+        /// <exception cref="SyntaxErrorException"></exception>
         private bool TypeAndMethodParse(string lookback, TElem marker)
         {
             int l = 0, i;
@@ -1139,6 +1285,11 @@ namespace DataTools.CSTools
             return true;
         }
 
+        /// <summary>
+        /// Remove the where clause from the specified string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>A new string with its where clause stripped out.</returns>
         private string RemoveWhere(string value)
         {
             bool io = false;
@@ -1173,6 +1324,10 @@ namespace DataTools.CSTools
             return value;
         }
 
+        /// <summary>
+        /// Perform post-scan cleanup tasks.
+        /// </summary>
+        /// <param name="markers"></param>
         private void PostScanTasks(TList markers)
         {
             int c = markers.Count;
@@ -1285,7 +1440,12 @@ namespace DataTools.CSTools
             }
         }
 
-        protected virtual AccessModifiers ActivasToAccessModifiers(Dictionary<string, bool> activas)
+        /// <summary>
+        /// Translate <paramref name="activas"/> to access modifiers.
+        /// </summary>
+        /// <param name="activas"></param>
+        /// <returns></returns>
+        private AccessModifiers ActivasToAccessModifiers(Dictionary<string, bool> activas)
         {
             var test = new string[] { "public", "private", "internal", "protected" };
 
@@ -1310,7 +1470,11 @@ namespace DataTools.CSTools
 
         }
 
-        protected virtual void ResetActivas(Dictionary<string, bool> activas)
+        /// <summary>
+        /// Reset the <paramref name="activas"/>.
+        /// </summary>
+        /// <param name="activas"></param>
+        private void ResetActivas(Dictionary<string, bool> activas)
         {
             var keys = activas.Keys.ToList();
             foreach (var key in keys)
@@ -1319,18 +1483,13 @@ namespace DataTools.CSTools
             }
         }
 
-        protected virtual void EnsureLevels(List<bool> items, int levels)
-        {
-            if (levels > items.Count)
-            {
-                for (int i = items.Count; i < levels; i++)
-                {
-                    items.Add(false);
-                }
-            }
-        }
-
-        protected virtual int ColumnFromHere(char[] chars, int pos)
+        /// <summary>
+        /// Calculate the line column from the present position.
+        /// </summary>
+        /// <param name="chars"></param>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        private int ColumnFromHere(char[] chars, int pos)
         {
 
             int c = 0;
@@ -1348,17 +1507,8 @@ namespace DataTools.CSTools
             return pos;
         }
 
+        #endregion
+
     }
 
-    //public class SyntaxErrorException : Exception
-    //{
-
-    //    public SyntaxErrorException()
-    //    {
-    //    }
-
-    //    public SyntaxErrorException(string message) : base(message)
-    //    {
-    //    }
-    //}
 }

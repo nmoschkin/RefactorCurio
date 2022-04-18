@@ -19,7 +19,9 @@ using System.Threading.Tasks;
 
 namespace DataTools.CSTools
 {
-
+    /// <summary>
+    /// CS Refactor Curio Solution Marker
+    /// </summary>
     public class CSMarker : MarkerBase<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -45,6 +47,9 @@ namespace DataTools.CSTools
         }
     }
 
+    /// <summary>
+    /// CS Refactor Curio Solution Source Code File based on <see cref="CSCodeParser{TElem, TList}"/>.
+    /// </summary>
     public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -141,6 +146,10 @@ namespace DataTools.CSTools
             return oldname;
         }
 
+        /// <summary>
+        /// Fired when the file is renamed from outside the solution.
+        /// </summary>
+        /// <param name="newName"></param>
         internal void RenameEvent(string newName)
         {
             Filename = newName;
@@ -189,11 +198,20 @@ namespace DataTools.CSTools
             return cf;
         }
         
+        /// <summary>
+        /// Add the specified marker to the children collection if not there already.
+        /// </summary>
+        /// <param name="marker">The marker to add.</param>
         public void AddMarker(CSMarker marker)
         {
             if (!markers.Contains(marker)) markers.Add(marker);
         }
 
+        /// <summary>
+        /// Remove the specified marker.
+        /// </summary>
+        /// <param name="marker"></param>
+        /// <returns>True if the marker was located and removed successfully.</returns>
         public bool RemoveMarker(CSMarker marker)
         {
             return markers.Remove(marker);
@@ -215,6 +233,9 @@ namespace DataTools.CSTools
             return false;
         }
 
+        /// <summary>
+        /// Instantiate a blank, unloaded code file reader.
+        /// </summary>
         public CSCodeFile()
         {
             markers.CollectionChanged += OnChildrenChanged;
@@ -226,6 +247,9 @@ namespace DataTools.CSTools
         }
     }
 
+    /// <summary>
+    /// CS Refactor Curio Solution Source Code Directory object.
+    /// </summary>
     public class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
 
@@ -265,7 +289,9 @@ namespace DataTools.CSTools
             }
         }
 
-
+        /// <summary>
+        /// Gets the parent project.
+        /// </summary>
         public CurioProject Project
         {
             get
@@ -282,6 +308,10 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Gets the total number of recognized files under this directory (including in all subdirectories)
+        /// </summary>
+        /// <returns></returns>
         public int GetTotalFilesCount()
         {
             var count = files.Count;
@@ -294,6 +324,9 @@ namespace DataTools.CSTools
             return count;
         }
 
+        /// <summary>
+        /// Gets the observable list of subdirectories.
+        /// </summary>
         public ObservableCollection<CSDirectory> Directories
         {
             get => directories;
@@ -303,6 +336,9 @@ namespace DataTools.CSTools
             }
         }
         
+        /// <summary>
+        /// Gets the observable list of source code files.
+        /// </summary>
         public ObservableCollection<CSCodeFile> Files
         {
             get => files;
@@ -315,11 +351,17 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Gets the current list of namespaces (or empty if not loaded)
+        /// </summary>
         public IReadOnlyList<string> Namespaces
         {
             get => Namespaces;
         }
 
+        /// <summary>
+        /// Gets the absolute path of the current directory.
+        /// </summary>
         public string Path
         {
             get => path;
@@ -332,6 +374,9 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Gets the parent directory or null if this is the project root folder.
+        /// </summary>
         public CSDirectory Parent
         {
             get
@@ -346,8 +391,16 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Create a new directory element for the specified project.
+        /// </summary>
+        /// <param name="project">The project to create the element for.</param>
+        /// <param name="path">The valid path to the folder.</param>
+        /// <param name="parent">Optional parent subfolder within the specified project.</param>
         public CSDirectory(CurioProject project, string path, CSDirectory parent = null)
         {
+            if (parent.Project != null && project != parent.Project) throw new ArgumentException("Parent directory must be a member of the same project being referenced.");
+
             files = new ObservableCollection<CSCodeFile>();
             directories = new ObservableCollection<CSDirectory>();
             children = new ObservableCollection<IProjectElement>();
@@ -363,6 +416,10 @@ namespace DataTools.CSTools
             ReadDirectory();
         }
 
+        /// <summary>
+        /// Gets all namespaces that can be found in all files in all subfolders of this directory.
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetAllNamespacesFromHere()
         {
             CheckNamespaces();
@@ -378,6 +435,11 @@ namespace DataTools.CSTools
             return ns.Distinct().ToList();
         }
 
+        /// <summary>
+        /// Remove the object at the specified path from the project (does not delete the file on disk)
+        /// </summary>
+        /// <param name="path">The file or directory to remove.</param>
+        /// <returns>True if successful.</returns>
         public bool RemovePath(string path)
         {
             var obj = Find(path);
@@ -389,6 +451,11 @@ namespace DataTools.CSTools
             return false;
         }
 
+        /// <summary>
+        /// Remove the specified project element from the project (does not delete files)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool Remove(IProjectElement item)
         {
             if (item is IProjectNode node)
@@ -431,6 +498,14 @@ namespace DataTools.CSTools
             return false;
         }
 
+        /// <summary>
+        /// Process a <see cref="FileNotifyInfo"/> change event from the filesystem watcher.
+        /// </summary>
+        /// <param name="info">The info to parse.</param>
+        /// <remarks>
+        /// If the project file, itself, changes, the entire subdirectory structure is updated.
+        /// Otherwise, only the affected file is updated.
+        /// </remarks>
         public void ProcessChangeEvent(FileNotifyInfo info)
         {
             var s = this.Project.ProjectRootPath + "\\" + info.Filename;
@@ -477,6 +552,15 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Find the project element at the location specified by <paramref name="path"/>, optionally creating it, if it does not exist.
+        /// </summary>
+        /// <param name="path">The path for the project element to retrieve.</param>
+        /// <param name="create">True to create the element if it does not exist.</param>
+        /// <returns>An element or null.</returns>
+        /// <remarks>
+        /// The directory must be a subdirectory of the one being referenced by this object or nothing will be returned, even if the object exists on disk.
+        /// </remarks>
         public IProjectElement Find(string path, bool create = false)
         {
             if (Directory.Exists(path))
@@ -493,6 +577,15 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Find the project directory at the location specified by <paramref name="path"/>, optionally creating it, if it does not exist.
+        /// </summary>
+        /// <param name="path">The path for the project directory to retrieve.</param>
+        /// <param name="create"></param>
+        /// <returns>A directory object or null.</returns>
+        /// <remarks>
+        /// The path must already exist on disk.
+        /// </remarks>
         public CSDirectory FindDirectory(string path, bool create = false)
         {
             var fp = System.IO.Path.GetFullPath(path).ToLower();
@@ -529,6 +622,15 @@ namespace DataTools.CSTools
             return null;
         }
 
+        /// <summary>
+        /// Find the project file at the location specified by <paramref name="filename"/>, optionally creating it, if it does not exist.
+        /// </summary>
+        /// <param name="filename">The path for filename of the project file to retrieve.</param>
+        /// <param name="create"></param>
+        /// <returns>A directory object or null.</returns>
+        /// <remarks>
+        /// The file must already exist on disk.
+        /// </remarks>
         public CSCodeFile FindFile(string filename, bool create = false)
         {
             var fp = System.IO.Path.GetFullPath(filename).ToLower();
@@ -650,6 +752,10 @@ namespace DataTools.CSTools
 
         }
 
+        /// <summary>
+        /// Sort child elements.
+        /// </summary>
+        /// <param name="descending">True to sort in reverse.</param>
         public void Sort(bool descending = false)
         {
             var m = descending ? -1 : 1;
@@ -673,6 +779,9 @@ namespace DataTools.CSTools
 
         }
 
+        /// <summary>
+        /// Performs a check to ensure the local list of namespaces is up to date with the structure of the directory.
+        /// </summary>
         protected void CheckNamespaces()
         {
 

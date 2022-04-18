@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace DataTools.CSTools
 {
     /// <summary>
-    /// File sort filter.
+    /// File marker sort and filter.
     /// </summary>
     /// <typeparam name="TElem"></typeparam>
     /// <typeparam name="TList"></typeparam>
@@ -121,6 +121,11 @@ namespace DataTools.CSTools
 
     }
 
+    /// <summary>
+    /// Eliminates XML Document tags and comments and disintegrates merged compartments.
+    /// </summary>
+    /// <typeparam name="TElem"></typeparam>
+    /// <typeparam name="TList"></typeparam>
     public class CSXMLEliminatorFilter<TElem, TList> : MarkerFilterRule<TElem, TList>
         where TList : IMarkerList<TElem>, new()
         where TElem : IMarker<TElem, TList>, new()
@@ -189,6 +194,11 @@ namespace DataTools.CSTools
         }
     }
 
+    /// <summary>
+    /// The default filter chain for files consisting of the XML Eliminator and the File Sorter/Filter.
+    /// </summary>
+    /// <typeparam name="TElem"></typeparam>
+    /// <typeparam name="TList"></typeparam>
     public class CSFileChain<TElem, TList> : FixedFilterRuleChain<TElem, TList>
         where TList : IMarkerList<TElem>, new()
         where TElem : IMarker<TElem, TList>, new()

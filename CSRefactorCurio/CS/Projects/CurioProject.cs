@@ -99,6 +99,9 @@ namespace DataTools.CSTools
     /// <typeparam name="T"></typeparam>
     public interface IProjectNode<T> : IProjectNode where T : IList, INotifyCollectionChanged, INotifyPropertyChanged
     {
+        /// <summary>
+        /// Gets the list of child nodes.
+        /// </summary>
         new T Children { get; }
     }
 
