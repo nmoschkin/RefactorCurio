@@ -210,6 +210,17 @@ namespace DataTools.CSTools
         string Generics { get; set; }
 
         /// <summary>
+        /// If applicable, the inheritence of this element.
+        /// </summary>
+        string Inheritance { get; set; }
+
+        /// <summary>
+        /// If applicable, the where clause of this element.
+        /// </summary>
+        string WhereClause { get; set; }
+
+
+        /// <summary>
         /// The logical hierarchical level of this element in the original document.
         /// </summary>
         int Level { get; set; }
@@ -435,15 +446,22 @@ namespace DataTools.CSTools
                 if (Kind == MarkerKind.Delegate) amstr += "delegate ";
                 if (Kind == MarkerKind.Event) amstr += "event ";
                 if (kind == MarkerKind.Const) amstr += "const ";
+                if (kind == MarkerKind.Class) amstr += "class ";
+                if (kind == MarkerKind.Interface) amstr += "interface ";
+                if (kind == MarkerKind.Struct) amstr += "struct ";
+                if (kind == MarkerKind.Record) amstr += "record ";
                 if (IsAbstract) amstr += "abstract ";
                 if (IsOverride) amstr += "override ";
                 if (IsVirtual) amstr += "virtual ";
                 if (IsAsync) amstr += "async ";
-
+                
                 return amstr;
             }
         }
 
+        public virtual string Inheritance { get; set; }
+
+        public virtual string WhereClause { get; set; }
         public virtual bool IsVirtual { get; set; }
 
         public virtual bool IsAbstract { get; set; }
@@ -550,40 +568,7 @@ namespace DataTools.CSTools
         {
             get
             {
-                var sb = new StringBuilder();
-
-                if (!string.IsNullOrEmpty(DataType))
-                {
-                    sb.Append(DataType + " ");
-                }
-                
-                sb.Append(Name);
-
-                if (!string.IsNullOrEmpty(Generics))
-                {
-                    sb.Append(Generics);
-                }
-
-                if (!string.IsNullOrEmpty(MethodParamsString))
-                {
-                    sb.Append(MethodParamsString);
-                }
-                else
-                {
-                    switch (kind)
-                    {
-                        case MarkerKind.Method:
-                        case MarkerKind.Constructor:
-                        case MarkerKind.Destructor:
-                            sb.Append("()");
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-
-                return sb.ToString();
+                return ToString();
             }
         }
 

@@ -239,39 +239,85 @@
                                 Padding="0"
                                 Foreground="{conv:ColorPropertyToBrush Key=keyword}"
                                 Text="{Binding AccessModifierString}"
-                                ToolTip="{Binding}"
-                                />
+                                >
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <Label Content="{Binding Title}" />
+                                            <Label Content="{Binding}" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+
 
                             <TextBlock
                                 Margin="0"
                                 Padding="0"
                                 Foreground="{conv:ColorPropertyToBrush Key=type}"
                                 Text="{Binding DataTypeString}"
-                                ToolTip="{Binding}"
-                                />
+                                >
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <Label Content="{Binding Title}" />
+                                            <Label Content="{Binding}" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
                             <TextBlock
                                 Margin="0"
                                 Padding="0"
                                 Foreground="{conv:ColorPropertyToBrush Key=identifier}"
                                 Text="{Binding Name}"
-                                ToolTip="{Binding}"
-                                />
+                                >
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <Label Content="{Binding Title}" />
+                                            <Label Content="{Binding}" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
                             <TextBlock
                                 Margin="0"
                                 Padding="0"
                                 Text="{Binding Generics}"
-                                ToolTip="{Binding}"
-                                />
+                                >
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <Label Content="{Binding Title}" />
+                                            <Label Content="{Binding}" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
                             <TextBlock
                                 Margin="0"
                                 Padding="0"
                                 Foreground="{conv:ColorPropertyToBrush Key=punctuation}"
                                 Text="{Binding MethodParamsString}"
-                                ToolTip="{Binding}"
-                                />
+                                >
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <Label Content="{Binding Title}" />
+                                            <Label Content="{Binding}" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                         </StackPanel>
                     </Grid>
                 </HierarchicalDataTemplate>
