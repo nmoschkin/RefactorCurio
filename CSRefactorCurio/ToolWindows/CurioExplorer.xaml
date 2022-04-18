@@ -235,24 +235,22 @@
                             >
 
                             <TextBlock
-                                Grid.Column="1"
+                                Margin="0"
+                                Padding="0"
+                                Foreground="{conv:ColorPropertyToBrush Key=keyword}"
+                                Text="{Binding AccessModifierString}"
+                                ToolTip="{Binding}"
+                                />
+
+                            <TextBlock
                                 Margin="0"
                                 Padding="0"
                                 Foreground="{conv:ColorPropertyToBrush Key=type}"
-                                Text="{Binding DataType}"
+                                Text="{Binding DataTypeString}"
                                 ToolTip="{Binding}"
                                 />
 
                             <TextBlock
-                                Grid.Column="2"
-                                Margin="0"
-                                Padding="0"
-                                Text=" "
-                                ToolTip="{Binding}"
-                                />
-
-                            <TextBlock
-                                Grid.Column="3"
                                 Margin="0"
                                 Padding="0"
                                 Foreground="{conv:ColorPropertyToBrush Key=identifier}"
@@ -261,7 +259,6 @@
                                 />
 
                             <TextBlock
-                                Grid.Column="4"
                                 Margin="0"
                                 Padding="0"
                                 Text="{Binding Generics}"
@@ -269,7 +266,6 @@
                                 />
 
                             <TextBlock
-                                Grid.Column="5"
                                 Margin="0"
                                 Padding="0"
                                 Foreground="{conv:ColorPropertyToBrush Key=punctuation}"

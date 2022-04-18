@@ -227,7 +227,7 @@ namespace DataTools.CSTools
         /// <returns>A new object based on this one.</returns>
         /// <remarks>Implementations should make note of when and where they cannot fulfill the <paramref name="deep"/> contract.</remarks>
         T Clone<T>(bool deep) where T : IMarker, new();
-    
+   
     }
 
     /// <summary>
@@ -417,6 +417,33 @@ namespace DataTools.CSTools
 
         public virtual AccessModifiers AccessModifiers { get; set; }
 
+        public virtual string AccessModifierString
+        {
+            get
+            {
+                var amstr = "";
+
+                if (AccessModifiers != AccessModifiers.None) 
+                {
+                    var t = AccessModifiers.ToString().ToLower().Split(',');
+                    amstr = string.Join(" ", t);
+                    if (amstr != "") amstr += " ";
+                }
+
+                if (IsStatic) amstr += "static ";
+
+                if (Kind == MarkerKind.Delegate) amstr += "delegate ";
+                if (Kind == MarkerKind.Event) amstr += "event ";
+                if (kind == MarkerKind.Const) amstr += "const ";
+                if (IsAbstract) amstr += "abstract ";
+                if (IsOverride) amstr += "override ";
+                if (IsVirtual) amstr += "virtual ";
+                if (IsAsync) amstr += "async ";
+
+                return amstr;
+            }
+        }
+
         public virtual bool IsVirtual { get; set; }
 
         public virtual bool IsAbstract { get; set; }
@@ -505,6 +532,15 @@ namespace DataTools.CSTools
         }
 
         public virtual string DataType { get; set; }
+
+        public virtual string DataTypeString
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(DataType)) return DataType + " ";
+                return "";
+            }
+        }
 
         public virtual string Generics { get; set; }
 

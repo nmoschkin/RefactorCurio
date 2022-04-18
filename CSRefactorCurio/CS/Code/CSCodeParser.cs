@@ -727,7 +727,6 @@ namespace DataTools.CSTools
                     }
                     else if (chars[i] == ';' || (chars[i] == ',' && currPatt == MarkerKind.Enum))
                     {
-                        ms.Remove(ms.Length - 1, 1);
                         clo = false;
 
                         if ((currPatt == MarkerKind.Enum) || ((currPatt & MarkerKind.IsBlockLevel) != MarkerKind.IsBlockLevel))
