@@ -1181,6 +1181,8 @@ namespace DataTools.CSTools
             int l = 0, i;
             var str = lookback;
             if (lookback[0] == '=') return false;
+            if (marker.Kind == MarkerKind.EnumValue) return false;
+
             IList<string> dels = deletes;
             List<string> fd = new List<string>();
             str = str.Trim();

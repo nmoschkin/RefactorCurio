@@ -256,12 +256,12 @@ namespace CSRefactorCurio
 
         protected IColorableProperty GetCreateSingleItem(string key)
         {
-            if (_properties.TryGetValue(key, out var item))
+            var prop = _native.Item(key) as EnvDTE.ColorableItems;
+
+            if (_properties.TryGetValue(prop.Name, out var item))
             {
                 return item;
             }
-            
-            var prop = _native.Item(key) as EnvDTE.ColorableItems;
 
             if (prop != null)
             {
