@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using Microsoft.VisualStudio.VCProjectEngine;
+using System.Linq;
 
 namespace DataTools.Text
 {
@@ -243,41 +244,32 @@ namespace DataTools.Text
         /// <remarks>
         /// <paramref name="skipAllQuotes"/> is true by default, as one of the bonuses this function has over <see cref="string.Split(char[])"/> is the ability to do that.
         /// </remarks>
-        public static string[] Split(string scan, string separator, bool skipQuote = false, bool unescape = false, char quoteChar = '"', char escChar = '\\', bool unquote = false, bool withToken = false, bool withTokenIn = false, bool skipAllQuotes = true, bool trimResults = false)
+        public static string[] Split(string scan, string separator, bool skipQuote = false, bool unescape = false, char quoteChar = '"', char escChar = '\\', bool unquote = false, bool withToken = false, bool withTokenIn = false, bool skipAllQuotes = true, bool trimResults = false, bool skipPairs = true)
         {
 
-            int i = 0;
-            int f = 0;
-
-            int e = 0;
-            int g = 0;
+            int i;
             int line = 0;
+
             List<string> sOut = new List<string>();
-            int c = 0;
 
-            char[] chOut = null;
-            int h = 0;
-            int d = 0;
+            var sb = new StringBuilder();
 
-            bool inq = false;
+            int c, e;
 
             char[] chrs = scan.ToCharArray();
             char[] sep = separator.ToCharArray();
 
-            c = chrs.Length - 1;
-            e = sep.Length - 1;
+            c = chrs.Length;
+            e = sep.Length;
 
-            f = 0;
-            chOut = new char[c + 1];
-            string snew;
-
-            for (i = 0; i <= c; i++)
+            for (i = 0; i < c; i++)
             {
                 if (skipQuote && (chrs[i] == quoteChar))
                 {
-                    QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: quoteChar, escChar: escChar, withQuotes: true);
+                    var txt = QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: quoteChar, escChar: escChar, withQuotes: true);
                     if (sqEnd != null)
                     {
+                        sb.Append(txt);
                         i = (int)sqEnd;
                     }
                     else
@@ -287,9 +279,10 @@ namespace DataTools.Text
                 }
                 else if ((skipAllQuotes) && (chrs[i] == '\"'))
                 {
-                    QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\"', withQuotes: true);
+                    var txt = QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\"', withQuotes: true);
                     if (sqEnd != null)
                     {
+                        sb.Append(txt);
                         i = (int)sqEnd;
                     }
                     else
@@ -299,9 +292,10 @@ namespace DataTools.Text
                 }
                 else if ((skipAllQuotes) && (chrs[i] == '\''))
                 {
-                    QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\'', withQuotes: true);
+                    var txt = QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\'', withQuotes: true);
                     if (sqEnd != null)
                     {
+                        sb.Append(txt);
                         i = (int)sqEnd;
                     }
                     else
@@ -309,70 +303,78 @@ namespace DataTools.Text
                         break;
                     }
                 }
-                if ((!inq) && (chrs[i] == sep[f]))
+                else if ((skipPairs) && (chrs[i] == '('))
                 {
-                    // save the starting index
-                    h = i;
-                    for (f = 0; f <= e; f++)
+                    var txt = TextBetween(chrs, i, ref line, '(', ')', out int? sqStart, out int? sqEnd, withDelimiters: true);
+                    if (sqEnd != null)
                     {
-                        if (i >= c) break;
-
-                        if (chrs[i] == sep[f])
-                            i++;
-
-                        else break;
-                    }
-
-
-                    if (f == e + 1)
-                    {
-                        if (withToken && !withTokenIn && d != 0)
-                        {
-                            sOut.Add(separator);
-                            d++;
-                        }
-
-                        if (withToken && withTokenIn)
-                        {
-                            foreach (char cs in sep)
-                            {
-                                chOut[g] = cs;
-                                g++;
-                            }
-                        }
-
-                        snew = new string(chOut, 0, g);
-                        if (trimResults) snew = snew.Trim();
-                        sOut.Add(snew);
-                        g = 0;
-
-                        d++;
-                        i--;
-
+                        sb.Append(txt);
+                        i = (int)sqEnd;
                     }
                     else
                     {
-                        chOut[g] = chrs[h];
-                        g++;
-                        i = h;
+                        break;
                     }
-                    f = 0;
+                }
+                else if ((skipPairs) && (chrs[i] == '{'))
+                {
+                    var txt = TextBetween(chrs, i, ref line, '{', '}', out int? sqStart, out int? sqEnd, withDelimiters: true);
+                    if (sqEnd != null)
+                    {
+                        sb.Append(txt);
+                        i = (int)sqEnd;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if ((skipPairs) && (chrs[i] == '['))
+                {
+                    var txt = TextBetween(chrs, i, ref line, '[', ']', out int? sqStart, out int? sqEnd, withDelimiters: true);
+                    if (sqEnd != null)
+                    {
+                        sb.Append(txt);
+                        i = (int)sqEnd;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 else
                 {
-                    chOut[g] = chrs[i];
-                    g++;
+                    if (chrs[i] == sep[0])
+                    {
+                        var x = 0;
+                        var y = i;
+                        
+                        while (y < c && x < e && chrs[y] == sep[x])
+                        {
+                            y++;
+                            x++;
+                        }
+
+                        if (x == e)
+                        {
+                            if (withTokenIn) sb.Append(sep);
+                            sOut.Add(sb.ToString());
+                            if (withToken) sOut.Add(separator);
+                            sb.Clear();
+
+                            i = y;
+                        }
+                    }
+
+                    sb.Append(chrs[i]);
                 }
-
             }
 
-            if (g != 0)
+            if (sb.Length > 0)
             {
-                snew = new string(chOut, 0, g);
-                if (trimResults) snew = snew.Trim();
-                sOut.Add(snew);
+                sOut.Add(sb.ToString());
             }
-
+            
             return sOut.ToArray();
         }
 

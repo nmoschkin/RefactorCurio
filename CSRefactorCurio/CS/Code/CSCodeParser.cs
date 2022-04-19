@@ -295,7 +295,7 @@ namespace DataTools.CSTools
         /// <summary>
         /// Gets a value indicating that the parser loaded the file lazily and has not yet parsed it.
         /// </summary>
-        public virtual bool IsLazyLoad { get; protected set; } = false; 
+        public virtual bool IsLazyLoad { get; protected set; } = false;
 
         /// <summary>
         /// Gets the name of the original source file.
@@ -407,7 +407,7 @@ namespace DataTools.CSTools
             if (!Directory.Exists(OutputPath)) throw new DirectoryNotFoundException(OutputPath);
 
             TList seen = new TList();
-            
+
             if (mfile == null) return false;
             if (markers == null) return false;
 
@@ -567,6 +567,29 @@ namespace DataTools.CSTools
 
         protected static Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
         protected static Regex genericPatt;
+        protected List<string> unrecognizedWords = new List<string>();
+
+        /// <summary>
+        /// Gets a list of all unrecognized words in this file.
+        /// </summary>
+        public IReadOnlyList<string> UnrecognizedWords => unrecognizedWords;
+
+
+        private static readonly string[] FilterType1 = new string[] { 
+            "public", "private", "protected", "internal", "global" ,
+            "class", "const", "struct", "record", "interface", "namespace", "delegate", "event", "namespace", "enum",
+            "async", "extern", "override", "abstract", "new", "unsafe", "fixed", "static", "using", "get", "set",
+            "for", "while", "do", "if", "else", "switch", "case", "default", "break", "yield", "return", "add", "remove",
+            "throw", "try", "catch", "finally", 
+            "foreach", "in", "out", "ref", "null", "is", "not",
+            "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", 
+            "float", "double", "decimal", 
+            "Guid", "DateTime", 
+            "string", "char", 
+            "void", "var", "dynamic", "object", 
+            "Enum", "Tuple", "bool", "true", "false"
+        };
+
         static CSCodeParser()
         {
             patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
@@ -626,15 +649,16 @@ namespace DataTools.CSTools
 
                 TList markers = new TList();
                 TElem currMarker = default;
+                string prevWord = "";
                 var strack = new Stack<MarkerKind>();
                 var stack = new Stack<TElem>();
                 var listStack = new Stack<TList>();
 
-                StringBuilder cw = new StringBuilder();
-                StringBuilder ms = new StringBuilder();
+                StringBuilder currWord = new StringBuilder();
+                StringBuilder forScan = new StringBuilder();
                 StringBuilder sb;
                 
-                ms.Capacity = chars.Length;
+                forScan.Capacity = chars.Length;
 
                 int startPos = 0;
                 int scanStartPos = 0;
@@ -658,16 +682,40 @@ namespace DataTools.CSTools
                 MarkerKind currPatt = MarkerKind.Code;
 
                 List<string> attrs = null;
+                
+                unrecognizedWords.Clear();
 
                 for (i = 0; i < c; i++)
                 {
+                    
                     if (chars[i] == '\r' || chars[i] == '\n')
                     {
-                        ms.Append(" ");
+                        forScan.Append(" ");
                     }
                     else
                     {
-                        ms.Append(chars[i]);
+                        if (AllowedName(chars[i], true))
+                        {
+                            currWord.Append(chars[i]);
+                        }
+                        else if (currWord.Length > 0)
+                        {
+                            var cw = currWord.ToString();
+
+                            if (prevWord == "" || prevWord == "new")
+                            {
+                                if (!FilterType1.Contains(cw) && !unrecognizedWords.Contains(cw))
+                                {
+                                    unrecognizedWords.Add(cw);
+                                }
+
+                            }
+
+                            prevWord = cw;
+                            currWord.Clear();
+                        }
+
+                        forScan.Append(chars[i]);
                     }
 
                     if (chars[i] == '\n')
@@ -678,19 +726,23 @@ namespace DataTools.CSTools
                     {
                         TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, quoteChar: '\'', withQuotes: true);
                         i = (int)ept;
+                        prevWord = "";
                     }
                     else if (chars[i] == '\"')
                     {
                         TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, withQuotes: true);
                         i = (int)ept;
+                        prevWord = "";
                     }
                     else if (chars[i] == '(')
                     {
                         clo = true;
+                        prevWord = "";
                     }
                     else if (chars[i] == '[' && !clo)
                     {
-                        ms.Remove(ms.Length - 1, 1);
+                        prevWord = "";
+                        forScan.Remove(forScan.Length - 1, 1);
 
                         var sl = currLine;
                         var lookahead = TextTools.TextBetween(chars, i, ref currLine, '[', ']', out int? spt, out int? ept, withDelimiters: true);
@@ -704,7 +756,17 @@ namespace DataTools.CSTools
                         }
 
                         if (attrs == null) attrs = new List<string>();
-                        attrs.Add(lookahead);
+                        var spa = TextTools.Split(lookahead.Substring(1, lookahead.Length - 2), ",");
+                        foreach (var r in spa)
+                        {
+                            var attr = FirstNameFromHere(r, true);
+                            if (!FilterType1.Contains(attr) && !unrecognizedWords.Contains(attr))
+                            {
+                                unrecognizedWords.Add(attr);
+                            }
+                        }
+
+                        attrs.AddRange(spa);
 
                         i = (int)ept;
                         scanStartPos = i + 1;
@@ -715,7 +777,7 @@ namespace DataTools.CSTools
 
                         if ((currPatt == MarkerKind.Enum) || ((currPatt & MarkerKind.IsBlockLevel) != MarkerKind.IsBlockLevel))
                         {
-                            var lookback = TextTools.OneSpace(ms.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
+                            var lookback = TextTools.OneSpace(forScan.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
                             Match testEnum = null;
                             
                             if (currPatt == MarkerKind.Enum)
@@ -757,14 +819,15 @@ namespace DataTools.CSTools
                                     Attributes = attrs
                                 };
 
-                                TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
+                                TypeAndMethodParse(lookback, currMarker);
                             }
 
                             markers.Add(currMarker);
                         }
 
                         scanStartPos = startPos = i + 1;
-                        ms.Clear();
+                        forScan.Clear();
+                        prevWord = "";
                         if (i < c - 1 && chars[i + 1] == '\n')
                         {
                             startLine = currLine + 1;
@@ -777,7 +840,7 @@ namespace DataTools.CSTools
                     }
                     else if (chars[i] == '{')
                     {
-                        ms.Remove(ms.Length - 1, 1);
+                        forScan.Remove(forScan.Length - 1, 1);
                         clo = false;
                         ++currLevel;
 
@@ -785,7 +848,7 @@ namespace DataTools.CSTools
 
                         if ((currPatt == MarkerKind.Event) || currPatt == MarkerKind.Property || ((currPatt & MarkerKind.IsBlockLevel) != MarkerKind.IsBlockLevel))
                         {
-                            var lookback = TextTools.OneSpace(ms.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
+                            var lookback = TextTools.OneSpace(forScan.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
                             Match cons = currCons?.Match(lookback) ?? null;
                             Match ops = patterns[MarkerKind.Operator].Match(lookback);
                             var lb = RemoveWhere(lookback);
@@ -846,7 +909,7 @@ namespace DataTools.CSTools
                                         Attributes = attrs
                                     };
 
-                                    TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
+                                    TypeAndMethodParse(lookback, currMarker);
 
                                     currPatt = currMarker.Kind;
 
@@ -878,7 +941,8 @@ namespace DataTools.CSTools
                         markers = new TList();
 
                         scanStartPos = startPos = i + 1;
-                        ms.Clear();
+                        forScan.Clear();
+                        prevWord = "";
 
                         if (i < c - 1 && chars[i + 1] == '\n')
                         {
@@ -896,7 +960,7 @@ namespace DataTools.CSTools
                         clo = false;
                         if (currPatt == MarkerKind.Enum)
                         {
-                            var lookback = TextTools.OneSpace(ms.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
+                            var lookback = TextTools.OneSpace(forScan.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
                             var testEnum = patterns[MarkerKind.EnumValue].Match(lookback);
 
                             if (testEnum.Success)
@@ -938,7 +1002,8 @@ namespace DataTools.CSTools
 
                         scanStartPos = startPos = i + 1;
 
-                        ms.Clear();
+                        forScan.Clear();
+                        prevWord = "";
 
                         if (i < c - 1 && chars[i + 1] == '\n')
                         {
@@ -952,8 +1017,8 @@ namespace DataTools.CSTools
                     }
                     else if ((i < c - 1) && ((chars[i] == '/' && chars[i + 1] == '/') || (chars[i] == '#')))
                     {
-                        ms.Remove(ms.Length - 1, 1);
-                        ms.Append(' ');
+                        forScan.Remove(forScan.Length - 1, 1);
+                        forScan.Append(' ');
                         clo = false;
                         currMarker = new TElem()
                         {
@@ -1005,8 +1070,8 @@ namespace DataTools.CSTools
                     }
                     else if ((i < c - 3) && (chars[i] == '/' && chars[i + 1] == '*'))
                     {
-                        ms.Remove(ms.Length - 1, 1);
-                        ms.Append(' ');
+                        forScan.Remove(forScan.Length - 1, 1);
+                        forScan.Append(' ');
 
                         clo = false;
                         currMarker = new TElem()
@@ -1073,11 +1138,30 @@ namespace DataTools.CSTools
             }
 
         }
+        private string FirstNameFromHere(string val, bool alsoDot)
+        {
+            val = val.Trim();
+            var sb = new StringBuilder();
 
+            int c = val.Length;
+            for (int i = 0; i < c; i++)
+            {
+                if (AllowedName(val[i], alsoDot))
+                {
+                    sb.Append(val[i]);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return sb.ToString();
+        }
         /// <summary>
-        /// A list of filtered keywords for the C# language.
+        /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TElem)"/> (in literally no particular order.)
         /// </summary>
-        private static readonly string[] deletes = new string[] { "ref", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
+        private static readonly string[] FilterType2 = new string[] { "global", "ref", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         /// <summary>
         /// Parse the type, name and method parameters from a lookback string.
@@ -1086,16 +1170,17 @@ namespace DataTools.CSTools
         /// <param name="marker">The destination marker.</param>
         /// <returns>True if successful.</returns>
         /// <exception cref="SyntaxErrorException"></exception>
-        private int TypeAndMethodParse(string lookback, char[] chars, int start, int stop, TElem marker)
+        private int TypeAndMethodParse(string lookback, TElem marker)
         {
             if (string.IsNullOrEmpty(lookback)) return 0;
 
             int l = 0, i;
             var str = lookback;
+
             if (lookback[0] == '=') return 0;
             if (marker.Kind == MarkerKind.EnumValue) return 0;
 
-            IList<string> dels = deletes;
+            IList<string> dels = FilterType2;
             List<string> fd = new List<string>();
             str = str.Trim();
             var w = str.ToCharArray();
@@ -1183,6 +1268,7 @@ namespace DataTools.CSTools
                                 case "private":
                                 case "internal":
                                 case "protected":
+                                case "global":
                                     marker.AccessModifiers |= (AccessModifiers)Enum.Parse(typeof(AccessModifiers), TextTools.TitleCase(del));
                                     break;
 
@@ -1593,6 +1679,11 @@ namespace DataTools.CSTools
             for (i = 0; i < c; i++)
             {
                 if (markers[i].Children != null) PostScanTasks(markers[i].Children);
+
+                if (unrecognizedWords.Contains(markers[i].Name))
+                {
+                    unrecognizedWords.Remove(markers[i].Name);
+                }
 
                 if (i < c - 1)
                 {

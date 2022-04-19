@@ -73,9 +73,14 @@ namespace DataTools.CSTools
         Internal = 0x4,
 
         /// <summary>
-        /// public
+        /// Public
         /// </summary>
         Public = 0x8,
+
+        /// <summary>
+        /// Global
+        /// </summary>
+        Global = 0x10
     }
 
     /// <summary>
