@@ -418,6 +418,7 @@ namespace DataTools.CSTools
         #region Protected Fields
 
         protected MarkerKind kind;
+        protected WeakReference<IProjectNode> homeFile;
         protected TList markers = new TList();
         protected string mpstr;
         protected string name;
@@ -521,7 +522,24 @@ namespace DataTools.CSTools
 
         public virtual string Generics { get; set; }
 
-        public virtual IProjectNode HomeFile { get; set; }
+        public virtual IProjectNode HomeFile
+        {
+            get
+            {
+                if (homeFile != null && homeFile.TryGetTarget(out IProjectNode target))
+                {
+                    return target;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                homeFile = new WeakReference<IProjectNode>(value);
+            }
+        }
 
         public virtual string Inheritance { get; set; }
 
