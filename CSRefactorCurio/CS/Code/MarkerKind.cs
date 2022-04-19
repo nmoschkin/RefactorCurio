@@ -266,6 +266,13 @@ namespace DataTools.CSTools
         [Description("Attribute or Decorator")]
         ExplicitImplementation = 0x4000,
 
+
+        /// <summary>
+        /// External Reference
+        /// </summary>
+        [Description("External Reference")]
+        ExternalReference = 0x1000,
+
         /// <summary>
         /// Custom 1
         /// </summary>
@@ -301,6 +308,8 @@ namespace DataTools.CSTools
         /// Is a code-level element.
         /// </summary>
         IsCodeLevel = 0x200
+
+
 
     }
 

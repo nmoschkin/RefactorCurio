@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,7 @@ namespace CSRefactorCurio.ViewModels
         public IOwnedCommand ClickBuild => clickBuild;
 
         public ObservableCollection<IProjectElement> CurrentItems => classMode ? projects : namespaces;
+        private List<string> allFQN;
 
         public CurioExplorerSolution()
         {
@@ -144,9 +146,41 @@ namespace CSRefactorCurio.ViewModels
             namespacesMap.Clear();
             namespaces = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
 
+            allFQN = AllFullyQualifiedNames(namespacesMap.Values).Distinct().ToList();
+            allFQN.Sort();
+
             OnPropertyChanged(nameof(Namespaces));
+
             if (!classMode) OnPropertyChanged(nameof(CurrentItems));
+
             Cursor = null;
+        }
+
+        private List<string> AllFullyQualifiedNames(IEnumerable<CSNamespace> namespaces)
+        {
+            List<string> myfqs = new List<string>();
+
+            foreach (var ns in namespaces)
+            {
+                myfqs.Add(ns.Name);
+                myfqs.AddRange(AllFullyQualifiedNames(ns.Markers));
+                myfqs.AddRange(AllFullyQualifiedNames(ns.Namespaces));
+            }
+
+            return myfqs;
+        } 
+
+        private List<string> AllFullyQualifiedNames(IEnumerable<CSMarker> markers)
+        {
+            List<string> myfqs = new List<string>();
+
+            foreach (var item in markers)
+            {
+                myfqs.Add(item.FullyQualifiedName);
+                myfqs.AddRange(AllFullyQualifiedNames(item.Children));
+            }
+
+            return myfqs;
         }
 
         public CurioExplorerSolution(EnvDTE.Solution sln) : this()

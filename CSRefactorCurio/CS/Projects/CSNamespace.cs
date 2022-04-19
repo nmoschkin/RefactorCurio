@@ -17,19 +17,71 @@ namespace DataTools.CSTools
     /// </summary>
     public class CSNamespace : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
-        private string name;
+        #region Private Fields
+
         private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
-
         private ObservableCollection<CSMarker> markers = new ObservableCollection<CSMarker>();
-
+        private string name;
         private ObservableCollection<CSNamespace> namespaces = new ObservableCollection<CSNamespace>();
 
         private CSNamespace parent;
-        
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Create a new namespace with the specified name and optional parent.
+        /// </summary>
+        /// <param name="name">Fully qualified namespace.</param>
+        /// <param name="parent">Parent</param>
+        public CSNamespace(string name, CSNamespace parent = null)
+        {
+            this.name = name;
+            this.parent = parent;
+        }
+
+        /// <summary>
+        /// Create a new namespace with the specified name, initial children and optional parent.
+        /// </summary>
+        /// <param name="items">The initial children.</param>
+        /// <param name="name">Fully qualified namespace.</param>
+        /// <param name="parent">Parent</param>
+        public CSNamespace(string name, IEnumerable<IProjectElement> items, CSNamespace parent = null) : this(name, parent)
+        {
+            foreach (var item in items)
+            {
+                children.Add(item);
+            }
+        }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
         IList IProjectNode.Children => children;
 
+        /// <summary>
+        /// Gets the child objects (either namespaces or markers).
+        /// </summary>
+        public ObservableCollection<IProjectElement> Children
+        {
+            get => children;
+            protected set
+            {
+                SetProperty(ref children, value);
+            }
+        }
+
         public ElementType ChildType => ElementType.SolutionFolder | ElementType.Namespace;
-        
+
+        public ElementType ElementType => ElementType.Namespace;
+
+        /// <summary>
+        /// True if this is the root.
+        /// </summary>
+        public bool IsRoot => parent == null;
+
         /// <summary>
         /// Gets the observable collection of code elements that are at home in this namespace.
         /// </summary>
@@ -39,6 +91,18 @@ namespace DataTools.CSTools
             protected set
             {
                 SetProperty(ref markers, value);    
+            }
+        }
+
+        /// <summary>
+        /// Gets the namespace name.
+        /// </summary>
+        public string Name
+        {
+            get => name;
+            protected set
+            {
+                SetProperty(ref name, value);
             }
         }
 
@@ -53,6 +117,17 @@ namespace DataTools.CSTools
                 SetProperty(ref namespaces, value);
             }
         }
+
+        /// <summary>
+        /// Gets the parent namespace, or null if this is a root namespace.
+        /// </summary>
+        public CSNamespace Parent => parent;
+
+        public string Title => name;
+
+        #endregion Public Properties
+
+        #region Public Methods
 
         /// <summary>
         /// Generate a namespace map from the specified project.
@@ -101,6 +176,42 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
+        /// Sort the namespace map in place.
+        /// </summary>
+        /// <param name="descending">Sort in descending order.</param>
+        public void Sort(bool descending = false)
+        {
+            var m = descending ? -1 : 1;
+
+            QuickSort.Sort(Children, (a, b) =>
+            {
+                if (a.ElementType == ElementType.Namespace && b.ElementType != ElementType.Namespace) return -1 * m;
+                else if (a.ElementType != ElementType.Namespace && b.ElementType == ElementType.Namespace) return 1 * m;
+                else return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
+            });
+
+            QuickSort.Sort(Markers, (a, b) =>
+            {
+                return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
+            });
+
+            QuickSort.Sort(Namespaces, (a, b) =>
+            {
+                return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
+            });
+
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        #endregion Public Methods
+
+        #region Protected Methods
+
+        /// <summary>
         /// Ensure that a dictionary map of namespaces has the specified namespace element, creating it if necessary.
         /// </summary>
         /// <param name="name">The fully qualified namespace.</param>
@@ -140,34 +251,6 @@ namespace DataTools.CSTools
 
             return lvn;
         }
-
-        /// <summary>
-        /// Sort the namespace map in place.
-        /// </summary>
-        /// <param name="descending">Sort in descending order.</param>
-        public void Sort(bool descending = false)
-        {
-            var m = descending ? -1 : 1;    
-
-            QuickSort.Sort(Children, (a, b) =>
-            {
-                if (a.ElementType == ElementType.Namespace && b.ElementType != ElementType.Namespace) return -1 * m;
-                else if (a.ElementType != ElementType.Namespace && b.ElementType == ElementType.Namespace) return 1 * m;
-                else return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
-            });
-
-            QuickSort.Sort(Markers, (a, b) =>
-            {
-                return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
-            });
-
-            QuickSort.Sort(Namespaces, (a, b) =>
-            {
-                return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
-            });
-
-        }
-
         /// <summary>
         /// Get the namespaces for the specified node.
         /// </summary>
@@ -205,67 +288,6 @@ namespace DataTools.CSTools
             return processed;
         }
 
-        /// <summary>
-        /// Gets the namespace name.
-        /// </summary>
-        public string Name
-        {
-            get => name;
-            protected set
-            {
-                SetProperty(ref name, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets the parent namespace, or null if this is a root namespace.
-        /// </summary>
-        public CSNamespace Parent => parent;
-
-        /// <summary>
-        /// Gets the child objects (either namespaces or markers).
-        /// </summary>
-        public ObservableCollection<IProjectElement> Children
-        {
-            get => children;
-            protected set
-            {
-                SetProperty(ref children, value);
-            }
-        }
-
-        /// <summary>
-        /// Create a new namespace with the specified name and optional parent.
-        /// </summary>
-        /// <param name="name">Fully qualified namespace.</param>
-        /// <param name="parent">Parent</param>
-        public CSNamespace(string name, CSNamespace parent = null)
-        {
-            this.name = name;
-            this.parent = parent;
-        }
-
-        /// <summary>
-        /// Create a new namespace with the specified name, initial children and optional parent.
-        /// </summary>
-        /// <param name="items">The initial children.</param>
-        /// <param name="name">Fully qualified namespace.</param>
-        /// <param name="parent">Parent</param>
-        public CSNamespace(string name, IEnumerable<IProjectElement> items, CSNamespace parent = null) : this(name, parent)
-        {
-            foreach (var item in items)
-            {
-                children.Add(item);
-            }
-        }
-
-        public override string ToString()
-        {
-            return Name;
-        }
-
-        public string Title => name;
-        
-        public ElementType ElementType => ElementType.Namespace;
+        #endregion Protected Methods
     }
 }

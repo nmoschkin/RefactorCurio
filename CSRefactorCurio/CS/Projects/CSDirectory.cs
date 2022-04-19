@@ -20,73 +20,43 @@ using System.Threading.Tasks;
 namespace DataTools.CSTools
 {
     /// <summary>
-    /// CS Refactor Curio Solution Marker
-    /// </summary>
-    public class CSMarker : MarkerBase<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public override ObservableMarkerList<CSMarker> Children 
-        { 
-            get => base.Children;
-            set
-            {
-                if (base.Children != value)
-                {
-                    base.Children = value;
-                    OnPropertyChanged();
-                }
-            }
-        
-        }
-
-
-        protected void OnPropertyChanged([CallerMemberName]string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    /// <summary>
     /// CS Refactor Curio Solution Source Code File based on <see cref="CSCodeParser{TElem, TList}"/>.
     /// </summary>
     public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        #region Private Fields
+
+        CSFileChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSFileChain<CSMarker, ObservableMarkerList<CSMarker>>();
 
         private ObservableMarkerList<CSMarker> filteredChildren;
 
-        private string title;
-        
-        CSFileChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSFileChain<CSMarker, ObservableMarkerList<CSMarker>>();
- 
-        public ElementType ElementType => ElementType.File;
-        public ElementType ChildType => ElementType.Marker;
-
-        IList IProjectNode.Children => markers;
-
         bool nocolnotify = false;
 
-        public MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>>();
+        private string title;
 
-        public virtual ObservableMarkerList<CSMarker> FilteredItems
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Instantiate a blank, unloaded code file reader.
+        /// </summary>
+        public CSCodeFile()
         {
-            get
-            {
-                if ((markers == null || markers.Count == 0) && IsLazyLoad) Refresh();
-                return filteredChildren;
-            }
-            protected set
-            {
-                if (filteredChildren != value)
-                {
-                    filteredChildren = value;
-                    OnPropertyChanged();
-                }
-                
-            }
+            markers.CollectionChanged += OnChildrenChanged;
         }
 
+        #endregion Public Constructors
+
+        #region Public Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Public Events
+
+        #region Public Properties
+
+        IList IProjectNode.Children => markers;
         public virtual ObservableMarkerList<CSMarker> Children
         {
             get
@@ -115,15 +85,91 @@ namespace DataTools.CSTools
             }
         }
 
-        public MarkerFilterRule ProvideFilterRule(ObservableMarkerList<CSMarker> items)
+        public ElementType ChildType => ElementType.Marker;
+        public ElementType ElementType => ElementType.File;
+        public override string Filename
         {
-            return fileChain; 
+            get => base.Filename;
+            protected set
+            {
+                if (base.Filename != value)
+                {
+                    base.Filename = value;
+                    if (value != null)
+                    {
+                        Title = System.IO.Path.GetFileName(value);
+                    }
+
+                    OnPropertyChanged();
+                }
+            }
         }
 
-        public ObservableMarkerList<CSMarker> RunFilters(ObservableMarkerList<CSMarker> items)
+        public MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>>();
+
+        public virtual ObservableMarkerList<CSMarker> FilteredItems
         {
-            FilteredItems = Filter.ApplyFilter(items, ProvideFilterRule(items));
-            return FilteredItems;
+            get
+            {
+                if ((markers == null || markers.Count == 0) && IsLazyLoad) Refresh();
+                return filteredChildren;
+            }
+            protected set
+            {
+                if (filteredChildren != value)
+                {
+                    filteredChildren = value;
+                    OnPropertyChanged();
+                }
+
+            }
+        }
+        public string Title
+        {
+            get => title;
+            set
+            {
+                if (title != value)
+                {
+                    title = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion Public Properties
+
+        #region Public Methods
+
+        new public static CSCodeFile LoadFromFile(string path, bool lazy)
+        {
+            var cf = new CSCodeFile();
+            cf.LoadFile(path, lazy);
+            return cf;
+        }
+
+        /// <summary>
+        /// Add the specified marker to the children collection if not there already.
+        /// </summary>
+        /// <param name="marker">The marker to add.</param>
+        public void AddMarker(CSMarker marker)
+        {
+            if (!markers.Contains(marker)) markers.Add(marker);
+        }
+
+        public MarkerFilterRule ProvideFilterRule(ObservableMarkerList<CSMarker> items)
+        {
+            return fileChain;
+        }
+
+        /// <summary>
+        /// Remove the specified marker.
+        /// </summary>
+        /// <param name="marker"></param>
+        /// <returns>True if the marker was located and removed successfully.</returns>
+        public bool RemoveMarker(CSMarker marker)
+        {
+            return markers.Remove(marker);
         }
 
         public string Rename(string newName)
@@ -146,6 +192,16 @@ namespace DataTools.CSTools
             return oldname;
         }
 
+        public ObservableMarkerList<CSMarker> RunFilters(ObservableMarkerList<CSMarker> items)
+        {
+            FilteredItems = Filter.ApplyFilter(items, ProvideFilterRule(items));
+            return FilteredItems;
+        }
+
+        #endregion Public Methods
+
+        #region Internal Methods
+
         /// <summary>
         /// Fired when the file is renamed from outside the solution.
         /// </summary>
@@ -155,68 +211,14 @@ namespace DataTools.CSTools
             Filename = newName;
         }
 
-        public string Title
-        {
-            get => title;
-            set
-            {
-                if (title != value)
-                {
-                    title = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        #endregion Internal Methods
 
-        public override string Filename 
-        { 
-            get => base.Filename; 
-            protected set
-            {
-                if (base.Filename != value)
-                {
-                    base.Filename = value;
-                    if (value != null)
-                    {
-                        Title = System.IO.Path.GetFileName(value);
-                    }
+        #region Protected Methods
 
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        protected void OnPropertyChanged([CallerMemberName]string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        new public static CSCodeFile LoadFromFile(string path, bool lazy)
-        {
-            var cf = new CSCodeFile();
-            cf.LoadFile(path, lazy);
-            return cf;
-        }
-        
-        /// <summary>
-        /// Add the specified marker to the children collection if not there already.
-        /// </summary>
-        /// <param name="marker">The marker to add.</param>
-        public void AddMarker(CSMarker marker)
-        {
-            if (!markers.Contains(marker)) markers.Add(marker);
-        }
-
-        /// <summary>
-        /// Remove the specified marker.
-        /// </summary>
-        /// <param name="marker"></param>
-        /// <returns>True if the marker was located and removed successfully.</returns>
-        public bool RemoveMarker(CSMarker marker)
-        {
-            return markers.Remove(marker);
-        }
-
         protected override bool Parse(string text)
         {
             markers.Clear();
@@ -224,7 +226,9 @@ namespace DataTools.CSTools
 
             if (base.Parse(text) && markers != null)
             {
+                SetHomeFile(markers);
                 RunFilters(markers);
+                
                 nocolnotify = false;
                 return true;
             }
@@ -233,18 +237,26 @@ namespace DataTools.CSTools
             return false;
         }
 
-        /// <summary>
-        /// Instantiate a blank, unloaded code file reader.
-        /// </summary>
-        public CSCodeFile()
-        {
-            markers.CollectionChanged += OnChildrenChanged;
-        }
+
+        #endregion Protected Methods
+
+        #region Private Methods
 
         private void OnChildrenChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (!nocolnotify) RunFilters(markers);
         }
+
+        private void SetHomeFile(IMarkerList markers)
+        {
+            foreach (IMarker item in markers)
+            {
+                item.HomeFile = this;
+                SetHomeFile(item.Children);
+            }
+        }
+
+        #endregion Private Methods
     }
 
     /// <summary>
@@ -253,33 +265,51 @@ namespace DataTools.CSTools
     public class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
 
-        private WeakReference<CSDirectory> parent = null;
-        private WeakReference<CurioProject> project = null;
-
-        private ObservableCollection<CSCodeFile> files;
-        private ObservableCollection<CSDirectory> directories;
+        #region Private Fields
 
         private ObservableCollection<IProjectElement> children;
-
+        private ObservableCollection<CSDirectory> directories;
+        private ObservableCollection<CSCodeFile> files;
+        private List<string> namespaces;
+        private WeakReference<CSDirectory> parent = null;
         private string path = null;
+        private WeakReference<CurioProject> project = null;
         private string title = null;
 
-        private List<string> namespaces;
+        #endregion Private Fields
 
-        public ElementType ElementType => ElementType.Directory;
-        public ElementType ChildType => ElementType.File;
+        #region Public Constructors
 
-        IList IProjectNode.Children => children;
-
-        public string Title
+        /// <summary>
+        /// Create a new directory element for the specified project.
+        /// </summary>
+        /// <param name="project">The project to create the element for.</param>
+        /// <param name="path">The valid path to the folder.</param>
+        /// <param name="parent">Optional parent subfolder within the specified project.</param>
+        public CSDirectory(CurioProject project, string path, CSDirectory parent = null)
         {
-            get => title;
-            protected set
+            if (parent != null && project != parent.Project) throw new ArgumentException("Parent directory must be a member of the same project being referenced.");
+
+            files = new ObservableCollection<CSCodeFile>();
+            directories = new ObservableCollection<CSDirectory>();
+            children = new ObservableCollection<IProjectElement>();
+
+            if (parent != null)
             {
-                SetProperty(ref title, value);
+                this.parent = new WeakReference<CSDirectory>(parent);
             }
+
+            this.project = new WeakReference<CurioProject>(project);
+            Path = path;
+
+            ReadDirectory();
         }
 
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        IList IProjectNode.Children => children;
         public ObservableCollection<IProjectElement> Children
         {
             get => children;
@@ -289,41 +319,7 @@ namespace DataTools.CSTools
             }
         }
 
-        /// <summary>
-        /// Gets the parent project.
-        /// </summary>
-        public CurioProject Project
-        {
-            get
-            {
-                if (project != null)
-                {
-                    if (project.TryGetTarget(out var projectReader))
-                    {
-                        return projectReader;
-                    }
-                }
-
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets the total number of recognized files under this directory (including in all subdirectories)
-        /// </summary>
-        /// <returns></returns>
-        public int GetTotalFilesCount()
-        {
-            var count = files.Count;
-
-            foreach (var dir in directories)
-            {
-                count += dir.GetTotalFilesCount();
-            }
-
-            return count;
-        }
-
+        public ElementType ChildType => ElementType.File;
         /// <summary>
         /// Gets the observable list of subdirectories.
         /// </summary>
@@ -335,7 +331,8 @@ namespace DataTools.CSTools
                 SetProperty(ref directories, value);
             }
         }
-        
+
+        public ElementType ElementType => ElementType.Directory;
         /// <summary>
         /// Gets the observable list of source code files.
         /// </summary>
@@ -360,6 +357,23 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
+        /// Gets the parent directory or null if this is the project root folder.
+        /// </summary>
+        public CSDirectory Parent
+        {
+            get
+            {
+                if (parent == null) return null;
+
+                if (parent.TryGetTarget(out var root))
+                {
+                    return root;
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Gets the absolute path of the current directory.
         /// </summary>
         public string Path
@@ -375,182 +389,36 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
-        /// Gets the parent directory or null if this is the project root folder.
+        /// Gets the parent project.
         /// </summary>
-        public CSDirectory Parent
+        public CurioProject Project
         {
             get
             {
-                if (parent == null) return null;    
-
-                if (parent.TryGetTarget(out var root))
+                if (project != null)
                 {
-                    return root;
+                    if (project.TryGetTarget(out var projectReader))
+                    {
+                        return projectReader;
+                    }
                 }
+
                 return null;
             }
         }
 
-        /// <summary>
-        /// Create a new directory element for the specified project.
-        /// </summary>
-        /// <param name="project">The project to create the element for.</param>
-        /// <param name="path">The valid path to the folder.</param>
-        /// <param name="parent">Optional parent subfolder within the specified project.</param>
-        public CSDirectory(CurioProject project, string path, CSDirectory parent = null)
+        public string Title
         {
-            if (parent != null && project != parent.Project) throw new ArgumentException("Parent directory must be a member of the same project being referenced.");
-
-            files = new ObservableCollection<CSCodeFile>();
-            directories = new ObservableCollection<CSDirectory>();
-            children = new ObservableCollection<IProjectElement>();
-
-            if (parent != null)
+            get => title;
+            protected set
             {
-                this.parent = new WeakReference<CSDirectory>(parent);
+                SetProperty(ref title, value);
             }
-            
-            this.project = new WeakReference<CurioProject>(project);
-            Path = path;
-
-            ReadDirectory();
         }
 
-        /// <summary>
-        /// Gets all namespaces that can be found in all files in all subfolders of this directory.
-        /// </summary>
-        /// <returns></returns>
-        public List<string> GetAllNamespacesFromHere()
-        {
-            CheckNamespaces();
+        #endregion Public Properties
 
-            List<string> ns = new List<string>();
-            ns.AddRange(namespaces);
-
-            foreach (var dir in directories)
-            {
-                ns.AddRange(dir.GetAllNamespacesFromHere());
-            }
-
-            return ns.Distinct().ToList();
-        }
-
-        /// <summary>
-        /// Remove the object at the specified path from the project (does not delete the file on disk)
-        /// </summary>
-        /// <param name="path">The file or directory to remove.</param>
-        /// <returns>True if successful.</returns>
-        public bool RemovePath(string path)
-        {
-            var obj = Find(path);
-            if (obj is IProjectElement e)
-            {
-                return Remove(e);
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Remove the specified project element from the project (does not delete files)
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public bool Remove(IProjectElement item)
-        {
-            if (item is IProjectNode node)
-            {
-                if (children.Contains(node))
-                {
-                    children.Remove(node);
-                    if (node is CSDirectory dir)
-                    {
-                        directories.Remove(dir);
-                    }                    
-                    else if (node is CSCodeFile file)
-                    {
-                        files.Remove(file);
-                    }
-
-                    return true;
-                }
-
-                foreach (var dir in directories)
-                {
-                    if (dir.Remove(item)) return true;
-                }
-            }
-            else if (item is CSMarker child)
-            {
-                foreach (IProjectNode pnode in children)
-                {
-                    if (pnode.Children.Contains(item))
-                    {
-                        if (pnode is CSCodeFile file)
-                        {
-                            file.RemoveMarker(child);
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Process a <see cref="FileNotifyInfo"/> change event from the filesystem watcher.
-        /// </summary>
-        /// <param name="info">The info to parse.</param>
-        /// <remarks>
-        /// If the project file, itself, changes, the entire subdirectory structure is updated.
-        /// Otherwise, only the affected file is updated.
-        /// </remarks>
-        public void ProcessChangeEvent(FileNotifyInfo info)
-        {
-            var s = this.Project.ProjectRootPath + "\\" + info.Filename;
-
-            switch (info.Action)
-            {
-                case FileActions.Added:
-                    Find(s, true);
-                    break;
-
-                case FileActions.Removed:
-                    RemovePath(s);
-                    break;
-
-                case FileActions.RenamedOldName:
-                    var obj = Find(this.Project.ProjectRootPath + "\\" + info.OldName);
-                    if (obj != null)
-                    {
-
-                        if (obj is CSCodeFile file)
-                        {
-                            if (File.Exists(file.Filename)) file.Refresh();
-
-                            if (!info.NewName.EndsWith("TMP"))
-                            {
-                                file.RenameEvent(this.Project.ProjectRootPath + "\\" + info.NewName);
-                            }
-                        }
-                        else if (obj is CSDirectory dir)
-                        {
-                            dir.path = this.Project.ProjectRootPath + "\\" + info.NewName;
-                        }
-                    }
-                    break;
-
-                case FileActions.Modified:
-                    var fobj = FindFile(s);
-                    if (fobj != null)
-                    {
-                        fobj.Refresh();
-                    }
-                    break;
-
-            }
-        }
+        #region Public Methods
 
         /// <summary>
         /// Find the project element at the location specified by <paramref name="path"/>, optionally creating it, if it does not exist.
@@ -607,7 +475,7 @@ namespace DataTools.CSTools
                     if (!tp.Contains(System.IO.Path.DirectorySeparatorChar))
                     {
                         var newdir = new CSDirectory(Project, path, this);
-                        
+
                         directories.Add(newdir);
                         children.Add(newdir);
 
@@ -661,19 +529,107 @@ namespace DataTools.CSTools
             foreach (var dir in Directories)
             {
                 var cf = dir.FindFile(filename);
-                if (cf != null) return cf;  
+                if (cf != null) return cf;
             }
 
             return null;
         }
-        
+
+        /// <summary>
+        /// Gets all namespaces that can be found in all files in all subfolders of this directory.
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetAllNamespacesFromHere()
+        {
+            CheckNamespaces();
+
+            List<string> ns = new List<string>();
+            ns.AddRange(namespaces);
+
+            foreach (var dir in directories)
+            {
+                ns.AddRange(dir.GetAllNamespacesFromHere());
+            }
+
+            return ns.Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Gets the total number of recognized files under this directory (including in all subdirectories)
+        /// </summary>
+        /// <returns></returns>
+        public int GetTotalFilesCount()
+        {
+            var count = files.Count;
+
+            foreach (var dir in directories)
+            {
+                count += dir.GetTotalFilesCount();
+            }
+
+            return count;
+        }
+        /// <summary>
+        /// Process a <see cref="FileNotifyInfo"/> change event from the filesystem watcher.
+        /// </summary>
+        /// <param name="info">The info to parse.</param>
+        /// <remarks>
+        /// If the project file, itself, changes, the entire subdirectory structure is updated.
+        /// Otherwise, only the affected file is updated.
+        /// </remarks>
+        public void ProcessChangeEvent(FileNotifyInfo info)
+        {
+            var s = this.Project.ProjectRootPath + "\\" + info.Filename;
+
+            switch (info.Action)
+            {
+                case FileActions.Added:
+                    Find(s, true);
+                    break;
+
+                case FileActions.Removed:
+                    RemovePath(s);
+                    break;
+
+                case FileActions.RenamedOldName:
+                    var obj = Find(this.Project.ProjectRootPath + "\\" + info.OldName);
+                    if (obj != null)
+                    {
+
+                        if (obj is CSCodeFile file)
+                        {
+                            if (File.Exists(file.Filename)) file.Refresh();
+
+                            if (!info.NewName.EndsWith("TMP"))
+                            {
+                                file.RenameEvent(this.Project.ProjectRootPath + "\\" + info.NewName);
+                            }
+                        }
+                        else if (obj is CSDirectory dir)
+                        {
+                            dir.path = this.Project.ProjectRootPath + "\\" + info.NewName;
+                        }
+                    }
+                    break;
+
+                case FileActions.Modified:
+                    var fobj = FindFile(s);
+                    if (fobj != null)
+                    {
+                        fobj.Refresh();
+                    }
+                    break;
+
+            }
+        }
+
         public void ReadDirectory(string path = null)
         {
             var p = Project;
             var isf = p.IsFrameworkProject;
             var rt = p.ProjectRootPath;
 
-            if (p == null) return;  
+            if (p == null) return;
 
             path = path ?? this.path;
 
@@ -753,6 +709,68 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
+        /// Remove the specified project element from the project (does not delete files)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public bool Remove(IProjectElement item)
+        {
+            if (item is IProjectNode node)
+            {
+                if (children.Contains(node))
+                {
+                    children.Remove(node);
+                    if (node is CSDirectory dir)
+                    {
+                        directories.Remove(dir);
+                    }
+                    else if (node is CSCodeFile file)
+                    {
+                        files.Remove(file);
+                    }
+
+                    return true;
+                }
+
+                foreach (var dir in directories)
+                {
+                    if (dir.Remove(item)) return true;
+                }
+            }
+            else if (item is CSMarker child)
+            {
+                foreach (IProjectNode pnode in children)
+                {
+                    if (pnode.Children.Contains(item))
+                    {
+                        if (pnode is CSCodeFile file)
+                        {
+                            file.RemoveMarker(child);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Remove the object at the specified path from the project (does not delete the file on disk)
+        /// </summary>
+        /// <param name="path">The file or directory to remove.</param>
+        /// <returns>True if successful.</returns>
+        public bool RemovePath(string path)
+        {
+            var obj = Find(path);
+            if (obj is IProjectElement e)
+            {
+                return Remove(e);
+            }
+
+            return false;
+        }
+        /// <summary>
         /// Sort child elements.
         /// </summary>
         /// <param name="descending">True to sort in reverse.</param>
@@ -779,6 +797,15 @@ namespace DataTools.CSTools
 
         }
 
+        public override string ToString()
+        {
+            return Title;
+        }
+
+        #endregion Public Methods
+
+        #region Protected Methods
+
         /// <summary>
         /// Performs a check to ensure the local list of namespaces is up to date with the structure of the directory.
         /// </summary>
@@ -789,7 +816,7 @@ namespace DataTools.CSTools
 
             foreach (var item in Files)
             {
-                foreach(var marker in item.Markers)
+                foreach (var marker in item.Markers)
                 {
                     if (!p.Contains(marker.Namespace))
                     {
@@ -802,10 +829,46 @@ namespace DataTools.CSTools
             OnPropertyChanged(nameof(Namespaces));
         }
 
-        public override string ToString()
-        {
-            return Title;
+        #endregion Protected Methods
+    }
+
+    /// <summary>
+    /// CS Refactor Curio Solution Marker
+    /// </summary>
+    public class CSMarker : MarkerBase<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>
+    {
+        #region Public Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Public Events
+
+        #region Public Properties
+
+        public override ObservableMarkerList<CSMarker> Children 
+        { 
+            get => base.Children;
+            set
+            {
+                if (base.Children != value)
+                {
+                    base.Children = value;
+                    OnPropertyChanged();
+                }
+            }
+
         }
 
+        #endregion Public Properties
+
+
+        #region Protected Methods
+
+        protected void OnPropertyChanged([CallerMemberName]string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion Protected Methods
     }
 }

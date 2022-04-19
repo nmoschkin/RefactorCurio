@@ -65,16 +65,39 @@ namespace DataTools.CSTools
     /// </summary>
     public interface IProjectElement 
     {
-        /// <summary>
-        /// The title of the element.
-        /// </summary>
-        string Title { get; }
+        #region Public Properties
 
         /// <summary>
         /// The element type.
         /// </summary>
         ElementType ElementType { get; }
 
+        /// <summary>
+        /// The title of the element.
+        /// </summary>
+        string Title { get; }
+
+        #endregion Public Properties
+    }
+
+    /// <summary>
+    /// Represents a top-level project host element.
+    /// </summary>
+    public interface IProjectHost : IProjectElement, INotifyPropertyChanged
+    {
+        #region Public Properties
+
+        /// <summary>
+        /// The project properties.
+        /// </summary>
+        IPropertiesContainer Properties { get; }
+
+        /// <summary>
+        /// The root folder of the project children.
+        /// </summary>
+        IProjectNode RootFolder { get; }
+
+        #endregion Public Properties
     }
 
     /// <summary>
@@ -82,6 +105,8 @@ namespace DataTools.CSTools
     /// </summary>
     public interface IProjectNode : IProjectElement
     {
+        #region Public Properties
+
         /// <summary>
         /// The element children.
         /// </summary>
@@ -91,6 +116,8 @@ namespace DataTools.CSTools
         /// The type flags for the element children (can be or'd)
         /// </summary>
         ElementType ChildType { get; }
+
+        #endregion Public Properties
     }
 
     /// <summary>
@@ -99,46 +126,39 @@ namespace DataTools.CSTools
     /// <typeparam name="T"></typeparam>
     public interface IProjectNode<T> : IProjectNode where T : IList, INotifyCollectionChanged, INotifyPropertyChanged
     {
+        #region Public Properties
+
         /// <summary>
         /// Gets the list of child nodes.
         /// </summary>
         new T Children { get; }
+
+        #endregion Public Properties
     }
-
-    /// <summary>
-    /// Represents a top-level project host element.
-    /// </summary>
-    public interface IProjectHost : IProjectElement, INotifyPropertyChanged
-    {
-        /// <summary>
-        /// The root folder of the project children.
-        /// </summary>
-        IProjectNode RootFolder { get; }
-
-        /// <summary>
-        /// The project properties.
-        /// </summary>
-        IPropertiesContainer Properties { get; }
-    }
-
     /// <summary>
     /// Represents a solution folder in a project.
     /// </summary>
     public class CSSolutionFolder : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
-        private string title;
-        
-        private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
+        #region Private Fields
 
-        public ElementType ChildType => ElementType.Project;
+        private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
+        private string title;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public CSSolutionFolder(string title)
         {
             this.title = title;
         }
 
-        IList IProjectNode.Children => Children;
+        #endregion Public Constructors
 
+        #region Public Properties
+
+        IList IProjectNode.Children => Children;
         /// <summary>
         /// Gets the child project elements.
         /// </summary>
@@ -151,6 +171,9 @@ namespace DataTools.CSTools
             }
         }
 
+        public ElementType ChildType => ElementType.Project;
+        public ElementType ElementType => ElementType.SolutionFolder;
+
         public string Title
         {
             get => title;
@@ -160,7 +183,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public ElementType ElementType => ElementType.SolutionFolder;
+        #endregion Public Properties
     }
 
     /// <summary>
@@ -168,83 +191,87 @@ namespace DataTools.CSTools
     /// </summary>
     public class CurioProject : ObservableBase, IProjectHost, IDisposable
     {
+        #region Protected Fields
+
         protected bool disposedValue;
 
-        private string rootPath = "";
-        private string projectFile = "";
+        #endregion Protected Fields
+
+        #region Private Fields
 
         private EnvDTE.Project _project;
-        private PropertiesContainer properties;
-        private FSMonitor monitor;
-
-        private CSDirectory rootFolder = null;
-
-        private object selectedItem = null;
-        private bool isFrameworkProject;
-
-        private XmlDocument xml;
-        private string title = null;
-
         private List<string> allNamespaces = new List<string>();
-        private string defns;
         private string assyname;
-
-        private List<string> includes;
+        private string defns;
         private List<string> excludes;
+        private List<string> includes;
+        private bool isFrameworkProject;
+        private FSMonitor monitor;
+        private string projectFile = "";
+        private PropertiesContainer properties;
+        private CSDirectory rootFolder = null;
+        private string rootPath = "";
+        private object selectedItem = null;
+        private string title = null;
+        private XmlDocument xml;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         /// <summary>
-        /// Gets a value indicating if the project is a .NET Framework project (as opposed to .NET Core/5/6/etc.)
+        /// Create a new CS Refactor Curio Project from the specified project file and native COM object.
         /// </summary>
-        public bool IsFrameworkProject => isFrameworkProject;
+        /// <param name="filename">The project file to load.</param>
+        /// <param name="nativeProject">The COM object from the DTE.</param>
+        /// <exception cref="FileNotFoundException">If the project cannot be loaded.</exception>
+        public CurioProject(string filename, EnvDTE.Project nativeProject)
+        {
+            _project = nativeProject;
+            PopulateProjectProperties();
 
-        /// <summary>
-        /// Gets the default namespace for the project.
-        /// </summary>
-        public string DefaultNamespace => defns;
+            if (filename == null || !File.Exists(filename)) throw new FileNotFoundException();
+
+            ProjectRootPath = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "");
+            ProjectFile = Path.GetFileName(filename);
+
+            monitor = new FSMonitor(ProjectRootPath, nativeProject.DTE.MainWindow.HWnd);
+
+            monitor.WatchNotifyChange += OnDirectoryChanged;
+
+            ReloadProject();
+            monitor.Watch();
+        }
+
+        #endregion Public Constructors
+
+        #region Private Destructors
+
+        ~CurioProject()
+        {
+            monitor?.Dispose();
+        }
+
+        #endregion Private Destructors
+
+        #region Public Properties
 
         /// <summary>
         /// Gets the assembly name for the project.
         /// </summary>
         public string AssemblyName => assyname;
 
-        public IPropertiesContainer Properties => properties;
+        /// <summary>
+        /// Gets the default namespace for the project.
+        /// </summary>
+        public string DefaultNamespace => defns;
+
+        public ElementType ElementType => ElementType.Project;
 
         /// <summary>
-        /// Gets the native project COM object.
+        /// List of explicitly excluded files.
         /// </summary>
-        public EnvDTE.Project NativeProject
-        {
-            get => _project;
-        }
-
-        /// <summary>
-        /// Gets or sets the currently selected item.
-        /// </summary>
-        public object SelectedItem
-        {
-            get => selectedItem;
-            set
-            {
-                if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
-                SetProperty(ref selectedItem, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets the root folder of the project.
-        /// </summary>
-        public CSDirectory RootFolder
-        {
-            get => rootFolder;
-            protected set
-            {
-                if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
-                if (SetProperty(ref rootFolder, value))
-                {
-                    OnPropertyChanged(nameof(RootFolder));
-                }
-            }
-        }
+        public IReadOnlyList<string> Excludes => excludes;
 
         /// <summary>
         /// List of explicitly included files.
@@ -252,23 +279,20 @@ namespace DataTools.CSTools
         public IReadOnlyList<string> Includes => includes;
 
         /// <summary>
-        /// List of explicitly excluded files.
+        /// Gets a value indicating if the project is a .NET Framework project (as opposed to .NET Core/5/6/etc.)
         /// </summary>
-        public IReadOnlyList<string> Excludes => excludes;
-
-        IProjectNode IProjectHost.RootFolder => rootFolder;
+        public bool IsFrameworkProject => isFrameworkProject;
+        /// <summary>
+        /// Gets a list of all namespace that are currently detected in the project.
+        /// </summary>
+        public IReadOnlyList<string> Namespaces => allNamespaces;
 
         /// <summary>
-        /// Gets the full project root directory path.
+        /// Gets the native project COM object.
         /// </summary>
-        public string ProjectRootPath
+        public EnvDTE.Project NativeProject
         {
-            get => rootPath;
-            protected set
-            {
-                if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
-                SetProperty(ref rootPath, value);
-            }
+            get => _project;
         }
 
         /// <summary>
@@ -287,6 +311,50 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Gets the full project root directory path.
+        /// </summary>
+        public string ProjectRootPath
+        {
+            get => rootPath;
+            protected set
+            {
+                if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
+                SetProperty(ref rootPath, value);
+            }
+        }
+
+        public IPropertiesContainer Properties => properties;
+        /// <summary>
+        /// Gets the root folder of the project.
+        /// </summary>
+        public CSDirectory RootFolder
+        {
+            get => rootFolder;
+            protected set
+            {
+                if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
+                if (SetProperty(ref rootFolder, value))
+                {
+                    OnPropertyChanged(nameof(RootFolder));
+                }
+            }
+        }
+
+        IProjectNode IProjectHost.RootFolder => rootFolder;
+
+        /// <summary>
+        /// Gets or sets the currently selected item.
+        /// </summary>
+        public object SelectedItem
+        {
+            get => selectedItem;
+            set
+            {
+                if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
+                SetProperty(ref selectedItem, value);
+            }
+        }
         public string Title
         {
             get => title;
@@ -297,10 +365,17 @@ namespace DataTools.CSTools
             }
         }
 
-        /// <summary>
-        /// Gets a list of all namespace that are currently detected in the project.
-        /// </summary>
-        public IReadOnlyList<string> Namespaces => allNamespaces;
+        #endregion Public Properties
+
+        #region Public Methods
+
+        public virtual void Dispose()
+        {
+            ((IDisposable)monitor).Dispose();
+            monitor = null;
+            disposedValue = true;
+            GC.SuppressFinalize(this);
+        }
 
         /// <summary>
         /// Reload the project and all project files (Costly)
@@ -358,50 +433,17 @@ namespace DataTools.CSTools
         }
 
 
-        /// <summary>
-        /// Populate the properties container with the project properties from the native COM object.
-        /// </summary>
-        protected virtual void PopulateProjectProperties()
+        public override string ToString()
         {
             if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
-            properties = new PropertiesContainer(_project);
 
-            if (properties.ContainsKey("DefaultNamespace"))
-            {
-                defns = (string)properties["DefaultNamespace"].Value;
-            }
-
-            if (properties.ContainsKey("AssemblyName"))
-            {
-                assyname = (string)properties["AssemblyName"].Value;
-            }
+            return Title;
         }
 
-        /// <summary>
-        /// Create a new CS Refactor Curio Project from the specified project file and native COM object.
-        /// </summary>
-        /// <param name="filename">The project file to load.</param>
-        /// <param name="nativeProject">The COM object from the DTE.</param>
-        /// <exception cref="FileNotFoundException">If the project cannot be loaded.</exception>
-        public CurioProject(string filename, EnvDTE.Project nativeProject)
-        {
-            _project = nativeProject;
-            PopulateProjectProperties();
+        #endregion Public Methods
 
-            if (filename == null || !File.Exists(filename)) throw new FileNotFoundException();
+        #region Protected Methods
 
-            ProjectRootPath = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "");
-            ProjectFile = Path.GetFileName(filename);
-            
-            monitor = new FSMonitor(ProjectRootPath, nativeProject.DTE.MainWindow.HWnd);
-
-            monitor.WatchNotifyChange += OnDirectoryChanged;
-
-            ReloadProject();
-            monitor.Watch();
-        }
-
-        
         /// <summary>
         /// Raised by the directory watcher to indicate that contents of the folder have changed.
         /// </summary>
@@ -422,28 +464,26 @@ namespace DataTools.CSTools
             }
         }
 
-        public ElementType ElementType => ElementType.Project;
-
-        public override string ToString()
+        /// <summary>
+        /// Populate the properties container with the project properties from the native COM object.
+        /// </summary>
+        protected virtual void PopulateProjectProperties()
         {
             if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
+            properties = new PropertiesContainer(_project);
 
-            return Title;
+            if (properties.ContainsKey("DefaultNamespace"))
+            {
+                defns = (string)properties["DefaultNamespace"].Value;
+            }
+
+            if (properties.ContainsKey("AssemblyName"))
+            {
+                assyname = (string)properties["AssemblyName"].Value;
+            }
         }
 
-        public virtual void Dispose()
-        {
-            ((IDisposable)monitor).Dispose();
-            monitor = null; 
-            disposedValue = true;
-            GC.SuppressFinalize(this);
-        }
-
-        ~CurioProject()
-        {
-            monitor?.Dispose();
-        }
-
+        #endregion Protected Methods
     }
 
 

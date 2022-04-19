@@ -682,7 +682,8 @@ namespace DataTools.CSTools
                 MarkerKind currPatt = MarkerKind.Code;
 
                 List<string> attrs = null;
-                
+                List<string> currUnknowns = new List<string>();
+
                 unrecognizedWords.Clear();
 
                 for (i = 0; i < c; i++)
@@ -694,7 +695,7 @@ namespace DataTools.CSTools
                     }
                     else
                     {
-                        if (AllowedName(chars[i], true))
+                        if (AllowedChar(chars[i], true))
                         {
                             currWord.Append(chars[i]);
                         }
@@ -704,9 +705,17 @@ namespace DataTools.CSTools
 
                             if (prevWord == "" || prevWord == "new")
                             {
-                                if (!FilterType1.Contains(cw) && !unrecognizedWords.Contains(cw))
+                                if (!FilterType1.Contains(cw))
                                 {
-                                    unrecognizedWords.Add(cw);
+                                    if (!unrecognizedWords.Contains(cw))
+                                    {
+                                        unrecognizedWords.Add(cw);
+                                    }
+
+                                    if (!currUnknowns.Contains(cw))
+                                    {
+                                        currUnknowns.Add(cw);
+                                    }
                                 }
 
                             }
@@ -827,7 +836,9 @@ namespace DataTools.CSTools
 
                         scanStartPos = startPos = i + 1;
                         forScan.Clear();
+                        
                         prevWord = "";
+
                         if (i < c - 1 && chars[i + 1] == '\n')
                         {
                             startLine = currLine + 1;
@@ -851,8 +862,7 @@ namespace DataTools.CSTools
                             var lookback = TextTools.OneSpace(forScan.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
                             Match cons = currCons?.Match(lookback) ?? null;
                             Match ops = patterns[MarkerKind.Operator].Match(lookback);
-                            var lb = RemoveWhere(lookback);
-
+                            
                             if (cons != null && cons.Success && !ops.Success)
                             {
                                 currMarker = new TElem
@@ -995,6 +1005,12 @@ namespace DataTools.CSTools
                             currMarker.EndPos = i;
                             currMarker.EndLine = currLine;
                             currMarker.EndColumn = ColumnFromHere(chars, i);
+
+                            if (currPatt == MarkerKind.Class || currPatt == MarkerKind.Struct || currPatt == MarkerKind.Record || currPatt == MarkerKind.Interface)
+                            {
+                                currMarker.UnknownWords = currUnknowns;
+                                currUnknowns = new List<string>();
+                            }
                         }
 
                         currMarker.Children = markers;
@@ -1146,7 +1162,7 @@ namespace DataTools.CSTools
             int c = val.Length;
             for (int i = 0; i < c; i++)
             {
-                if (AllowedName(val[i], alsoDot))
+                if (AllowedChar(val[i], alsoDot))
                 {
                     sb.Append(val[i]);
                 }
@@ -1180,8 +1196,8 @@ namespace DataTools.CSTools
             if (lookback[0] == '=') return 0;
             if (marker.Kind == MarkerKind.EnumValue) return 0;
 
-            IList<string> dels = FilterType2;
-            List<string> fd = new List<string>();
+            IList<string> filter2 = FilterType2;
+            
             str = str.Trim();
             var w = str.ToCharArray();
             int c = w.Length;
@@ -1203,7 +1219,7 @@ namespace DataTools.CSTools
             {
                 ch = w[i];
 
-                if (AllowedName(ch, true))
+                if (AllowedChar(ch, true))
                 {
                     if (fl) break;
                     tsb.Append(ch);
@@ -1280,7 +1296,7 @@ namespace DataTools.CSTools
                     if (lww)
                     {
                         var del = tsb.ToString();
-                        if (dels.Contains(del))
+                        if (filter2.Contains(del))
                         {
                             tsb.Clear();
                             lww = false;
@@ -1407,7 +1423,7 @@ namespace DataTools.CSTools
             {
                 ch = w[i];
 
-                if (AllowedName(ch, true))
+                if (AllowedChar(ch, true))
                 {
                     //if (ch == '.') eii = true;
                     nsb.Append(ch);
@@ -1511,7 +1527,7 @@ namespace DataTools.CSTools
                         if (x == -1) x = i;
                         tsb.Append(ch);
                     }
-                    else if (!AllowedName(ch, true))
+                    else if (!AllowedChar(ch, true))
                     {
                         if (tsb.ToString() == "where")
                         {
@@ -1567,11 +1583,11 @@ namespace DataTools.CSTools
                             ihits.Add(tsb.ToString().Trim());
                             tsb.Clear();
                         }
-                        else if (AllowedName(ch, true))
+                        else if (AllowedChar(ch, true))
                         {
                             tsb.Append(ch);
                         }
-                        else if (!AllowedName(ch, true))
+                        else if (!AllowedChar(ch, true))
                         {
                             // there's this crazy edge case where you can have a class named 'where'
                             if (tsb.ToString() == "where" && xz != ',' && xz != ':')
@@ -1639,13 +1655,13 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
-        /// Check if this is an allowed identifier charachter.
+        /// Check if this is an allowed identifier character.
         /// </summary>
         /// <param name="ch">Character to test.</param>
         /// <param name="alsoDot">Dot is valid.</param>
         /// <param name="first">Valid for first character.</param>
         /// <returns></returns>
-        private bool AllowedName(char ch, bool alsoDot, bool first = false)
+        private bool AllowedChar(char ch, bool alsoDot, bool first = false)
         {
             if (first)
             {
@@ -1655,45 +1671,6 @@ namespace DataTools.CSTools
             {
                 return char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || (alsoDot && ch == '.');
             }
-        }
-
-        /// <summary>
-        /// Remove the where clause from the specified string.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns>A new string with its where clause stripped out.</returns>
-        private string RemoveWhere(string value)
-        {
-            bool io = false;
-
-            int c = value.Length;
-            var sb = new StringBuilder();   
-
-            for (int i = c - 1; i >= 0; i--)
-            {
-                char ch = value[i];
-
-                if (ch == ')') io = true;
-                else if (ch == '(') io = false;
-
-                if (char.IsWhiteSpace(ch))
-                {
-                    sb.Clear();
-                }
-                else
-                {
-                    sb.Insert(0, ch);
-                }
-
-                if (sb.ToString() == "where")
-                {
-                    if (!io) value = value.Substring(0, i);
-                    
-                    sb.Clear();
-                }
-            }
-
-            return value;
         }
 
         /// <summary>
