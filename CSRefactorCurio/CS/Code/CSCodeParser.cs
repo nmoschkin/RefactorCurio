@@ -579,7 +579,7 @@ namespace DataTools.CSTools
         /// </summary>
         private static readonly string[] FilterType1 = new string[] { 
             "public", "private", "protected", "internal", "global",
-            "class", "const", "struct", "record", "interface", "namespace", "delegate", "event", "enum",
+            "class", "const", "struct", "record", "interface", "namespace", "delegate", "event", "enum", "readonly",
             "async", "extern", "override", "abstract", "sealed", "new", "unsafe", "fixed", "static", "using", "get", "set",
             "for", "while", "do", "if", "else", "switch", "case", "default", "break", "yield", "return", "add", "remove",
             "throw", "try", "catch", "finally", 
@@ -595,7 +595,11 @@ namespace DataTools.CSTools
         /// <summary>
         /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TElem)"/> (in literally no particular order.)
         /// </summary>
-        private static readonly string[] FilterType2 = new string[] { "global", "ref", "sealed", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
+        private static readonly string[] FilterType2 = new string[] { 
+            "global", "ref", "sealed", "class", "interface", "record", "struct", 
+            "namespace", "public", "private", "static", "async", "abstract", "const", 
+            "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", 
+            "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         static CSCodeParser()
         {
