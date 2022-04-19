@@ -592,43 +592,48 @@ namespace DataTools.CSTools
             "Enum", "Tuple", "bool", "true", "false"
         };
 
+        /// <summary>
+        /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TElem)"/> (in literally no particular order.)
+        /// </summary>
+        private static readonly string[] FilterType2 = new string[] { "global", "ref", "sealed", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
+
         static CSCodeParser()
         {
-            patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
-            patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
-            patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
-            patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
-            patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-            patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            //patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
+            //patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
+            //patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
+            //patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
+            //patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
+            //patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
+            //patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
+            //patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
+            //patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
+            //patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            //patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
             patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
-            patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
-            patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
-            patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
-            patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
-            patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
-            patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
-            patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
-            patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
-            patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
-            patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
-            patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
-            patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
-            patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
-            patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
+            //patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
+            //patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
+            //patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
+            //patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
+            //patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
+            //patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
+            //patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
+            //patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
+            //patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
+            //patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
+            //patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
+            //patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
+            //patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
+            //patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
+            //patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
+            //patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
+            //patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
+            //patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
+            //patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
+            //patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
             patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
-            patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
-            patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
+            //patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
+            //patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
 
             genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
         }
@@ -1176,11 +1181,6 @@ namespace DataTools.CSTools
 
             return sb.ToString();
         }
-
-        /// <summary>
-        /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TElem)"/> (in literally no particular order.)
-        /// </summary>
-        private static readonly string[] FilterType2 = new string[] { "global", "ref", "sealed", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         /// <summary>
         /// Parse the type, name and method parameters from a lookback string.
