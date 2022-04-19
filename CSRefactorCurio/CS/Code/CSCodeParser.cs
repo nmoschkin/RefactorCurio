@@ -1506,7 +1506,7 @@ namespace DataTools.CSTools
                 char xz = ' ';
                 x = -1;
                 List<string> ihits = new List<string>();
-                if (str[0] == ':')
+                if (str[0] == ':' || str[0] == 'w')
                 {
                     tsb.Clear();
 
