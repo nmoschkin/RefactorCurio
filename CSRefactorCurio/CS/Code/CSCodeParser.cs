@@ -579,7 +579,7 @@ namespace DataTools.CSTools
         /// </summary>
         private static readonly string[] FilterType1 = new string[] { 
             "public", "private", "protected", "internal", "global",
-            "class", "const", "struct", "record", "interface", "namespace", "delegate", "event", "namespace", "enum",
+            "class", "const", "struct", "record", "interface", "namespace", "delegate", "event", "enum",
             "async", "extern", "override", "abstract", "sealed", "new", "unsafe", "fixed", "static", "using", "get", "set",
             "for", "while", "do", "if", "else", "switch", "case", "default", "break", "yield", "return", "add", "remove",
             "throw", "try", "catch", "finally", 
