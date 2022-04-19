@@ -88,6 +88,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You need to build the project first..
+        /// </summary>
+        internal static string BUILD_PROJECT_FIRST {
+            get {
+                return ResourceManager.GetString("BUILD_PROJECT_FIRST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Build Solution.
         /// </summary>
         internal static string BUILD_SOLUTION {
@@ -102,6 +111,24 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string CANCEL {
             get {
                 return ResourceManager.GetString("CANCEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Class.
+        /// </summary>
+        internal static string CLASS {
+            get {
+                return ResourceManager.GetString("CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Classes.
+        /// </summary>
+        internal static string CLASSES {
+            get {
+                return ResourceManager.GetString("CLASSES", resourceCulture);
             }
         }
         
@@ -124,11 +151,128 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Directories.
+        /// </summary>
+        internal static string DIRECTORIES {
+            get {
+                return ResourceManager.GetString("DIRECTORIES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Directory.
+        /// </summary>
+        internal static string DIRECTORY {
+            get {
+                return ResourceManager.GetString("DIRECTORY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disabled.
+        /// </summary>
+        internal static string DISABLED {
+            get {
+                return ResourceManager.GetString("DISABLED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string ENABLED {
+            get {
+                return ResourceManager.GetString("ENABLED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enum.
+        /// </summary>
+        internal static string ENUM {
+            get {
+                return ResourceManager.GetString("ENUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enums.
+        /// </summary>
+        internal static string ENUMS {
+            get {
+                return ResourceManager.GetString("ENUMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expand List.
         /// </summary>
         internal static string EXPAND_LIST {
             get {
                 return ResourceManager.GetString("EXPAND_LIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to False.
+        /// </summary>
+        internal static string FALSE {
+            get {
+                return ResourceManager.GetString("FALSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File.
+        /// </summary>
+        internal static string FILE {
+            get {
+                return ResourceManager.GetString("FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files.
+        /// </summary>
+        internal static string FILES {
+            get {
+                return ResourceManager.GetString("FILES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Folder.
+        /// </summary>
+        internal static string FOLDER {
+            get {
+                return ResourceManager.GetString("FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Folders.
+        /// </summary>
+        internal static string FOLDERS {
+            get {
+                return ResourceManager.GetString("FOLDERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Interface.
+        /// </summary>
+        internal static string INTERFACE {
+            get {
+                return ResourceManager.GetString("INTERFACE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Interfaces.
+        /// </summary>
+        internal static string INTERFACES {
+            get {
+                return ResourceManager.GetString("INTERFACES", resourceCulture);
             }
         }
         
@@ -156,6 +300,33 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string NAME {
             get {
                 return ResourceManager.GetString("NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Namespace.
+        /// </summary>
+        internal static string NAMESPACE {
+            get {
+                return ResourceManager.GetString("NAMESPACE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Namespaces.
+        /// </summary>
+        internal static string NAMESPACES {
+            get {
+                return ResourceManager.GetString("NAMESPACES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string NO {
+            get {
+                return ResourceManager.GetString("NO", resourceCulture);
             }
         }
         
@@ -192,6 +363,42 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string OPEN_OBJECT_IN_CODE {
             get {
                 return ResourceManager.GetString("OPEN_OBJECT_IN_CODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you wish to proceed?.
+        /// </summary>
+        internal static string PROCEED_CONFIRM {
+            get {
+                return ResourceManager.GetString("PROCEED_CONFIRM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project.
+        /// </summary>
+        internal static string PROJECT {
+            get {
+                return ResourceManager.GetString("PROJECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Record.
+        /// </summary>
+        internal static string RECORD {
+            get {
+                return ResourceManager.GetString("RECORD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Records.
+        /// </summary>
+        internal static string RECORDS {
+            get {
+                return ResourceManager.GetString("RECORDS", resourceCulture);
             }
         }
         
@@ -268,6 +475,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Retry.
+        /// </summary>
+        internal static string RETRY {
+            get {
+                return ResourceManager.GetString("RETRY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Scan.
         /// </summary>
         internal static string SCAN {
@@ -282,6 +498,33 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string SCAN_NOW {
             get {
                 return ResourceManager.GetString("SCAN_NOW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Solution.
+        /// </summary>
+        internal static string SOLUTION {
+            get {
+                return ResourceManager.GetString("SOLUTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Struct.
+        /// </summary>
+        internal static string STRUCT {
+            get {
+                return ResourceManager.GetString("STRUCT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Structs.
+        /// </summary>
+        internal static string STRUCTS {
+            get {
+                return ResourceManager.GetString("STRUCTS", resourceCulture);
             }
         }
         
@@ -313,6 +556,24 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string TimeSource {
             get {
                 return ResourceManager.GetString("TimeSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to True.
+        /// </summary>
+        internal static string TRUE {
+            get {
+                return ResourceManager.GetString("TRUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        internal static string YES {
+            get {
+                return ResourceManager.GetString("YES", resourceCulture);
             }
         }
     }

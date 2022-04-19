@@ -126,11 +126,20 @@
   <data name="BUILD" xml:space="preserve">
     <value>Build</value>
   </data>
+  <data name="BUILD_PROJECT_FIRST" xml:space="preserve">
+    <value>You need to build the project first.</value>
+  </data>
   <data name="BUILD_SOLUTION" xml:space="preserve">
     <value>Build Solution</value>
   </data>
   <data name="CANCEL" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="CLASS" xml:space="preserve">
+    <value>Class</value>
+  </data>
+  <data name="CLASSES" xml:space="preserve">
+    <value>Classes</value>
   </data>
   <data name="COUNT" xml:space="preserve">
     <value>Count</value>
@@ -138,8 +147,47 @@
   <data name="DETAILS" xml:space="preserve">
     <value>Details</value>
   </data>
+  <data name="DIRECTORIES" xml:space="preserve">
+    <value>Directories</value>
+  </data>
+  <data name="DIRECTORY" xml:space="preserve">
+    <value>Directory</value>
+  </data>
+  <data name="DISABLED" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="ENABLED" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="ENUM" xml:space="preserve">
+    <value>Enum</value>
+  </data>
+  <data name="ENUMS" xml:space="preserve">
+    <value>Enums</value>
+  </data>
   <data name="EXPAND_LIST" xml:space="preserve">
     <value>Expand List</value>
+  </data>
+  <data name="FALSE" xml:space="preserve">
+    <value>False</value>
+  </data>
+  <data name="FILE" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="FILES" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="FOLDER" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="FOLDERS" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+  <data name="INTERFACE" xml:space="preserve">
+    <value>Interface</value>
+  </data>
+  <data name="INTERFACES" xml:space="preserve">
+    <value>Interfaces</value>
   </data>
   <data name="MI_BUILD_SOLUTION" xml:space="preserve">
     <value>_Build Solution</value>
@@ -149,6 +197,15 @@
   </data>
   <data name="NAME" xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="NAMESPACE" xml:space="preserve">
+    <value>Namespace</value>
+  </data>
+  <data name="NAMESPACES" xml:space="preserve">
+    <value>Namespaces</value>
+  </data>
+  <data name="NO" xml:space="preserve">
+    <value>No</value>
   </data>
   <data name="OBJECT" xml:space="preserve">
     <value>Object</value>
@@ -161,6 +218,18 @@
   </data>
   <data name="OPEN_OBJECT_IN_CODE" xml:space="preserve">
     <value>Open Object In Code</value>
+  </data>
+  <data name="PROCEED_CONFIRM" xml:space="preserve">
+    <value>Do you wish to proceed?</value>
+  </data>
+  <data name="PROJECT" xml:space="preserve">
+    <value>Project</value>
+  </data>
+  <data name="RECORD" xml:space="preserve">
+    <value>Record</value>
+  </data>
+  <data name="RECORDS" xml:space="preserve">
+    <value>Records</value>
   </data>
   <data name="REFRESH" xml:space="preserve">
     <value>Refresh</value>
@@ -186,14 +255,32 @@
   <data name="RESET" xml:space="preserve">
     <value>Reset</value>
   </data>
+  <data name="RETRY" xml:space="preserve">
+    <value>Retry</value>
+  </data>
   <data name="SCAN" xml:space="preserve">
     <value>Scan</value>
   </data>
   <data name="SCAN_NOW" xml:space="preserve">
     <value>Scan Now</value>
   </data>
+  <data name="SOLUTION" xml:space="preserve">
+    <value>Solution</value>
+  </data>
+  <data name="STRUCT" xml:space="preserve">
+    <value>Struct</value>
+  </data>
+  <data name="STRUCTS" xml:space="preserve">
+    <value>Structs</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="TimeSource" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\Resources\TimeSource.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="TRUE" xml:space="preserve">
+    <value>True</value>
+  </data>
+  <data name="YES" xml:space="preserve">
+    <value>Yes</value>
   </data>
 </root>
