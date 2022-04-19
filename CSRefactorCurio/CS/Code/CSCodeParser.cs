@@ -599,7 +599,7 @@ namespace DataTools.CSTools
             "global", "ref", "sealed", "class", "interface", "record", "struct", 
             "namespace", "public", "private", "static", "async", "abstract", "const", 
             "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", 
-            "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
+            "internal", "switch", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         static CSCodeParser()
         {
