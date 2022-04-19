@@ -320,7 +320,10 @@ namespace DataTools.CSTools
                     foreach (var marker in markers)
                     {
                         SetAtomicFile(marker, cf);
+
                     }
+
+                    //SetParent(markers, default);
 
                     ParseSuccess = true;
                     IsLazyLoad = false;
@@ -332,6 +335,19 @@ namespace DataTools.CSTools
                 }
 
                 return ParseSuccess;
+            }
+            
+        }
+        
+        private void SetParent(TList markers, TMarker parent)
+        {
+            foreach (var marker in markers)
+            {
+                marker.ParentElementName = parent?.Name ?? "";
+                if (marker.Children != null && marker.Children.Count > 0)
+                {
+                    SetParent(marker.Children, marker);
+                }
             }
         }
 
@@ -580,6 +596,7 @@ namespace DataTools.CSTools
                                     StartPos = startPos,
                                     StartLine = startLine,
                                     StartColumn = ColumnFromHere(chars, startPos),
+                                    ParentElementName = currName,
                                     EndPos = i - 1,
                                     EndLine = currLine,
                                     EndColumn = ColumnFromHere(chars, i - 1),
@@ -597,6 +614,7 @@ namespace DataTools.CSTools
                                     StartPos = startPos,
                                     StartLine = startLine,
                                     StartColumn = ColumnFromHere(chars, startPos),
+                                    ParentElementName = currName,
                                     EndPos = i,
                                     EndLine = currLine,
                                     EndColumn = ColumnFromHere(chars, i),
@@ -649,6 +667,7 @@ namespace DataTools.CSTools
                                     StartLine = startLine,
                                     StartColumn = ColumnFromHere(chars, startPos),
                                     Kind = MarkerKind.Constructor,
+                                    ParentElementName = currName,
                                     Name = currName,
                                     MethodParamsString = cons.Groups[1].Value,
                                     Level = currLevel,
@@ -675,6 +694,7 @@ namespace DataTools.CSTools
                                         MethodParamsString = "()",
                                         Name = currName,
                                         Level = currLevel,
+                                        ParentElementName = currName,
                                         ScanHit = lookback,
                                         Attributes = attrs
                                     };
@@ -693,6 +713,7 @@ namespace DataTools.CSTools
                                         StartColumn = ColumnFromHere(chars, startPos),
                                         Level = currLevel,
                                         ScanHit = lookback,
+                                        ParentElementName = currName,
                                         Attributes = attrs
                                     };
 
@@ -757,6 +778,7 @@ namespace DataTools.CSTools
                                     Namespace = currNS,
                                     StartPos = startPos,
                                     StartLine = startLine,
+                                    ParentElementName = currName,
                                     StartColumn = ColumnFromHere(chars, startPos),
                                     EndPos = i - 1,
                                     EndLine = currLine,
@@ -819,6 +841,7 @@ namespace DataTools.CSTools
                             StartLine = currLine,
                             StartPos = i,
                             Level = currLevel,
+                            ParentElementName = currName,
                             Namespace = currNS
                         };
 
@@ -873,6 +896,7 @@ namespace DataTools.CSTools
                             StartLine = currLine,
                             StartPos = i,
                             Level = currLevel,
+                            ParentElementName = currName,
                             Namespace = currNS
 
                         };
@@ -1407,11 +1431,10 @@ namespace DataTools.CSTools
                         if (tsb.Length > 0) tsb.Append(", ");
                         tsb.Append(s);
                     }
-
-                    marker.Inheritance = " : " + tsb.ToString();
+                    marker.Inheritances = ihits;                    
+                    marker.InheritanceString = " : " + tsb.ToString();
                 }
-                
-
+              
             }
 
             if (marker.Kind == MarkerKind.Code)

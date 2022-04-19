@@ -72,7 +72,7 @@ namespace DataTools.CSTools
     /// <summary>
     /// Represents a logical segment in a source code file.
     /// </summary>
-    public interface IMarker : IProjectNode, ICloneable
+    public interface IMarker : IProjectNode, INamespace, ICloneable
     {
         #region Public Properties
 
@@ -116,12 +116,7 @@ namespace DataTools.CSTools
         /// </summary>
         int EndPos { get; set; }
 
-        /// <summary>
-        /// Gets the fully-qualified name calculated from the <see cref="Namespace"/> and <see cref="Name"/> properties.
-        /// </summary>
-        string FullyQualifiedName { get; }
-
-        /// <summary>
+       /// <summary>
         /// If applicable, the generic type parameters of this element.
         /// </summary>
         string Generics { get; set; }
@@ -132,9 +127,14 @@ namespace DataTools.CSTools
         IProjectNode HomeFile { get; set; }
 
         /// <summary>
-        /// If applicable, the inheritence of this element.
+        /// If applicable, the inheritances of this element.
         /// </summary>
-        string Inheritance { get; set; }
+        List<string> Inheritances { get; set; }
+
+        /// <summary>
+        /// If applicable, the inheritance string of this element.
+        /// </summary>
+        string InheritanceString { get; set; }
 
         /// <summary>
         /// Element is marked abstract.
@@ -207,9 +207,14 @@ namespace DataTools.CSTools
         string Name { get; set; }
 
         /// <summary>
-        /// Home namespace of this element.
+        /// The name of the parent element.
         /// </summary>
-        string Namespace { get; set; }
+        /// <remarks>
+        /// The actual parent object can change hands many times in the course of sorting and filtering.
+        /// We just want to remember the name of a class, interface, struct, record, or enum.
+        /// </remarks>
+        string ParentElementName { get; set; }
+
         /// <summary>
         /// The scanned text that was used to determine the nature of the current element.
         /// </summary>
@@ -432,6 +437,7 @@ namespace DataTools.CSTools
         protected string name;
         protected string scanHit;
         protected List<string> unknownWords;
+        protected string parentElement;
 
         #endregion Protected Fields
 
@@ -569,7 +575,9 @@ namespace DataTools.CSTools
             }
         }
 
-        public virtual string Inheritance { get; set; }
+        public virtual List<string> Inheritances { get; set; }
+
+        public virtual string InheritanceString { get; set; }
 
         public virtual bool IsAbstract { get; set; }
 
@@ -636,6 +644,12 @@ namespace DataTools.CSTools
         }
 
         public virtual string Namespace { get; set; }
+
+        public virtual string ParentElementName
+        {
+            get => parentElement;
+            set => parentElement = value;
+        }
 
         public virtual string ScanHit
         {

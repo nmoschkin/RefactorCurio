@@ -61,6 +61,78 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Abort.
+        /// </summary>
+        internal static string ABORT {
+            get {
+                return ResourceManager.GetString("ABORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Apply.
+        /// </summary>
+        internal static string APPLY {
+            get {
+                return ResourceManager.GetString("APPLY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build.
+        /// </summary>
+        internal static string BUILD {
+            get {
+                return ResourceManager.GetString("BUILD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Solution.
+        /// </summary>
+        internal static string BUILD_SOLUTION {
+            get {
+                return ResourceManager.GetString("BUILD_SOLUTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string CANCEL {
+            get {
+                return ResourceManager.GetString("CANCEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Count.
+        /// </summary>
+        internal static string COUNT {
+            get {
+                return ResourceManager.GetString("COUNT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        internal static string DETAILS {
+            get {
+                return ResourceManager.GetString("DETAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand List.
+        /// </summary>
+        internal static string EXPAND_LIST {
+            get {
+                return ResourceManager.GetString("EXPAND_LIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Build Solution.
         /// </summary>
         internal static string MI_BUILD_SOLUTION {
@@ -75,6 +147,172 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string MI_MAP_DEPENDENCIES {
             get {
                 return ResourceManager.GetString("MI_MAP_DEPENDENCIES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string NAME {
+            get {
+                return ResourceManager.GetString("NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object.
+        /// </summary>
+        internal static string OBJECT {
+            get {
+                return ResourceManager.GetString("OBJECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object Type.
+        /// </summary>
+        internal static string OBJECT_TYPE {
+            get {
+                return ResourceManager.GetString("OBJECT_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        internal static string OK {
+            get {
+                return ResourceManager.GetString("OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Object In Code.
+        /// </summary>
+        internal static string OPEN_OBJECT_IN_CODE {
+            get {
+                return ResourceManager.GetString("OPEN_OBJECT_IN_CODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        internal static string REFRESH {
+            get {
+                return ResourceManager.GetString("REFRESH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload.
+        /// </summary>
+        internal static string RELOAD {
+            get {
+                return ResourceManager.GetString("RELOAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose Result Type.
+        /// </summary>
+        internal static string REPORT_CHOOSE_RESULT_TYPE {
+            get {
+                return ResourceManager.GetString("REPORT_CHOOSE_RESULT_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Most Interdependent Namespaces.
+        /// </summary>
+        internal static string REPORT_MOST_INTERDEPENDENT {
+            get {
+                return ResourceManager.GetString("REPORT_MOST_INTERDEPENDENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Most Referenced Objects.
+        /// </summary>
+        internal static string REPORT_MOST_REFERENCED_OBJECTS {
+            get {
+                return ResourceManager.GetString("REPORT_MOST_REFERENCED_OBJECTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Most Spread Out Namespaces.
+        /// </summary>
+        internal static string REPORT_MOST_SPREAD_OUT {
+            get {
+                return ResourceManager.GetString("REPORT_MOST_SPREAD_OUT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rescan.
+        /// </summary>
+        internal static string RESCAN {
+            get {
+                return ResourceManager.GetString("RESCAN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        internal static string RESET {
+            get {
+                return ResourceManager.GetString("RESET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scan.
+        /// </summary>
+        internal static string SCAN {
+            get {
+                return ResourceManager.GetString("SCAN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scan Now.
+        /// </summary>
+        internal static string SCAN_NOW {
+            get {
+                return ResourceManager.GetString("SCAN_NOW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///    /// &lt;summary&gt;
+        ///    /// Time interval length interpretation types
+        ///    /// &lt;/summary&gt;
+        ///    public enum TimeTypes
+        ///    {
+        ///        /// &lt;summary&gt;
+        ///        /// Interpret seconds
+        ///        /// &lt;/summary&gt;
+        ///        InSeconds,
+        ///        /// &lt;summary&gt;
+        ///        /// Interpret milliseconds
+        ///        /// &lt;/summary&gt;
+        ///        InMilliseconds,
+        ///
+        ///        /// &lt;summary&gt;
+        ///        /// Interpret nanoseconds
+        ///        /// &lt;/summary&gt;
+        ///        InNanoseconds
+        ///    }
+        ///
+        ///    /// &lt;summary&gt;
+        ///    /// Methods for converting between Unix a [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TimeSource {
+            get {
+                return ResourceManager.GetString("TimeSource", resourceCulture);
             }
         }
     }

@@ -46,11 +46,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AppResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AppResources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Build\MSBuildTool.cs" />
     <Compile Include="Commands\ICommandOwner.cs" />
     <Compile Include="Commands\OwnedCommand.cs" />
@@ -81,6 +76,9 @@
     <Compile Include="Dialogs\ToolWindows\JsonOptionsDialog.xaml.cs">
       <DependentUpon>JsonOptionsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ToolWindows\Report.xaml.cs">
+      <DependentUpon>Report.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\JsonGeneratorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +99,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\ShowCurioExplorerCommand.cs" />
     <Compile Include="CSRefactorCurioPackage.cs" />
+    <Compile Include="Reporting\ReportBases.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -110,6 +109,7 @@
     <Compile Include="Helpers\BrushHelper.cs" />
     <Compile Include="ViewModels\CurioExplorerSolution.cs" />
     <Compile Include="ViewModels\JSConvertViewModel.cs" />
+    <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\RequestCloseEventArgs.cs" />
     <Compile Include="VSCommandTable1.cs">
       <AutoGen>True</AutoGen>
@@ -142,6 +142,10 @@
   <ItemGroup>
     <Compile Include="ToolWindows\CurioExplorerToolWindow.cs" />
     <Page Include="Dialogs\ToolWindows\JsonOptionsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ToolWindows\Report.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -180,10 +184,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AppResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\JsonGeneratorForm.resx">
       <DependentUpon>JsonGeneratorForm.cs</DependentUpon>
     </EmbeddedResource>

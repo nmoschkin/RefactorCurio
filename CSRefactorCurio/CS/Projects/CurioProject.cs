@@ -60,6 +60,20 @@ namespace DataTools.CSTools
         Marker = 0x20
     }
 
+    public interface INamespace
+    {
+        /// <summary>
+        /// Home namespace of this element.
+        /// </summary>
+        string Namespace { get; set; }
+
+        /// <summary>
+        /// Gets the fully-qualified name calculated from the <see cref="Namespace"/> and <see cref="Name"/> properties.
+        /// </summary>
+        string FullyQualifiedName { get; }
+
+    }
+
     /// <summary>
     /// Represents a basic project element.
     /// </summary>

@@ -15,7 +15,7 @@ namespace DataTools.CSTools
     /// <summary>
     /// A CS Refactor Curio Solution Namespace
     /// </summary>
-    public class CSNamespace : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
+    public class CSNamespace : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>, INamespace
     {
         #region Private Fields
 
@@ -60,6 +60,20 @@ namespace DataTools.CSTools
         #region Public Properties
 
         IList IProjectNode.Children => children;
+
+        string INamespace.Namespace
+        {
+            get => name;
+            set
+            {
+                if (SetProperty(ref name, value))
+                {
+                    OnPropertyChanged(nameof(FullyQualifiedName));
+                }
+            }
+        }
+
+        public string FullyQualifiedName => name;
 
         /// <summary>
         /// Gets the child objects (either namespaces or markers).

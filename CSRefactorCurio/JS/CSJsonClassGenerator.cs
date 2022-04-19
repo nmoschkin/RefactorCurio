@@ -11,6 +11,7 @@ using DataTools.MathTools;
 using CSRefactorCurio;
 using DataTools.Observable;
 using System.Collections.ObjectModel;
+using CSRefactorCurio.Globalization.Resources;
 
 namespace DataTools.CSTools
 {
