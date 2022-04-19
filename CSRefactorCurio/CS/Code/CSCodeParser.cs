@@ -1458,6 +1458,7 @@ namespace DataTools.CSTools
                         }
                         else if (!AllowedName(ch, true))
                         {
+                            // there's this crazy edge case where you can have a class named 'where'
                             if (tsb.ToString() == "where" && xz != ',' && xz != ':')
                             {
                                 x = i - 5;
