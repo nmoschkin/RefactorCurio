@@ -567,7 +567,6 @@ namespace DataTools.CSTools
 
         protected static Dictionary<MarkerKind, Regex> patterns = new Dictionary<MarkerKind, Regex>();
         protected static Regex genericPatt;
-
         static CSCodeParser()
         {
             patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
@@ -658,22 +657,7 @@ namespace DataTools.CSTools
                 string currName = null;
                 MarkerKind currPatt = MarkerKind.Code;
 
-                Dictionary<string, bool> activas = new Dictionary<string, bool>();
-
                 List<string> attrs = null;
-
-                activas.Add("public", false);
-                activas.Add("internal", false);
-                activas.Add("protected", false);
-                activas.Add("private", true);
-                activas.Add("static", false);
-                activas.Add("extern", false);
-                activas.Add("abstract", false);
-                activas.Add("virtual", false);
-                activas.Add("override", false);
-                activas.Add("new", false);
-                activas.Add("readonly", false);
-                activas.Add("async", false);
 
                 for (i = 0; i < c; i++)
                 {
@@ -732,57 +716,51 @@ namespace DataTools.CSTools
                         if ((currPatt == MarkerKind.Enum) || ((currPatt & MarkerKind.IsBlockLevel) != MarkerKind.IsBlockLevel))
                         {
                             var lookback = TextTools.OneSpace(ms.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
-                            currMarker = new TElem
+                            Match testEnum = null;
+                            
+                            if (currPatt == MarkerKind.Enum)
                             {
-                                Namespace = currNS,
-                                StartPos = startPos,
-                                StartLine = startLine,
-                                StartColumn = ColumnFromHere(chars, startPos),
-                                EndPos = i,
-                                EndLine = currLine,
-                                EndColumn = ColumnFromHere(chars, i),
-                                Level = currLevel,
-                                ScanHit = lookback,
-                                Attributes = attrs
-                            };
+                                testEnum = patterns[MarkerKind.EnumValue].Match(lookback);
 
-                            currMarker.IsAbstract = activas["abstract"];
-                            currMarker.IsVirtual = activas["virtual"];
-                            currMarker.IsStatic = activas["static"];
-                            currMarker.IsExtern = activas["extern"];
-                            currMarker.IsOverride = activas["override"];
-                            currMarker.IsAsync = activas["async"];
-                            currMarker.IsNew = activas["new"];
+                            }
+                            
+                            if (testEnum != null && testEnum.Success)
+                            {
+                                currMarker = new TElem
+                                {
+                                    Namespace = currNS,
+                                    StartPos = startPos,
+                                    StartLine = startLine,
+                                    StartColumn = ColumnFromHere(chars, startPos),
+                                    EndPos = i - 1,
+                                    EndLine = currLine,
+                                    EndColumn = ColumnFromHere(chars, i - 1),
+                                    Kind = MarkerKind.EnumValue,
+                                    Name = testEnum.Groups[1].Value,
+                                    Level = currLevel,
+                                    ScanHit = lookback,
+                                };
+                            }
+                            else
+                            {
+                                currMarker = new TElem
+                                {
+                                    Namespace = currNS,
+                                    StartPos = startPos,
+                                    StartLine = startLine,
+                                    StartColumn = ColumnFromHere(chars, startPos),
+                                    EndPos = i,
+                                    EndLine = currLine,
+                                    EndColumn = ColumnFromHere(chars, i),
+                                    Level = currLevel,
+                                    ScanHit = lookback,
+                                    Attributes = attrs
+                                };
+
+                                TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
+                            }
 
                             markers.Add(currMarker);
-                            ResetActivas(activas);
-                            var lb = RemoveWhere(lookback);
-
-                            foreach (var kvp in patterns)
-                            {
-                                var result = kvp.Value.Match(lb);
-
-                                if (result.Success)
-                                {
-                                    if (kvp.Key == MarkerKind.EnumValue && currPatt != MarkerKind.Enum) continue;
-
-                                    currMarker.Kind = kvp.Key;
-                                    currMarker.Name = result.Groups[1].Value;
-
-                                    break;
-                                }
-                            }
-
-                            if (((!currMarker.IsAbstract && currMarker.Kind == MarkerKind.Method) || ((currPatt & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)) && (currPatt != MarkerKind.Interface && currPatt != MarkerKind.Enum))
-                            {
-                                currMarker.Kind = MarkerKind.Code;
-                            }
-                            //else if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate || currMarker.Kind == MarkerKind.FieldValue)
-                            //{
-                            //    TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
-                            //}
-                            TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
-
                         }
 
                         scanStartPos = startPos = i + 1;
@@ -822,7 +800,7 @@ namespace DataTools.CSTools
                                     StartColumn = ColumnFromHere(chars, startPos),
                                     Kind = MarkerKind.Constructor,
                                     Name = currName,
-                                    AccessModifiers = ActivasToAccessModifiers(activas),
+                                    MethodParamsString = cons.Groups[1].Value,
                                     Level = currLevel,
                                     ScanHit = lookback,
                                     Attributes = attrs
@@ -844,6 +822,7 @@ namespace DataTools.CSTools
                                         StartLine = startLine,
                                         StartColumn = ColumnFromHere(chars, startPos),
                                         Kind = MarkerKind.Destructor,
+                                        MethodParamsString = "()",
                                         Name = currName,
                                         Level = currLevel,
                                         ScanHit = lookback,
@@ -855,86 +834,44 @@ namespace DataTools.CSTools
                                 }
                                 else
                                 {
-                                    foreach (var kvp in patterns)
+
+                                    currMarker = new TElem
                                     {
-                                        var result = kvp.Value.Match(lb);
+                                        Namespace = currNS,
+                                        StartPos = startPos,
+                                        StartLine = startLine,
+                                        StartColumn = ColumnFromHere(chars, startPos),
+                                        Level = currLevel,
+                                        ScanHit = lookback,
+                                        Attributes = attrs
+                                    };
 
-                                        if (result.Success)
+                                    TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
+
+                                    currPatt = currMarker.Kind;
+
+                                    if (currMarker.Kind == MarkerKind.Namespace)
+                                    {
+                                        currNS = currMarker.Name;
+                                        currMarker.Namespace = currNS;
+                                        if (pre == -1)
                                         {
-                                            if (kvp.Key == MarkerKind.EnumValue && currPatt != MarkerKind.Enum) continue;
-
-                                            currMarker = new TElem
-                                            {
-                                                Namespace = currNS,
-                                                StartPos = startPos,
-                                                StartLine = startLine,
-                                                StartColumn = ColumnFromHere(chars, startPos),
-                                                Kind = kvp.Key,
-                                                Name = result.Groups[1].Value,
-                                                Level = currLevel,
-                                                ScanHit = lookback,
-                                                Attributes = attrs
-                                            };
-
-                                            TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
-
-                                            //if (currMarker.Kind == MarkerKind.Method || currMarker.Kind == MarkerKind.Property || currMarker.Kind == MarkerKind.Const || currMarker.Kind == MarkerKind.Field || currMarker.Kind == MarkerKind.Event || currMarker.Kind == MarkerKind.Delegate)
-                                            //{
-                                            //    TypeAndMethodParse(lookback, chars, scanStartPos, i, currMarker);
-                                            //}
-
-                                            currPatt = kvp.Key;
-
-                                            if (kvp.Key == MarkerKind.Namespace)
-                                            {
-                                                currNS = result.Groups[1].Value;
-                                                currMarker.Namespace = currNS;
-                                                if (pre == -1)
-                                                {
-                                                    pre = startPos - 1;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                currMarker.AccessModifiers = ActivasToAccessModifiers(activas);
-
-                                                currMarker.IsAbstract = activas["abstract"];
-                                                currMarker.IsVirtual = activas["virtual"];
-                                                currMarker.IsStatic = activas["static"];
-                                                currMarker.IsExtern = activas["extern"];
-                                                currMarker.IsOverride = activas["override"];
-                                                currMarker.IsNew = activas["new"];
-                                                currMarker.IsAsync = activas["async"];
-
-
-                                                var genScan = genericPatt.Match(lookback);
-                                                if (genScan.Success)
-                                                {
-                                                    if (genScan.Groups[1].Value == currMarker.Name)
-                                                    {
-                                                        currMarker.Generics = $"<{genScan.Groups[2].Value}>";
-                                                    }
-                                                }
-                                            }
-
-                                            markers.Add(currMarker);
-
-                                            if (currPatt == MarkerKind.Class || currPatt == MarkerKind.Struct || currPatt == MarkerKind.Record)
-                                            {
-                                                currName = currMarker.Name;
-
-                                                currCons = new Regex($"^.*{currMarker.Name}\\s*\\(.*\\).*$");
-                                                currDecons = new Regex($"^.*\\~{currMarker.Name}\\s*\\(\\)$");
-                                            }
-
-                                            break;
+                                            pre = startPos - 1;
                                         }
+                                    }
+
+                                    markers.Add(currMarker);
+
+                                    if (currPatt == MarkerKind.Class || currPatt == MarkerKind.Struct || currPatt == MarkerKind.Record)
+                                    {
+                                        currName = currMarker.Name;
+
+                                        currCons = new Regex($"^.*{currMarker.Name}\\s*(\\(.*\\)).*$");
+                                        currDecons = new Regex($"^.*\\~{currMarker.Name}\\s*\\(\\)$");
                                     }
                                 }
                             }
                         }
-
-                        ResetActivas(activas);
 
                         stack.Push(currMarker);
                         listStack.Push(markers);
@@ -975,19 +912,11 @@ namespace DataTools.CSTools
                                     EndColumn = ColumnFromHere(chars, i - 1),
                                     Kind = MarkerKind.EnumValue,
                                     Name = testEnum.Groups[1].Value,
-                                    IsAbstract = activas["abstract"],
-                                    IsVirtual = activas["virtual"],
-                                    IsStatic = activas["static"],
-                                    IsExtern = activas["extern"],
-                                    IsOverride = activas["override"],
-                                    IsAsync = activas["async"],
-                                    IsNew = activas["new"],
                                     Level = currLevel,
                                     ScanHit = lookback,
                                 };
                                 
                                 markers.Add(currMarker);
-                                ResetActivas(activas);
                             }
                         }
 
@@ -1019,8 +948,6 @@ namespace DataTools.CSTools
                         {
                             startLine = currLine;
                         }
-
-                        ResetActivas(activas);
 
                     }
                     else if ((i < c - 1) && ((chars[i] == '/' && chars[i + 1] == '/') || (chars[i] == '#')))
@@ -1136,23 +1063,6 @@ namespace DataTools.CSTools
                         if (j >= c) break;
                         i = j;
                     }
-                    else if (char.IsLetter(chars[i]))
-                    {
-                        cw.Append(chars[i]);
-                    }
-                    else
-                    {
-                        if (cw.Length > 0)
-                        {
-                            var cword = cw.ToString();
-
-                            if (activas.ContainsKey(cword))
-                            {
-                                activas[cword] = true;
-                            }
-                            cw.Clear();
-                        }
-                    }
                 }
 
                 preambleTo = pre;
@@ -1167,7 +1077,7 @@ namespace DataTools.CSTools
         /// <summary>
         /// A list of filtered keywords for the C# language.
         /// </summary>
-        private static readonly string[] deletes = new string[] { "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new" };
+        private static readonly string[] deletes = new string[] { "operator", "explicit", "implicit", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         /// <summary>
         /// Parse the type, name and method parameters from a lookback string.
@@ -1176,19 +1086,19 @@ namespace DataTools.CSTools
         /// <param name="marker">The destination marker.</param>
         /// <returns>True if successful.</returns>
         /// <exception cref="SyntaxErrorException"></exception>
-        private bool TypeAndMethodParse(string lookback, char[] chars, int start, int stop, TElem marker)
+        private int TypeAndMethodParse(string lookback, char[] chars, int start, int stop, TElem marker)
         {
             int l = 0, i;
             var str = lookback;
-            if (lookback[0] == '=') return false;
-            if (marker.Kind == MarkerKind.EnumValue) return false;
+            if (lookback[0] == '=') return 0;
+            if (marker.Kind == MarkerKind.EnumValue) return 0;
 
             IList<string> dels = deletes;
             List<string> fd = new List<string>();
             str = str.Trim();
             var w = str.ToCharArray();
             int c = w.Length;
-
+            
             var tsb = new StringBuilder();
             var nsb = new StringBuilder();
             bool fl = false;
@@ -1197,6 +1107,10 @@ namespace DataTools.CSTools
 
             bool hasParams = false;
             bool eii = false;
+
+            string generics1 = "";
+
+            marker.Kind = MarkerKind.Code;
 
             for (i = 0; i < c; i++)
             {
@@ -1218,12 +1132,12 @@ namespace DataTools.CSTools
                         if (t != null && bx != null)
                         {
                             i = (int)bx;
-                            tsb.Append(t);
+                            generics1 = t;
                             fl = true;
                         }
                         else
                         {
-                            return false;
+                            return 0;
                         }
                         lww = false;
                     }
@@ -1245,7 +1159,7 @@ namespace DataTools.CSTools
                         }
                         else
                         {
-                            return false;
+                            return 0;
                         }
                         lww = false;
                     }
@@ -1258,16 +1172,78 @@ namespace DataTools.CSTools
                 {
                     if (lww)
                     {
-                        if (dels.Contains(tsb.ToString()))
+                        var del = tsb.ToString();
+                        if (dels.Contains(del))
                         {
                             tsb.Clear();
                             lww = false;
+                            switch(del)
+                            {
+                                case "public":
+                                case "private":
+                                case "internal":
+                                case "protected":
+                                    marker.AccessModifiers |= (AccessModifiers)Enum.Parse(typeof(AccessModifiers), TextTools.TitleCase(del));
+                                    break;
+
+                                case "class":
+                                case "event":
+                                case "interface":
+                                case "struct":
+                                case "record":
+                                case "const":
+                                case "get":
+                                case "set":
+                                case "add":
+                                case "remove":
+                                case "enum":
+                                case "namespace":
+                                case "using":
+                                    marker.Kind = (MarkerKind)Enum.Parse(typeof (MarkerKind), TextTools.TitleCase(del));
+                                    break;
+
+                                case "async":
+                                    marker.IsAsync = true;
+                                    break;
+
+                                case "abstract":
+                                    marker.IsAbstract = true;
+                                    break;
+
+                                case "override":
+                                    marker.IsOverride = true;
+                                    break;
+
+                                case "extern":
+                                    marker.IsExtern = true;
+                                    break;
+
+                                case "new":
+                                    marker.IsNew = true;
+                                    break;
+
+                                case "static":
+                                    marker.IsStatic = true;
+                                    break;
+
+                                case "readonly":
+                                    marker.IsReadOnly = true;
+                                    break;
+
+                                case "virtual":
+                                    marker.IsVirtual = true;
+                                    break;
+
+                                default:
+                                    break;
+                            }
+
                         }
-                        else
-                        {
-                            i++;
-                            break;
-                        }
+                    }
+                    else
+                    {
+                        i++;
+                        break;
                     }
                 }
 
@@ -1275,11 +1251,40 @@ namespace DataTools.CSTools
 
             if (tsb.Length > 0)
             {
-                marker.DataType = tsb.ToString();
+                if (marker.Kind == MarkerKind.Namespace)
+                {
+                    marker.Name = marker.Namespace = tsb.ToString();
+                    return 1;
+                }
+                else
+                {
+                    switch(marker.Kind)
+                    {
+                        case MarkerKind.Class:
+                        case MarkerKind.Struct:
+                        case MarkerKind.Interface:
+                        case MarkerKind.Record:
+                        case MarkerKind.Enum:
+                            marker.Name = tsb.ToString();
+                            marker.Generics = generics1;
+                            break;
+
+                        case MarkerKind.Using:
+                            marker.Name = tsb.ToString();
+                            return 1;
+
+                        default:
+                            tsb.Append(generics1);
+                            marker.DataType = tsb.ToString();
+                            break;
+
+                    }
+
+                }
             }
             else
             {
-                return false;
+                return 0;
             }
 
             for (; i < c; i++)
@@ -1293,6 +1298,18 @@ namespace DataTools.CSTools
                 }
                 else
                 {
+                    if (marker.DataType == "bool" && nsb.ToString() == "operator")
+                    {
+                        nsb.Clear();
+                        i++;
+                        while (i < c && w[i] != '(' && !char.IsWhiteSpace(w[i]))
+                        {
+                            nsb.Append(w[i]);
+                            i++;
+                        }
+                        marker.Kind = MarkerKind.Operator;
+                    }
+
                     break;
                 }
             }
@@ -1301,17 +1318,15 @@ namespace DataTools.CSTools
             {
                 marker.Name = nsb.ToString();   
             }
-            else
-            {
-                return false;
-            }
+
+            var retVal = 1;
+            
+            tsb.Clear();
+            int x = -1;
             if (i < c)
             {
                 for (; i < c; i++)
                 {
-                    while (i < c && char.IsWhiteSpace(w[i])) i++;
-                    if (i >= c) return true;
-
                     ch = w[i];
 
                     if (ch == '(')
@@ -1319,15 +1334,16 @@ namespace DataTools.CSTools
                         var parms = TextTools.TextBetween(w, i, ref l, '(', ')', out int? ax, out int? bx, withDelimiters: true);
                         if (parms != null)
                         {
-                            marker.MethodParamsString = parms;
                             if (parms != "()")
                             {
                                 marker.MethodParams = new List<string>(TextTools.Split(parms.Substring(1, parms.Length - 2), ",", trimResults: true));
                             }
+
+                            marker.MethodParamsString = parms;
+
                             if (bx != null) i = (int)bx;
-                            marker.Kind = MarkerKind.Method;
-                            if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
                             hasParams = true;
+                            retVal++;
                         }
                     }
                     else if (ch == '<')
@@ -1339,21 +1355,48 @@ namespace DataTools.CSTools
                             if (bx != null) i = (int)bx;
                         }
                     }
-                    else if ((!hasParams) && (i < c - 1) && (w[i] == '=') && (w[i + 1] == '>'))
+                    else if ((!hasParams) && (i < c - 2) && (w[i] == '=') && (w[i + 1] == '>'))
                     {
                         marker.Kind = MarkerKind.Property;
                         if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
-                        return true;
+                        return retVal;
+                    }
+                    else if ((hasParams) && (i < c - 2) && (w[i] == '=') && (w[i + 1] == '>'))
+                    {
+                        marker.Kind = MarkerKind.Method;
+                        if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
+                        return retVal;
                     }
                     else if (ch == ';' || ch == '=')
                     {
-                        if (marker.Kind == MarkerKind.Code) marker.Kind = MarkerKind.FieldValue;
-                        if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
-                        return true;
+                        if (marker.Kind == MarkerKind.Code)
+                        {
+                            marker.Kind = MarkerKind.Field;
+                            if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
+                            return retVal;
+                        }
                     }
                     else if (ch == ':')
                     {
                         break;
+                    }
+                    else if (char.IsLetter(ch))
+                    {
+                        if (x == -1) x = i;
+                        tsb.Append(ch);
+                    }
+                    else if (char.IsWhiteSpace(ch))
+                    {
+                        if (tsb.ToString() == "where")
+                        {
+                            i = x;
+                            break;
+                        }
+                        else
+                        {
+                            x = -1;
+                            tsb.Clear();
+                        }
                     }
                 }
             }
@@ -1374,19 +1417,25 @@ namespace DataTools.CSTools
                     marker.WhereClause = " where " + sp[1].Trim();
                     str = sp[0].Trim();
                 }
-
-                marker.Inheritance = " : " + str;
+                
+                if (!string.IsNullOrEmpty(str)) marker.Inheritance = " : " + str;
             }
-            else
+
+            if (marker.Kind == MarkerKind.Code)
             {
-                if (marker.Kind == MarkerKind.Code || marker.Kind == MarkerKind.Field || marker.Kind == MarkerKind.FieldValue)
+                if (retVal == 2)
                 {
                     marker.Kind = MarkerKind.Property;
-                    if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
                 }
+                else
+                {
+                    marker.Kind = MarkerKind.Method;
+                }
+
+                if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
             }
 
-            return true;
+            return retVal;
         }
 
         /// <summary>
@@ -1572,19 +1621,6 @@ namespace DataTools.CSTools
 
             return AccessModifiers.None;
 
-        }
-
-        /// <summary>
-        /// Reset the <paramref name="activas"/>.
-        /// </summary>
-        /// <param name="activas"></param>
-        private void ResetActivas(Dictionary<string, bool> activas)
-        {
-            var keys = activas.Keys.ToList();
-            foreach (var key in keys)
-            {
-                activas[key] = false;
-            }
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using DataTools.SortedLists;
 using DataTools.Observable;
 using Microsoft.Build.Framework.XamlTypes;
 using System.Text.RegularExpressions;
+using MessagePack;
 
 namespace DataTools.CSTools
 {
@@ -254,6 +255,7 @@ namespace DataTools.CSTools
         protected string scanHit;
         protected string name;
         protected MarkerKind kind;
+        protected string mpstr;
 
         /// <summary>
         /// Create a shallow copy of this marker as a <see cref="MarkerBase{TElem, TList}"/> instance.
@@ -443,6 +445,11 @@ namespace DataTools.CSTools
 
                 if (IsStatic) amstr += "static ";
 
+                if (IsAbstract) amstr += "abstract ";
+                if (IsOverride) amstr += "override ";
+                if (IsVirtual) amstr += "virtual ";
+                if (IsAsync) amstr += "async ";
+
                 if (Kind == MarkerKind.Delegate) amstr += "delegate ";
                 if (Kind == MarkerKind.Event) amstr += "event ";
                 if (kind == MarkerKind.Const) amstr += "const ";
@@ -450,10 +457,6 @@ namespace DataTools.CSTools
                 if (kind == MarkerKind.Interface) amstr += "interface ";
                 if (kind == MarkerKind.Struct) amstr += "struct ";
                 if (kind == MarkerKind.Record) amstr += "record ";
-                if (IsAbstract) amstr += "abstract ";
-                if (IsOverride) amstr += "override ";
-                if (IsVirtual) amstr += "virtual ";
-                if (IsAsync) amstr += "async ";
                 
                 return amstr;
             }
@@ -515,7 +518,23 @@ namespace DataTools.CSTools
             }
         }
 
-        public virtual string MethodParamsString { get; set; }
+        public virtual string MethodParamsString
+        {
+            get => mpstr;
+            set
+            {
+                mpstr = value?.Trim() ?? "";
+
+                if (string.IsNullOrEmpty(mpstr))
+                {
+                    mpstr = "()";
+                }
+                else if (!(mpstr[0] == '(' && mpstr[mpstr.Length - 1] == ')'))
+                {
+                    mpstr = "(" + mpstr + ")";
+                }
+            }
+        }
 
         public virtual List<string> MethodParams { get; set; }
 
