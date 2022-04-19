@@ -1088,6 +1088,8 @@ namespace DataTools.CSTools
         /// <exception cref="SyntaxErrorException"></exception>
         private int TypeAndMethodParse(string lookback, char[] chars, int start, int stop, TElem marker)
         {
+            if (string.IsNullOrEmpty(lookback)) return 0;
+
             int l = 0, i;
             var str = lookback;
             if (lookback[0] == '=') return 0;
@@ -1456,7 +1458,7 @@ namespace DataTools.CSTools
                         }
                         else if (!AllowedName(ch, true))
                         {
-                            if (tsb.ToString() == "where" && xz != ',')
+                            if (tsb.ToString() == "where" && xz != ',' && xz != ':')
                             {
                                 x = i - 5;
                                 tsb.Clear();
