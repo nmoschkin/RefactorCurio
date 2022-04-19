@@ -574,7 +574,18 @@ namespace DataTools.CSTools
         {
             get
             {
-                if (!string.IsNullOrEmpty(DataType)) return DataType + " ";
+                if (!string.IsNullOrEmpty(DataType))
+                {
+                    if (kind == MarkerKind.Operator)
+                    {
+                        return DataType + " operator ";
+                    }
+                    else
+                    {
+                        return DataType + " ";
+                    }
+                }
+
                 return "";
             }
         }

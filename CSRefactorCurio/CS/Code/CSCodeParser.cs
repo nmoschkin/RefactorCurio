@@ -1077,7 +1077,7 @@ namespace DataTools.CSTools
         /// <summary>
         /// A list of filtered keywords for the C# language.
         /// </summary>
-        private static readonly string[] deletes = new string[] { "operator", "explicit", "implicit", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "explicit", "implicit", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
+        private static readonly string[] deletes = new string[] { "ref", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         /// <summary>
         /// Parse the type, name and method parameters from a lookback string.
@@ -1115,8 +1115,6 @@ namespace DataTools.CSTools
             for (i = 0; i < c; i++)
             {
                 ch = w[i];
-
-                if (i == 0 && !AllowedName(ch, false, true)) throw new SyntaxErrorException();
 
                 if (AllowedName(ch, true))
                 {
@@ -1192,6 +1190,7 @@ namespace DataTools.CSTools
                                 case "struct":
                                 case "record":
                                 case "const":
+                                case "delegate":
                                 case "get":
                                 case "set":
                                 case "add":
@@ -1238,6 +1237,11 @@ namespace DataTools.CSTools
                                     break;
                             }
 
+                        }
+                        else
+                        {
+                            i++;
+                            break;
                         }
                     }
                     else
@@ -1287,6 +1291,8 @@ namespace DataTools.CSTools
                 return 0;
             }
 
+            tsb.Clear();
+
             for (; i < c; i++)
             {
                 ch = w[i];
@@ -1298,7 +1304,7 @@ namespace DataTools.CSTools
                 }
                 else
                 {
-                    if (marker.DataType == "bool" && nsb.ToString() == "operator")
+                    if (nsb.ToString() == "operator")
                     {
                         nsb.Clear();
                         i++;
@@ -1491,7 +1497,7 @@ namespace DataTools.CSTools
                         tsb.Append(s);
                     }
 
-                    marker.Inheritance = tsb.ToString();
+                    marker.Inheritance = " : " + tsb.ToString();
                 }
                 
 
@@ -1501,11 +1507,11 @@ namespace DataTools.CSTools
             {
                 if (retVal == 2)
                 {
-                    marker.Kind = MarkerKind.Property;
+                    marker.Kind = MarkerKind.Method;
                 }
                 else
                 {
-                    marker.Kind = MarkerKind.Method;
+                    marker.Kind = MarkerKind.Property;
                 }
 
                 if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;

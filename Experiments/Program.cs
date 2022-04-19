@@ -13,7 +13,7 @@ namespace Experiments
     {
         static void Main(string[] args)
         {
-            var path = @"C:\Users\theim\Desktop\Projects\Personal Projects\Repos\KuCoin.NET\KuCoin.NET\Observable\ObservableDictionary.cs";
+            var path = @"C:\Users\theim\Desktop\Projects\Personal Projects\Repos\RefactorCurio\CSRefactorCurio\DataTools\MemPtr.cs";
 
 
             var data = File.ReadAllText(path);

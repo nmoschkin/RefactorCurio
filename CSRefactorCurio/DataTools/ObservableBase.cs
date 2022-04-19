@@ -12,6 +12,13 @@ using System.Threading.Tasks;
 namespace DataTools.Observable
 {
 
+    public delegate void ObservablePropertyChangingEventHandler(object sender, ObservablePropertyChangingEventArgs e);
+
+    public interface IObservablePropertyChanging
+    {
+        event ObservablePropertyChangingEventHandler PropertyChanging;
+    }
+
     /// <summary>
     /// Provide data for the <see cref="ObservableBase.PropertyChanging"/> event.
     /// </summary>
@@ -34,13 +41,6 @@ namespace DataTools.Observable
         public ObservablePropertyChangingEventArgs(string propertyName) : base(propertyName)
         {
         }
-    }
-
-    public delegate void ObservablePropertyChangingEventHandler(object sender, ObservablePropertyChangingEventArgs e);
-
-    public interface IObservablePropertyChanging
-    {
-        event ObservablePropertyChangingEventHandler PropertyChanging;
     }
 
     /// <summary>
