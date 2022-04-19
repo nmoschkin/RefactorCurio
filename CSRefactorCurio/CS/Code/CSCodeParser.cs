@@ -1116,9 +1116,9 @@ namespace DataTools.CSTools
             {
                 ch = w[i];
 
-                if (i == 0 && (!char.IsLetter(ch) && ch == '.' && ch == '@' && ch == '_')) throw new SyntaxErrorException();
+                if (i == 0 && !AllowedName(ch, false, true)) throw new SyntaxErrorException();
 
-                if (char.IsLetterOrDigit(ch) || ch == '.' || ch == '@' || ch == '_')
+                if (AllowedName(ch, true))
                 {
                     if (fl) break;
                     tsb.Append(ch);
@@ -1291,7 +1291,7 @@ namespace DataTools.CSTools
             {
                 ch = w[i];
 
-                if (char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || ch == '.')
+                if (AllowedName(ch, true))
                 {
                     //if (ch == '.') eii = true;
                     nsb.Append(ch);
@@ -1318,6 +1318,8 @@ namespace DataTools.CSTools
             {
                 marker.Name = nsb.ToString();   
             }
+            
+            bool inh = false;
 
             var retVal = 1;
             
@@ -1325,6 +1327,7 @@ namespace DataTools.CSTools
             int x = -1;
             if (i < c)
             {
+                
                 for (; i < c; i++)
                 {
                     ch = w[i];
@@ -1385,7 +1388,7 @@ namespace DataTools.CSTools
                         if (x == -1) x = i;
                         tsb.Append(ch);
                     }
-                    else if (char.IsWhiteSpace(ch))
+                    else if (!AllowedName(ch, true))
                     {
                         if (tsb.ToString() == "where")
                         {
@@ -1404,21 +1407,94 @@ namespace DataTools.CSTools
             if (i < c)
             {
                 str = str.Substring(i).Trim();
-                
+                w = str.ToCharArray();
+                c = str.Length;
+                char xz = ' ';
+                x = -1;
+                List<string> ihits = new List<string>();
                 if (str[0] == ':')
                 {
-                    str = str.Substring(1).Trim();
+                    tsb.Clear();
+
+                    for (i = 0; i < c; i++)
+                    {
+                        ch = w[i];
+
+                        if (ch == '(')
+                        {
+                            var parms = TextTools.TextBetween(w, i, ref l, '(', ')', out int? ax, out int? bx, withDelimiters: true);
+                            if (parms != null)
+                            {
+                                tsb.Append(parms);
+                                if (bx != null) i = (int)bx;
+                            }
+                        }
+                        else if (ch == '<')
+                        {
+                            var parms = TextTools.TextBetween(w, i, ref l, '<', '>', out int? ax, out int? bx, withDelimiters: true);
+                            if (parms != null)
+                            {
+                                tsb.Append(parms);
+                                if (bx != null) i = (int)bx;
+                            }
+                        }
+                        else if (ch == ',')
+                        {
+                            inh = true;
+                            ihits.Add(tsb.ToString().Trim());
+                            tsb.Clear();
+                        }
+                        else if (AllowedName(ch, true))
+                        {
+                            tsb.Append(ch);
+                        }
+                        else if (!AllowedName(ch, true))
+                        {
+                            if (tsb.ToString() == "where" && xz != ',')
+                            {
+                                x = i - 5;
+                                tsb.Clear();
+                                break;
+                            }
+                            else 
+                            {
+                                x = -1;
+                                inh = false;
+                                if (tsb.Length > 0)
+                                    ihits.Add(tsb.ToString().Trim());
+                                tsb.Clear();
+                            }
+                        }
+
+                        if (!char.IsWhiteSpace(ch)) xz = ch;
+                    }
+
+                    if (tsb.Length > 0)
+                    {
+                        ihits.Add(tsb.ToString().Trim());
+                        tsb.Clear();
+                    }
                 }
 
-                var sp = TextTools.Split(str, "where ");
-
-                if (sp.Length > 1) 
+                if (x != -1)
                 {
-                    marker.WhereClause = " where " + sp[1].Trim();
-                    str = sp[0].Trim();
+                    var sp = str.Substring(x);
+                    marker.WhereClause = sp;
                 }
                 
-                if (!string.IsNullOrEmpty(str)) marker.Inheritance = " : " + str;
+                if (ihits.Count > 0)
+                {
+                    tsb.Clear();
+                    foreach(var s in ihits)
+                    {
+                        if (tsb.Length > 0) tsb.Append(", ");
+                        tsb.Append(s);
+                    }
+
+                    marker.Inheritance = tsb.ToString();
+                }
+                
+
             }
 
             if (marker.Kind == MarkerKind.Code)
@@ -1436,6 +1512,25 @@ namespace DataTools.CSTools
             }
 
             return retVal;
+        }
+
+        /// <summary>
+        /// Check if this is an allowed identifier charachter.
+        /// </summary>
+        /// <param name="ch">Character to test.</param>
+        /// <param name="alsoDot">Dot is valid.</param>
+        /// <param name="first">Valid for first character.</param>
+        /// <returns></returns>
+        private bool AllowedName(char ch, bool alsoDot, bool first = false)
+        {
+            if (first)
+            {
+                return char.IsLetter(ch) || ch == '@' || ch == '_';
+            }
+            else
+            {
+                return char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || (alsoDot && ch == '.');
+            }
         }
 
         /// <summary>
