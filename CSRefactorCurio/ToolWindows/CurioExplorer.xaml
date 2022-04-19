@@ -245,7 +245,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
-
+                                            <Label Content="{Binding HomeFile}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -263,7 +263,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
-
+                                            <Label Content="{Binding HomeFile}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -280,7 +280,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
-
+                                            <Label Content="{Binding HomeFile}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -296,7 +296,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
-
+                                            <Label Content="{Binding HomeFile}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -313,7 +313,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
-
+                                            <Label Content="{Binding HomeFile}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -330,7 +330,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
-
+                                            <Label Content="{Binding HomeFile}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -346,7 +346,7 @@
                                         <StackPanel Orientation="Vertical">
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
-
+                                            <Label Content="{Binding HomeFile}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>

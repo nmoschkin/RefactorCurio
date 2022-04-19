@@ -62,12 +62,12 @@ namespace DataTools.CSTools
         /// <typeparam name="TI">The type of <see cref="IMarker"/></typeparam>
         /// <typeparam name="TL">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
         /// <param name="path">The path of the new file.</param>
-        /// <param name="file">The <see cref="RenderedFile{TElem, TList}"/> information.</param>
+        /// <param name="file">The <see cref="AtomicGenerationInfo{TElem, TList}"/> information.</param>
         /// <param name="lines">The original file split into lines.</param>
         /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
         /// <param name="parser">The code parser instance.</param>
         /// <returns>A new output file.</returns>
-        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, RenderedFile<TI, TL> file, string[] lines, bool sepDirs, CSCodeParser<TI, TL> parser = null) where TI: IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
+        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, AtomicGenerationInfo<TI, TL> file, string[] lines, bool sepDirs, CSCodeParser<TI, TL> parser = null) where TI: IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
         {
             return NewFile<TI, TL>(path, file.Markers[0].Kind, file.Markers[0].Name, FormatOutputText<TI, TL>(file.Markers, lines, file.PreambleEnd, file.PreambleBegin), sepDirs, parser);
         }
@@ -244,7 +244,7 @@ namespace DataTools.CSTools
         protected int preambleTo = 0;
 
         protected TList markers = new TList();
-        protected RenderedFile<TElem, TList> mfile = null;
+        protected AtomicGenerationInfo<TElem, TList> mfile = null;
 
         protected List<string> lastErrors = new List<string>();
 
@@ -460,7 +460,7 @@ namespace DataTools.CSTools
                     }
                 }
 
-                var mf = new RenderedFile<TElem, TList>()
+                var mf = new AtomicGenerationInfo<TElem, TList>()
                 {
                     Lines = mfile.Lines,
                     Markers = mlist,
@@ -516,9 +516,9 @@ namespace DataTools.CSTools
 
                 try
                 {
-                    markers = InternalRawParseCSCode(text.ToCharArray());
+                    markers = InternalParseCSCode(text.ToCharArray());
 
-                    var cf = new RenderedFile<TElem, TList>()
+                    var cf = new AtomicGenerationInfo<TElem, TList>()
                     {
                         PreambleBegin = 0,
                         PreambleEnd = preambleTo,
@@ -529,7 +529,7 @@ namespace DataTools.CSTools
 
                     foreach (var marker in markers)
                     {
-                        SetParentFile(marker, cf);
+                        SetAtomicFile(marker, cf);
                     }
 
                     ParseSuccess = true;
@@ -546,19 +546,19 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
-        /// Set the parent <see cref="RenderedFile{TElem, TList}"/> object to the specified marker and its descendents.
+        /// Set the parent <see cref="AtomicGenerationInfo{TElem, TList}"/> object to the specified marker and its descendents.
         /// </summary>
         /// <param name="marker">The marker to modify.</param>
         /// <param name="file">The parent file object.</param>
-        protected void SetParentFile(TElem marker, RenderedFile<TElem, TList> file)
+        protected void SetAtomicFile(TElem marker, AtomicGenerationInfo<TElem, TList> file)
         {
-            marker.ParentFile = file;
+            marker.AtomicSourceFile = file;
 
             if (marker.Children != null)
             {
                 foreach (var child in marker.Children)
                 {
-                    SetParentFile(child, file);
+                    SetAtomicFile(child, file);
                 }
             }
         }
@@ -574,11 +574,13 @@ namespace DataTools.CSTools
         /// </summary>
         public IReadOnlyList<string> UnrecognizedWords => unrecognizedWords;
 
-
+        /// <summary>
+        /// The big list of all C# keywords and intrinsic types
+        /// </summary>
         private static readonly string[] FilterType1 = new string[] { 
-            "public", "private", "protected", "internal", "global" ,
+            "public", "private", "protected", "internal", "global",
             "class", "const", "struct", "record", "interface", "namespace", "delegate", "event", "namespace", "enum",
-            "async", "extern", "override", "abstract", "new", "unsafe", "fixed", "static", "using", "get", "set",
+            "async", "extern", "override", "abstract", "sealed", "new", "unsafe", "fixed", "static", "using", "get", "set",
             "for", "while", "do", "if", "else", "switch", "case", "default", "break", "yield", "return", "add", "remove",
             "throw", "try", "catch", "finally", 
             "foreach", "in", "out", "ref", "null", "is", "not",
@@ -640,7 +642,7 @@ namespace DataTools.CSTools
         /// <remarks>
         /// Only override this if you really know what you're doing!
         /// </remarks>
-        protected virtual TList InternalRawParseCSCode(char[] chars)
+        protected virtual TList InternalParseCSCode(char[] chars)
         {
 
             lock (SyncRoot)
@@ -1174,10 +1176,11 @@ namespace DataTools.CSTools
 
             return sb.ToString();
         }
+
         /// <summary>
         /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TElem)"/> (in literally no particular order.)
         /// </summary>
-        private static readonly string[] FilterType2 = new string[] { "global", "ref", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
+        private static readonly string[] FilterType2 = new string[] { "global", "ref", "sealed", "class", "interface", "record", "struct", "namespace", "public", "private", "static", "async", "abstract", "const", "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         /// <summary>
         /// Parse the type, name and method parameters from a lookback string.
@@ -1353,6 +1356,10 @@ namespace DataTools.CSTools
 
                                 case "readonly":
                                     marker.IsReadOnly = true;
+                                    break;
+
+                                case "sealed":
+                                    marker.IsSealed = true;
                                     break;
 
                                 case "virtual":

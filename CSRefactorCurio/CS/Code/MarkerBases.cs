@@ -167,6 +167,11 @@ namespace DataTools.CSTools
         bool IsReadOnly { get; set; }
 
         /// <summary>
+        /// Element is a sealed class.
+        /// </summary>
+        bool IsSealed { get; set; }
+
+        /// <summary>
         /// Element is a static member.
         /// </summary>
         bool IsStatic { get; set; }
@@ -260,14 +265,14 @@ namespace DataTools.CSTools
         #region Public Properties
 
         /// <summary>
+        /// The generated atomic source file information for this object.
+        /// </summary>
+        AtomicGenerationInfo<TElem, TList> AtomicSourceFile { get; set; }
+
+        /// <summary>
         /// The child elements.
         /// </summary>
         new TList Children { get; set; }
-
-        /// <summary>
-        /// The parent source file information object.
-        /// </summary>
-        RenderedFile<TElem, TList> ParentFile { get; set; }
 
         #endregion Public Properties
     }
@@ -417,8 +422,11 @@ namespace DataTools.CSTools
     {
         #region Protected Fields
 
-        protected MarkerKind kind;
         protected WeakReference<IProjectNode> homeFile;
+        protected WeakReference<AtomicGenerationInfo<TElem, TList>> atomicFile;
+
+        protected MarkerKind kind;
+
         protected TList markers = new TList();
         protected string mpstr;
         protected string name;
@@ -447,6 +455,7 @@ namespace DataTools.CSTools
                 if (IsStatic) amstr += "static ";
 
                 if (IsAbstract) amstr += "abstract ";
+                if (IsSealed) amstr += "sealed ";
                 if (IsOverride) amstr += "override ";
                 if (IsVirtual) amstr += "virtual ";
                 if (IsAsync) amstr += "async ";
@@ -460,6 +469,25 @@ namespace DataTools.CSTools
                 if (kind == MarkerKind.Record) amstr += "record ";
 
                 return amstr;
+            }
+        }
+
+        public virtual AtomicGenerationInfo<TElem, TList> AtomicSourceFile
+        {
+            get
+            {
+                if (atomicFile != null && atomicFile.TryGetTarget(out AtomicGenerationInfo<TElem, TList> target))
+                {
+                    return target;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                atomicFile = new WeakReference<AtomicGenerationInfo<TElem, TList>>(value);
             }
         }
 
@@ -555,6 +583,8 @@ namespace DataTools.CSTools
 
         public virtual bool IsReadOnly { get; set; }
 
+        public virtual bool IsSealed { get; set; }
+
         public virtual bool IsStatic { get; set; }
 
         public virtual bool IsVirtual { get; set; }
@@ -606,8 +636,6 @@ namespace DataTools.CSTools
         }
 
         public virtual string Namespace { get; set; }
-
-        public virtual RenderedFile<TElem, TList> ParentFile { get; set; }
 
         public virtual string ScanHit
         {
@@ -1140,11 +1168,11 @@ namespace DataTools.CSTools
     }
 
     /// <summary>
-    /// Represents a rendered and reformatted source code file containing the preamble and only the specified items from the original code.
+    /// Represents a rendered and reformatted source code file containing the preamble and only the specified item from the original code.
     /// </summary>
     /// <typeparam name="TElem">The type of <see cref="IMarker"/> that will be used.</typeparam>
     /// <typeparam name="TList">The type of list that will contain the markers.</typeparam>
-    public class RenderedFile<TElem, TList> where TElem : IMarker, new() where TList : IList<TElem>, new()
+    public class AtomicGenerationInfo<TElem, TList> where TElem : IMarker, new() where TList : IList<TElem>, new()
     {
         #region Public Properties
 
