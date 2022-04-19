@@ -9,11 +9,11 @@ namespace DataTools.CSTools
     /// <summary>
     /// File marker sort and filter.
     /// </summary>
-    /// <typeparam name="TElem"></typeparam>
+    /// <typeparam name="TMarker"></typeparam>
     /// <typeparam name="TList"></typeparam>
-    public class CSFileSortFilter<TElem, TList> : SortFilterRule<TElem, TList>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
+    public class CSFileSortFilter<TMarker, TList> : SortFilterRule<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
     {
         int m = 1;
         bool descending = false;
@@ -30,13 +30,13 @@ namespace DataTools.CSTools
                     {
                         if (((IList<MarkerKind>)SortKindOrder).Contains(subitem.Kind))
                         {
-                            rl.Add(subitem.Clone<TElem>(false));
+                            rl.Add(subitem.Clone<TMarker>(false));
                         }
                     }
                 }
                 else if (((IList<MarkerKind>)SortKindOrder).Contains(item.Kind))
                 {
-                    rl.Add(item.Clone<TElem>(false));
+                    rl.Add(item.Clone<TMarker>(false));
                 }
             }
 
@@ -88,7 +88,7 @@ namespace DataTools.CSTools
                 }
             }
         }
-        public override int Compare(TElem x, TElem y)
+        public override int Compare(TMarker x, TMarker y)
         {
             if (x.Kind == y.Kind)
             {
@@ -126,11 +126,11 @@ namespace DataTools.CSTools
     /// <summary>
     /// Eliminates XML Document tags and comments and disintegrates merged compartments.
     /// </summary>
-    /// <typeparam name="TElem"></typeparam>
+    /// <typeparam name="TMarker"></typeparam>
     /// <typeparam name="TList"></typeparam>
-    public class CSXMLEliminatorFilter<TElem, TList> : MarkerFilterRule<TElem, TList>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
+    public class CSXMLEliminatorFilter<TMarker, TList> : MarkerFilterRule<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
     {
         public override TList ApplyFilter(TList items)
         {
@@ -140,7 +140,7 @@ namespace DataTools.CSTools
             {
                 if (IsValid(p1item))
                 {
-                    var cItem = p1item.Clone<TElem>(false);
+                    var cItem = p1item.Clone<TMarker>(false);
 
                     if ((cItem.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
                     {
@@ -168,7 +168,7 @@ namespace DataTools.CSTools
                 {
                     if (IsValid(child))
                     {
-                        var cItem = child.Clone<TElem>(false);
+                        var cItem = child.Clone<TMarker>(false);
                         
                         if ((cItem.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
                         {
@@ -199,20 +199,20 @@ namespace DataTools.CSTools
     /// <summary>
     /// The default filter chain for files consisting of the XML Eliminator and the File Sorter/Filter.
     /// </summary>
-    /// <typeparam name="TElem"></typeparam>
+    /// <typeparam name="TMarker"></typeparam>
     /// <typeparam name="TList"></typeparam>
-    public class CSFileChain<TElem, TList> : FixedFilterRuleChain<TElem, TList>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
+    public class CSFileChain<TMarker, TList> : FixedFilterRuleChain<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
     {
         public override FilterChainKind FilterChainKind => FilterChainKind.PassAll;
 
-        protected override IEnumerable<MarkerFilterRule<TElem, TList>> ProvideFilterChain()
+        protected override IEnumerable<MarkerFilterRule<TMarker, TList>> ProvideFilterChain()
         {
-            return new MarkerFilterRule<TElem, TList>[]
+            return new MarkerFilterRule<TMarker, TList>[]
             {
-                new CSXMLEliminatorFilter<TElem, TList>(),
-                new CSFileSortFilter<TElem, TList>()
+                new CSXMLEliminatorFilter<TMarker, TList>(),
+                new CSFileSortFilter<TMarker, TList>()
             };
         }
     }

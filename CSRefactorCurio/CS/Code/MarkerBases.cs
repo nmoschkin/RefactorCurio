@@ -256,18 +256,18 @@ namespace DataTools.CSTools
     }
 
     /// <summary>
-    /// Represents a strongly typed <see cref="IMarker"/> implementation with a strongly typed <see cref="IMarkerList{TElem}"/> implementation for storing child markers.
+    /// Represents a strongly typed <see cref="IMarker"/> implementation with a strongly typed <see cref="IMarkerList{TMarker}"/> implementation for storing child markers.
     /// </summary>
-    /// <typeparam name="TElem"></typeparam>
+    /// <typeparam name="TMarker"></typeparam>
     /// <typeparam name="TList"></typeparam>
-    public interface IMarker<TElem, TList> : IMarker where TElem : IMarker, new() where TList : IMarkerList<TElem>, new()
+    public interface IMarker<TMarker, TList> : IMarker where TMarker : IMarker, new() where TList : IMarkerList<TMarker>, new()
     {
         #region Public Properties
 
         /// <summary>
         /// The generated atomic source file information for this object.
         /// </summary>
-        AtomicGenerationInfo<TElem, TList> AtomicSourceFile { get; set; }
+        AtomicGenerationInfo<TMarker, TList> AtomicSourceFile { get; set; }
 
         /// <summary>
         /// The child elements.
@@ -280,13 +280,13 @@ namespace DataTools.CSTools
     /// <summary>
     /// A base class for providing a system for filtering <see cref="IMarker"/> items.
     /// </summary>
-    /// <typeparam name="TElem">The type of <see cref="IMarker"/> item.</typeparam>
-    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
-    /// <typeparam name="TFilter">The type of <see cref="MarkerFilter{TElem, TList}"/>.</typeparam>
-    public interface IMarkerFilterProvider<TElem, TList, TFilter>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
-        where TFilter : MarkerFilter<TElem, TList>, new()
+    /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
+    /// <typeparam name="TFilter">The type of <see cref="MarkerFilter{TMarker, TList}"/>.</typeparam>
+    public interface IMarkerFilterProvider<TMarker, TList, TFilter>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
+        where TFilter : MarkerFilter<TMarker, TList>, new()
     {
 
         #region Public Properties
@@ -324,26 +324,26 @@ namespace DataTools.CSTools
     }
 
     /// <summary>
-    /// A base class for providing a system for filtering <see cref="IMarker"/> items using the default <see cref="MarkerFilter{TElem, TList}"/> engine..
+    /// A base class for providing a system for filtering <see cref="IMarker"/> items using the default <see cref="MarkerFilter{TMarker, TList}"/> engine..
     /// </summary>
-    /// <typeparam name="TElem">The type of <see cref="IMarker"/> item.</typeparam>
-    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
-    public interface IMarkerFilterProvider<TElem, TList> : IMarkerFilterProvider<TElem, TList, MarkerFilter<TElem, TList>>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
+    /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
+    public interface IMarkerFilterProvider<TMarker, TList> : IMarkerFilterProvider<TMarker, TList, MarkerFilter<TMarker, TList>>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
     {
     }
 
     /// <summary>
     /// A simple and open chained filter rule for strongly typed filters.
     /// </summary>
-    public abstract class FixedFilterRuleChain<TElem, TList> : MarkerFilterRule<TElem, TList>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
+    public abstract class FixedFilterRuleChain<TMarker, TList> : MarkerFilterRule<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
     {
         #region Private Fields
 
-        MarkerFilterRuleChain<TElem, TList> filterChain;
+        MarkerFilterRuleChain<TMarker, TList> filterChain;
 
         #endregion Private Fields
 
@@ -354,7 +354,7 @@ namespace DataTools.CSTools
         /// </summary>
         public FixedFilterRuleChain()
         {
-            filterChain = new MarkerFilterRuleChain<TElem, TList>();
+            filterChain = new MarkerFilterRuleChain<TMarker, TList>();
             filterChain.FilterChainKind = FilterChainKind;
 
             var newRules = ProvideFilterChain();
@@ -406,7 +406,7 @@ namespace DataTools.CSTools
         /// Provide the filter chain.
         /// </summary>
         /// <returns></returns>
-        protected abstract IEnumerable<MarkerFilterRule<TElem, TList>> ProvideFilterChain();
+        protected abstract IEnumerable<MarkerFilterRule<TMarker, TList>> ProvideFilterChain();
 
         #endregion Protected Methods
     }
@@ -414,16 +414,16 @@ namespace DataTools.CSTools
     /// <summary>
     /// Abstract base that imlements <see cref="IMarker"/>.
     /// </summary>
-    /// <typeparam name="TElem">The type of <see cref="IMarker"/> that will be used.</typeparam>
+    /// <typeparam name="TMarker">The type of <see cref="IMarker"/> that will be used.</typeparam>
     /// <typeparam name="TList">The type of list that will contain child markers.</typeparam>
-    public abstract class MarkerBase<TElem, TList> : IMarker<TElem, TList>
-        where TElem : IMarker, new()
-        where TList : IMarkerList<TElem>, new()
+    public abstract class MarkerBase<TMarker, TList> : IMarker<TMarker, TList>
+        where TMarker : IMarker, new()
+        where TList : IMarkerList<TMarker>, new()
     {
         #region Protected Fields
 
         protected WeakReference<IProjectNode> homeFile;
-        protected WeakReference<AtomicGenerationInfo<TElem, TList>> atomicFile;
+        protected WeakReference<AtomicGenerationInfo<TMarker, TList>> atomicFile;
 
         protected MarkerKind kind;
 
@@ -472,11 +472,11 @@ namespace DataTools.CSTools
             }
         }
 
-        public virtual AtomicGenerationInfo<TElem, TList> AtomicSourceFile
+        public virtual AtomicGenerationInfo<TMarker, TList> AtomicSourceFile
         {
             get
             {
-                if (atomicFile != null && atomicFile.TryGetTarget(out AtomicGenerationInfo<TElem, TList> target))
+                if (atomicFile != null && atomicFile.TryGetTarget(out AtomicGenerationInfo<TMarker, TList> target))
                 {
                     return target;
                 }
@@ -487,7 +487,7 @@ namespace DataTools.CSTools
             }
             set
             {
-                atomicFile = new WeakReference<AtomicGenerationInfo<TElem, TList>>(value);
+                atomicFile = new WeakReference<AtomicGenerationInfo<TMarker, TList>>(value);
             }
         }
 
@@ -677,12 +677,12 @@ namespace DataTools.CSTools
         #region Public Methods
 
         /// <summary>
-        /// Create a shallow copy of this marker as a <see cref="MarkerBase{TElem, TList}"/> instance.
+        /// Create a shallow copy of this marker as a <see cref="MarkerBase{TMarker, TList}"/> instance.
         /// </summary>
         /// <returns>A new object of the same type with the same values.</returns>
-        public MarkerBase<TElem, TList> Clone()
+        public MarkerBase<TMarker, TList> Clone()
         {
-            var newItem = (MarkerBase<TElem, TList>)MemberwiseClone();
+            var newItem = (MarkerBase<TMarker, TList>)MemberwiseClone();
             return newItem;
         }
 
@@ -693,7 +693,7 @@ namespace DataTools.CSTools
 
             var r = new T();
 
-            if (r is MarkerBase<TElem, TList> newItem)
+            if (r is MarkerBase<TMarker, TList> newItem)
             {
                 // the ideal situation!  a common ancester (this class)
                 ObjectMerge.MergeObjects(this, newItem);
@@ -704,7 +704,7 @@ namespace DataTools.CSTools
 
                 foreach (var item in markers)
                 {
-                    newItem.Children.Add(item.Clone<TElem>(true));
+                    newItem.Children.Add(item.Clone<TMarker>(true));
                 }
 
                 return r;
@@ -778,12 +778,12 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
-        /// Clone this marker into another object derived from <see cref="MarkerBase{TElem, TList}"/>.
+        /// Clone this marker into another object derived from <see cref="MarkerBase{TMarker, TList}"/>.
         /// </summary>
         /// <param name="deep">Deeply copy the item by making a new collection for and copies of the children.</param>
         /// <typeparam name="T">The type of object to create, must be creatable.</typeparam>
         /// <returns>A new object based on this one.</returns>
-        public T Clone<T>(bool deep) where T : MarkerBase<TElem, TList>, new()
+        public T Clone<T>(bool deep) where T : MarkerBase<TMarker, TList>, new()
         {
             var newItem = new T();
 
@@ -795,7 +795,7 @@ namespace DataTools.CSTools
 
             foreach (var item in markers)
             {
-                newItem.Children.Add(item.Clone<TElem>(true));
+                newItem.Children.Add(item.Clone<TMarker>(true));
             }
 
             return newItem;
@@ -817,11 +817,11 @@ namespace DataTools.CSTools
     /// <summary>
     /// Interface for an object that works with filter rules to filter <see cref="IMarker"/> items.
     /// </summary>
-    /// <typeparam name="TElem">The <see cref="IMarker"/> to filter.</typeparam>
-    /// <typeparam name="TList">The <see cref="IMarker{TElem, TList}"/>.</typeparam>
-    public class MarkerFilter<TElem, TList>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
+    /// <typeparam name="TMarker">The <see cref="IMarker"/> to filter.</typeparam>
+    /// <typeparam name="TList">The <see cref="IMarker{TMarker, TList}"/>.</typeparam>
+    public class MarkerFilter<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
     {
         #region Public Methods
 
@@ -834,12 +834,12 @@ namespace DataTools.CSTools
         /// <returns>The filtered list.</returns>
         /// <remarks>
         /// Simple rules are run recursively as specified by the <paramref name="recursiveForSimpleRules"/> parameter.<br /><br />
-        /// Rules based on <see cref="MarkerFilterRule{TElem, TList}"/> must define their own recursion tactics.
+        /// Rules based on <see cref="MarkerFilterRule{TMarker, TList}"/> must define their own recursion tactics.
         /// </remarks>
         public virtual TList ApplyFilter(TList items, MarkerFilterRule rule, bool recursiveForSimpleRules = true)
         {
             // strong rules have their own filtering.
-            if (rule is MarkerFilterRule<TElem, TList> strongRule)
+            if (rule is MarkerFilterRule<TMarker, TList> strongRule)
             {
                 return ApplyFilter(items, strongRule);
             }
@@ -851,7 +851,7 @@ namespace DataTools.CSTools
                 if (rule.IsValid(item))
                 {
                     // we want a shallow copy, here.  The filter recursion will create a deeper copy for children.
-                    var newItem = (TElem)item.Clone();
+                    var newItem = (TMarker)item.Clone();
 
                     newList.Add(newItem);
                     ApplyFilter(newItem.Children, rule);
@@ -862,12 +862,12 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
-        /// Apply the given rule by calling the <see cref="MarkerFilterRule{TElem, TList}.ApplyFilter(TList)"/> method.
+        /// Apply the given rule by calling the <see cref="MarkerFilterRule{TMarker, TList}.ApplyFilter(TList)"/> method.
         /// </summary>
         /// <param name="items"></param>
         /// <param name="rule"></param>
         /// <returns></returns>
-        public virtual TList ApplyFilter(TList items, MarkerFilterRule<TElem, TList> rule)
+        public virtual TList ApplyFilter(TList items, MarkerFilterRule<TMarker, TList> rule)
         {
             return rule.ApplyFilter(items);
         }
@@ -896,9 +896,9 @@ namespace DataTools.CSTools
     /// <summary>
     /// Base class for a strongly-typed, self-applying filter rule.
     /// </summary>
-    /// <typeparam name="TElem">The <see cref="IMarker"/> element type.</typeparam>
-    /// <typeparam name="TList">The <see cref="IMarkerList{TElem}"/> type.</typeparam>
-    public abstract class MarkerFilterRule<TElem, TList> : MarkerFilterRule where TElem : IMarker, new() where TList : IMarkerList<TElem>, new()
+    /// <typeparam name="TMarker">The <see cref="IMarker"/> element type.</typeparam>
+    /// <typeparam name="TList">The <see cref="IMarkerList{TMarker}"/> type.</typeparam>
+    public abstract class MarkerFilterRule<TMarker, TList> : MarkerFilterRule where TMarker : IMarker, new() where TList : IMarkerList<TMarker>, new()
     {
         #region Public Methods
 
@@ -999,13 +999,13 @@ namespace DataTools.CSTools
     /// <summary>
     /// A simple and open chained filter rule for strongly typed filters.
     /// </summary>
-    public class MarkerFilterRuleChain<TElem, TList> : MarkerFilterRule<TElem, TList>
-        where TList : IMarkerList<TElem>, new()
-        where TElem : IMarker<TElem, TList>, new()
+    public class MarkerFilterRuleChain<TMarker, TList> : MarkerFilterRule<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
     {
         #region Private Fields
 
-        private List<MarkerFilterRule<TElem, TList>> rules;
+        private List<MarkerFilterRule<TMarker, TList>> rules;
 
         #endregion Private Fields
 
@@ -1016,16 +1016,16 @@ namespace DataTools.CSTools
         /// </summary>
         public MarkerFilterRuleChain()
         {
-            rules = new List<MarkerFilterRule<TElem, TList>>();
+            rules = new List<MarkerFilterRule<TMarker, TList>>();
         }
 
         /// <summary>
         /// Create a new marker rule chain from the specified initial starting values.
         /// </summary>
         /// <param name="rules">The initial starting values.</param>
-        public MarkerFilterRuleChain(IEnumerable<MarkerFilterRule<TElem, TList>> rules)
+        public MarkerFilterRuleChain(IEnumerable<MarkerFilterRule<TMarker, TList>> rules)
         {
-            this.rules = new List<MarkerFilterRule<TElem, TList>>(rules);
+            this.rules = new List<MarkerFilterRule<TMarker, TList>>(rules);
         }
 
         #endregion Public Constructors
@@ -1040,7 +1040,7 @@ namespace DataTools.CSTools
         /// <summary>
         /// Gets or sets the rule chain that will be used to validate items.
         /// </summary>
-        public virtual List<MarkerFilterRule<TElem, TList>> RuleChain
+        public virtual List<MarkerFilterRule<TMarker, TList>> RuleChain
         {
             get => rules;
             set => rules = value;
@@ -1170,9 +1170,9 @@ namespace DataTools.CSTools
     /// <summary>
     /// Represents a rendered and reformatted source code file containing the preamble and only the specified item from the original code.
     /// </summary>
-    /// <typeparam name="TElem">The type of <see cref="IMarker"/> that will be used.</typeparam>
+    /// <typeparam name="TMarker">The type of <see cref="IMarker"/> that will be used.</typeparam>
     /// <typeparam name="TList">The type of list that will contain the markers.</typeparam>
-    public class AtomicGenerationInfo<TElem, TList> where TElem : IMarker, new() where TList : IList<TElem>, new()
+    public class AtomicGenerationInfo<TMarker, TList> where TMarker : IMarker, new() where TList : IList<TMarker>, new()
     {
         #region Public Properties
 
@@ -1201,9 +1201,9 @@ namespace DataTools.CSTools
     /// <summary>
     /// Base class for a strongly-typed, self-applying sort filter.
     /// </summary>
-    /// <typeparam name="TElem">The <see cref="IMarker"/> element type.</typeparam>
-    /// <typeparam name="TList">The <see cref="IMarkerList{TElem}"/> type.</typeparam>
-    public abstract class SortFilterRule<TElem, TList> : MarkerFilterRule<TElem, TList>, IComparer<TElem> where TElem: IMarker, new() where TList: IMarkerList<TElem>, new()
+    /// <typeparam name="TMarker">The <see cref="IMarker"/> element type.</typeparam>
+    /// <typeparam name="TList">The <see cref="IMarkerList{TMarker}"/> type.</typeparam>
+    public abstract class SortFilterRule<TMarker, TList> : MarkerFilterRule<TMarker, TList>, IComparer<TMarker> where TMarker: IMarker, new() where TList: IMarkerList<TMarker>, new()
     {
         #region Public Methods
 
@@ -1222,7 +1222,7 @@ namespace DataTools.CSTools
             return newItems;
         }
 
-        public abstract int Compare(TElem x, TElem y);
+        public abstract int Compare(TMarker x, TMarker y);
 
         #endregion Public Methods
     }

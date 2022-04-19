@@ -24,9 +24,9 @@ namespace DataTools.CSTools
     /// <summary>
     /// Code Parser Output File
     /// </summary>
-    /// <typeparam name="TElem">The type of <see cref="IMarker"/></typeparam>
-    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
-    public class OutputFile<TElem, TList> where TElem: IMarker, new() where TList : IMarkerList<TElem>, new()
+    /// <typeparam name="TMarker">The type of <see cref="IMarker"/></typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
+    public class OutputFile<TMarker, TList> where TMarker: IMarker, new() where TList : IMarkerList<TMarker>, new()
     {
         /// <summary>
         /// The text of the new file.
@@ -62,9 +62,9 @@ namespace DataTools.CSTools
         /// Create a new file from the given parameters.
         /// </summary>
         /// <typeparam name="TI">The type of <see cref="IMarker"/></typeparam>
-        /// <typeparam name="TL">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+        /// <typeparam name="TL">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
         /// <param name="path">The path of the new file.</param>
-        /// <param name="file">The <see cref="AtomicGenerationInfo{TElem, TList}"/> information.</param>
+        /// <param name="file">The <see cref="AtomicGenerationInfo{TMarker, TList}"/> information.</param>
         /// <param name="lines">The original file split into lines.</param>
         /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
         /// <param name="parser">The code parser instance.</param>
@@ -78,13 +78,13 @@ namespace DataTools.CSTools
         /// Create a new file from the given parameters.
         /// </summary>
         /// <typeparam name="TI">The type of <see cref="IMarker"/></typeparam>
-        /// <typeparam name="TL">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+        /// <typeparam name="TL">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
         /// <param name="path">The path of the new file.</param>
         /// <param name="mkind">Specifies the top-level marker kind (for determining the destination folder)</param>
         /// <param name="name">The name of the new file (without extension)</param>
         /// <param name="text">The contents of the new file</param>
         /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
-        /// <param name="cs">An optional reference <see cref="CSCodeParser{TElem, TList}"/> with configuration information.</param>
+        /// <param name="cs">An optional reference <see cref="CSCodeParser{TMarker, TList}"/> with configuration information.</param>
         /// <returns>A new output file.</returns>
         public static OutputFile<TI, TL> NewFile<TI, TL>(string path, MarkerKind mkind, string name, string text, bool sepDirs, CodeParserBase<TI, TL> cs = null) where TI : IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
         {
@@ -129,14 +129,14 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
-        /// Create a simple <see cref="OutputFile{TElem, TList}"/> instance with just the specified filename and text.
+        /// Create a simple <see cref="OutputFile{TMarker, TList}"/> instance with just the specified filename and text.
         /// </summary>
         /// <param name="filename">The filename.</param>
         /// <param name="text">The text.</param>
         /// <returns></returns>
-        public static OutputFile<TElem, TList> NewFile(string filename, string text)
+        public static OutputFile<TMarker, TList> NewFile(string filename, string text)
         {
-            return new OutputFile<TElem, TList>
+            return new OutputFile<TMarker, TList>
             {
                 Text = text,
                 Filename = filename
@@ -147,7 +147,7 @@ namespace DataTools.CSTools
         /// Format the specified markers into a text for saving to a new class file.
         /// </summary>
         /// <typeparam name="TI">The type of <see cref="IMarker"/></typeparam>
-        /// <typeparam name="TL">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
+        /// <typeparam name="TL">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
         /// <param name="markers">The markers to format.</param>
         /// <param name="lines">The lines of the source file.</param>
         /// <param name="preambleTo">The end position of the common preamble calculated from the source file.</param>
@@ -232,9 +232,9 @@ namespace DataTools.CSTools
     /// <summary>
     /// C# Code Parser Class
     /// </summary>
-    /// <typeparam name="TElem">The type of <see cref="IMarker"/></typeparam>
-    /// <typeparam name="TList">The type of <see cref="IMarkerList{TElem}"/>.</typeparam>
-    public class CSCodeParser<TElem, TList> : CodeParserBase<TElem, TList> where TElem : IMarker<TElem, TList>, new() where TList : IMarkerList<TElem>, new()
+    /// <typeparam name="TMarker">The type of <see cref="IMarker"/></typeparam>
+    /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
+    public class CSCodeParser<TMarker, TList> : CodeParserBase<TMarker, TList> where TMarker : IMarker<TMarker, TList>, new() where TList : IMarkerList<TMarker>, new()
     {
 
         /// <summary>
@@ -280,12 +280,12 @@ namespace DataTools.CSTools
         /// </summary>
         /// <param name="filename">The valid relative or absolute pathname to the source file.</param>
         /// <param name="lazy">True to load the file without parsing it.</param>
-        /// <returns>A new <see cref="CSCodeParser{TElem, TList}"/> or derived object.</returns>
+        /// <returns>A new <see cref="CSCodeParser{TMarker, TList}"/> or derived object.</returns>
         /// <exception cref="FileNotFoundException"></exception>
-        public static CSCodeParser<TElem, TList> LoadFromFile(string filename, bool lazy = false)
+        public static CSCodeParser<TMarker, TList> LoadFromFile(string filename, bool lazy = false)
         {
             if (!File.Exists(filename)) throw new FileNotFoundException(filename);
-            var res = new CSCodeParser<TElem, TList>();
+            var res = new CSCodeParser<TMarker, TList>();
             res.LoadFile(filename, lazy);
             return res;
         }
@@ -308,7 +308,7 @@ namespace DataTools.CSTools
                 {
                     markers = InternalParseCSCode(text.ToCharArray());
 
-                    var cf = new AtomicGenerationInfo<TElem, TList>()
+                    var cf = new AtomicGenerationInfo<TMarker, TList>()
                     {
                         PreambleBegin = 0,
                         PreambleEnd = preambleTo,
@@ -359,7 +359,7 @@ namespace DataTools.CSTools
         };
 
         /// <summary>
-        /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TElem)"/> (in literally no particular order.)
+        /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TMarker)"/> (in literally no particular order.)
         /// </summary>
         private static readonly string[] FilterType2 = new string[] { 
             "global", "ref", "sealed", "class", "interface", "record", "struct", 
@@ -425,10 +425,10 @@ namespace DataTools.CSTools
                 int i, j, c = chars.Length;
 
                 TList markers = new TList();
-                TElem currMarker = default;
+                TMarker currMarker = default;
                 string prevWord = "";
                 var strack = new Stack<MarkerKind>();
-                var stack = new Stack<TElem>();
+                var stack = new Stack<TMarker>();
                 var listStack = new Stack<TList>();
 
                 StringBuilder currWord = new StringBuilder();
@@ -574,7 +574,7 @@ namespace DataTools.CSTools
                             
                             if (testEnum != null && testEnum.Success)
                             {
-                                currMarker = new TElem
+                                currMarker = new TMarker
                                 {
                                     Namespace = currNS,
                                     StartPos = startPos,
@@ -591,7 +591,7 @@ namespace DataTools.CSTools
                             }
                             else
                             {
-                                currMarker = new TElem
+                                currMarker = new TMarker
                                 {
                                     Namespace = currNS,
                                     StartPos = startPos,
@@ -642,7 +642,7 @@ namespace DataTools.CSTools
                             
                             if (cons != null && cons.Success && !ops.Success)
                             {
-                                currMarker = new TElem
+                                currMarker = new TMarker
                                 {
                                     StartPos = startPos,
                                     Namespace = currNS,
@@ -665,7 +665,7 @@ namespace DataTools.CSTools
 
                                 if (cons != null && cons.Success)
                                 {
-                                    currMarker = new TElem
+                                    currMarker = new TMarker
                                     {
                                         Namespace = currNS,
                                         StartPos = startPos,
@@ -685,7 +685,7 @@ namespace DataTools.CSTools
                                 else
                                 {
 
-                                    currMarker = new TElem
+                                    currMarker = new TMarker
                                     {
                                         Namespace = currNS,
                                         StartPos = startPos,
@@ -752,7 +752,7 @@ namespace DataTools.CSTools
 
                             if (testEnum.Success)
                             {
-                                currMarker = new TElem
+                                currMarker = new TMarker
                                 {
                                     Namespace = currNS,
                                     StartPos = startPos,
@@ -813,7 +813,7 @@ namespace DataTools.CSTools
                         forScan.Remove(forScan.Length - 1, 1);
                         forScan.Append(' ');
                         clo = false;
-                        currMarker = new TElem()
+                        currMarker = new TMarker()
                         {
                             StartColumn = ColumnFromHere(chars, i),
                             StartLine = currLine,
@@ -867,7 +867,7 @@ namespace DataTools.CSTools
                         forScan.Append(' ');
 
                         clo = false;
-                        currMarker = new TElem()
+                        currMarker = new TMarker()
                         {
                             StartColumn = ColumnFromHere(chars, i),
                             StartLine = currLine,
@@ -959,7 +959,7 @@ namespace DataTools.CSTools
         /// <param name="marker">The destination marker.</param>
         /// <returns>True if successful.</returns>
         /// <exception cref="SyntaxErrorException"></exception>
-        private int TypeAndMethodParse(string lookback, TElem marker)
+        private int TypeAndMethodParse(string lookback, TMarker marker)
         {
             if (string.IsNullOrEmpty(lookback)) return 0;
 
@@ -1485,7 +1485,7 @@ namespace DataTools.CSTools
                         }
                         else if (markers[i].Children != null && markers[i + 1].Children != null)
                         {
-                            if (markers[i].Children is List<TElem> l)
+                            if (markers[i].Children is List<TMarker> l)
                             {
                                 l.AddRange(markers[i + 1].Children);
                             }
@@ -1513,7 +1513,7 @@ namespace DataTools.CSTools
 
                     //    if (i < c)
                     //    {
-                    //        var mknew = new TElem();
+                    //        var mknew = new TMarker();
 
                     //        mknew.StartPos = markers[x].StartPos;
                     //        mknew.StartLine = markers[x].StartLine;
@@ -1548,7 +1548,7 @@ namespace DataTools.CSTools
                     //        mknew.IsNew = markers[i].IsNew;
                     //        mknew.IsAsync = markers[i].IsAsync;
 
-                    //        if (markers is List<TElem> l)
+                    //        if (markers is List<TMarker> l)
                     //        {
                     //            l.RemoveRange(x, (i - x) + 1);
                     //        }

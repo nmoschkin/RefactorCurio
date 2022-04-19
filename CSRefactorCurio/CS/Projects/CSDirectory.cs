@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 namespace DataTools.CSTools
 {
     /// <summary>
-    /// CS Refactor Curio Solution Source Code File based on <see cref="CSCodeParser{TElem, TList}"/>.
+    /// CS Refactor Curio Solution Source Code File based on <see cref="CSCodeParser{TMarker, TList}"/>.
     /// </summary>
     public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
     {

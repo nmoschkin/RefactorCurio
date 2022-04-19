@@ -23,33 +23,33 @@ namespace DataTools.CSTools
     /// <summary>
     /// Base interface for strongly-typed marker lists.
     /// </summary>
-    /// <typeparam name="TElem">The <see cref="IMarker"/></typeparam>
-    public interface IMarkerList<TElem> : IMarkerList, IList<TElem> where TElem : IMarker
+    /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
+    public interface IMarkerList<TMarker> : IMarkerList, IList<TMarker> where TMarker : IMarker
     {
     }
 
     /// <summary>
     /// Base interface for strongly-typed, observable marker lists.
     /// </summary>
-    /// <typeparam name="TElem">The <see cref="IMarker"/></typeparam>
-    public interface IObservarbleMarkerList<TElem> : IMarkerList<TElem>, INotifyCollectionChanged, INotifyPropertyChanged where TElem : IMarker
+    /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
+    public interface IObservarbleMarkerList<TMarker> : IMarkerList<TMarker>, INotifyCollectionChanged, INotifyPropertyChanged where TMarker : IMarker
     {
     }
 
     /// <summary>
     /// Marker list, standard implementation.
     /// </summary>
-    /// <typeparam name="TElem">The <see cref="IMarker"/></typeparam>
-    public class MarkerList<TElem> : Collection<TElem>, IMarkerList<TElem> where TElem : IMarker
+    /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
+    public class MarkerList<TMarker> : Collection<TMarker>, IMarkerList<TMarker> where TMarker : IMarker
     {
-        protected List<TElem> List { get; }
+        protected List<TMarker> List { get; }
 
         public MarkerList()
         {
-            List = base.Items as List<TElem>;
+            List = base.Items as List<TMarker>;
         }
 
-        public MarkerList(IEnumerable<TElem> items) : this()
+        public MarkerList(IEnumerable<TMarker> items) : this()
         {
             foreach (var item in items)
             {
@@ -61,8 +61,8 @@ namespace DataTools.CSTools
     /// <summary>
     /// Observable marker list, standard implementation.
     /// </summary>
-    /// <typeparam name="TElem">The <see cref="IMarker"/></typeparam>
-    public class ObservableMarkerList<TElem> : MarkerList<TElem>, IObservarbleMarkerList<TElem> where TElem : IMarker
+    /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
+    public class ObservableMarkerList<TMarker> : MarkerList<TMarker>, IObservarbleMarkerList<TMarker> where TMarker : IMarker
     {
         /// <summary>
         /// Gets or sets a value indicating that <see cref="INotifyCollectionChanged"/> events will not be fired.
@@ -125,7 +125,7 @@ namespace DataTools.CSTools
         {
         }
 
-        public ObservableMarkerList(IEnumerable<TElem> items) : base(items)
+        public ObservableMarkerList(IEnumerable<TMarker> items) : base(items)
         {
         }        
 
@@ -152,7 +152,7 @@ namespace DataTools.CSTools
 
         }
 
-        protected override void InsertItem(int index, TElem item)
+        protected override void InsertItem(int index, TMarker item)
         {
             lock (SyncRoot)
             {
@@ -162,9 +162,9 @@ namespace DataTools.CSTools
 
         }
 
-        protected override void SetItem(int index, TElem item)
+        protected override void SetItem(int index, TMarker item)
         {
-            TElem oldItem;
+            TMarker oldItem;
 
             lock (SyncRoot)
             {
@@ -192,7 +192,7 @@ namespace DataTools.CSTools
 
         protected override void RemoveItem(int index)
         {
-            TElem oldItem;
+            TMarker oldItem;
 
             lock (SyncRoot)
             {

@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace DataTools.CSTools
 {
-    public abstract class CodeParserBase<TElem, TList> 
-        where TElem : IMarker<TElem, TList>, new() 
-        where TList : IMarkerList<TElem>, new()
+    public abstract class CodeParserBase<TMarker, TList> 
+        where TMarker : IMarker<TMarker, TList>, new() 
+        where TList : IMarkerList<TMarker>, new()
     {
 
 
@@ -18,7 +18,7 @@ namespace DataTools.CSTools
         protected int preambleTo = 0;
 
         protected TList markers = new TList();
-        protected AtomicGenerationInfo<TElem, TList> mfile = null;
+        protected AtomicGenerationInfo<TMarker, TList> mfile = null;
 
         protected List<string> lastErrors = new List<string>();
 
@@ -190,8 +190,8 @@ namespace DataTools.CSTools
                     return x;
                 });
 
-                if (((IList<TElem>)mlist).Count == 0) continue;
-                if (seen is List<TElem> l)
+                if (((IList<TMarker>)mlist).Count == 0) continue;
+                if (seen is List<TMarker> l)
                 {
                     l.AddRange(mlist);
                 }
@@ -203,7 +203,7 @@ namespace DataTools.CSTools
                     }
                 }
 
-                var mf = new AtomicGenerationInfo<TElem, TList>()
+                var mf = new AtomicGenerationInfo<TMarker, TList>()
                 {
                     Lines = mfile.Lines,
                     Markers = mlist,
@@ -211,7 +211,7 @@ namespace DataTools.CSTools
                     PreambleEnd = mfile.PreambleEnd
                 };
 
-                var file = OutputFile<TElem, TList>.NewFile(path, mf, lines, SeparateDirs, this);
+                var file = OutputFile<TMarker, TList>.NewFile(path, mf, lines, SeparateDirs, this);
                 file.Write();
             }
 
@@ -246,11 +246,11 @@ namespace DataTools.CSTools
         protected abstract bool Parse(string text);
 
         /// <summary>
-        /// Set the parent <see cref="AtomicGenerationInfo{TElem, TList}"/> object to the specified marker and its descendents.
+        /// Set the parent <see cref="AtomicGenerationInfo{TMarker, TList}"/> object to the specified marker and its descendents.
         /// </summary>
         /// <param name="marker">The marker to modify.</param>
         /// <param name="file">The parent file object.</param>
-        protected void SetAtomicFile(TElem marker, AtomicGenerationInfo<TElem, TList> file)
+        protected void SetAtomicFile(TMarker marker, AtomicGenerationInfo<TMarker, TList> file)
         {
             marker.AtomicSourceFile = file;
 
