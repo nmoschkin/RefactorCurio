@@ -361,7 +361,7 @@
                 <ContextMenu>
                     <ContextMenu.Resources />
 
-                    <MenuItem>
+                    <MenuItem Command="{Binding ClickBuild}">
                         <MenuItem.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>

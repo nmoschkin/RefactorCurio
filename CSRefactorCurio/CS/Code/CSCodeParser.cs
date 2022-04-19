@@ -742,18 +742,18 @@ namespace DataTools.CSTools
                     else if (chars[i] == '[' && !clo)
                     {
                         prevWord = "";
-                        forScan.Remove(forScan.Length - 1, 1);
 
                         var sl = currLine;
                         var lookahead = TextTools.TextBetween(chars, i, ref currLine, '[', ']', out int? spt, out int? ept, withDelimiters: true);
                         
                         if (lookahead == null) continue;
                         
-                        if (!Regex.IsMatch(lookahead, @"\[\s*[\w\d._@]+\s*\(?.*?\)?\]"))
+                        if (!Regex.IsMatch(lookahead, @"\[\s*\w|_|@[\w\d._@]+\s*\(?.*?\)?\]"))
                         {
-                            i = (int)ept;
                             continue;
                         }
+
+                        forScan.Remove(forScan.Length - 1, 1);
 
                         if (attrs == null) attrs = new List<string>();
                         var spa = TextTools.Split(lookahead.Substring(1, lookahead.Length - 2), ",");
@@ -1248,6 +1248,28 @@ namespace DataTools.CSTools
                         }
                         lww = false;
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
+                }
+                else if (ch == '[')
+                {
+                    try
+                    {
+                        var t = TextTools.TextBetween(w, i, ref l, '[', ']', out int? ax, out int? bx, withDelimiters: true);
+                        if (t != null && bx != null)
+                        {
+                            i = (int)bx;
+                            tsb.Append(t);
+                            fl = true;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                        lww = false;
+                    }
                     catch (Exception ex) 
                     {
                         Console.WriteLine(ex.ToString());
@@ -1468,7 +1490,14 @@ namespace DataTools.CSTools
                     {
                         if (marker.Kind == MarkerKind.Code)
                         {
-                            marker.Kind = MarkerKind.Field;
+                            if (!hasParams)
+                            {
+                                marker.Kind = MarkerKind.Field;
+                            }
+                            else
+                            {
+                                marker.Kind = MarkerKind.Method;
+                            }
                             if (eii) marker.Kind |= MarkerKind.ExplicitImplementation;
                             return retVal;
                         }
@@ -1574,7 +1603,7 @@ namespace DataTools.CSTools
                 if (x != -1)
                 {
                     var sp = str.Substring(x);
-                    marker.WhereClause = sp;
+                    marker.WhereClause = " " + sp;
                 }
                 
                 if (ihits.Count > 0)

@@ -13,13 +13,13 @@ namespace Experiments
     {
         static void Main(string[] args)
         {
-            var path = @"C:\Users\theim\Desktop\Projects\Personal Projects\Repos\RefactorCurio\CSRefactorCurio\DataTools\MemPtr.cs";
+            var path = @"C:\Users\theim\Desktop\Projects\Personal Projects\Repos\DataTools\DataTools.Win32.Disk\Disk\Partition\Interfaces\IDiskLayout.cs";
 
 
             var data = File.ReadAllText(path);
 
 
-            var file = CSCodeFile.LoadFromFile(path);
+            var file = CSCodeFile.LoadFromFile(path, false);
 
 
 

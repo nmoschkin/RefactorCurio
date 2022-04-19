@@ -31,8 +31,10 @@ namespace CSRefactorCurio.ViewModels
 
         private IOwnedCommand clickNamespace;
         private IOwnedCommand clickClasses;
+        private IOwnedCommand clickBuild;
         public IOwnedCommand ClickNamespace => clickNamespace;
         public IOwnedCommand ClickClasses => clickClasses;
+        public IOwnedCommand ClickBuild => clickBuild;
 
         public ObservableCollection<IProjectElement> CurrentItems => classMode ? projects : namespaces;
 
@@ -49,10 +51,11 @@ namespace CSRefactorCurio.ViewModels
             {
                 ClassMode = true;
             }, nameof(ClickClasses));
-
+            clickBuild = new OwnedCommand(this, (o) =>
+            {
+                _sln?.SolutionBuild?.Build();
+            }, nameof(ClickBuild));
         }
-        
-
 
         public bool LoadingFlag { get; set; } = false;
 
