@@ -12,7 +12,6 @@
     d:DesignHeight="400"
     d:DesignWidth="600"
     toolkit:Themes.UseVsTheme="True"
-    Background="Transparent"
     mc:Ignorable="d"
     >
     <Grid>
@@ -28,7 +27,49 @@
                 Content="{glob:Translate AddColon=True,
                                          ResourceKey=REPORT_CHOOSE_RESULT_TYPE}"
                 />
-
+            <ComboBox
+                Width="150"
+                Margin="2"
+                ItemsSource="{Binding Reports, Mode=OneWay}"
+                SelectedItem="{Binding SelectedReport, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                />
         </ToolBar>
+
+        <DataGrid
+            Grid.Row="1"
+            AutoGenerateColumns="False"
+            Background="Transparent"
+            ItemsSource="{Binding SelectedReport.Reports}"
+            >
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Binding="{Binding Element.FullyQualifiedName}"
+                    Header="{glob:Translate ResourceKey=OBJECT}"
+                    IsReadOnly="True"
+                    />
+                <DataGridTextColumn
+                    Binding="{Binding AssociatedList.Count}"
+                    Header="{glob:Translate ResourceKey=COUNT}"
+                    IsReadOnly="True"
+                    />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Row="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.Column="3"
+                Margin="8"
+                Command="{Binding RunReportCommand}"
+                Content="{glob:Translate ResourceKey=RUN_SELECTED_REPORT}"
+                />
+        </Grid>
     </Grid>
 </platform:DialogWindow>

@@ -207,12 +207,13 @@ namespace DataTools.CSTools
         string Name { get; set; }
 
         /// <summary>
+        /// The original parent element (should be a weak reference)
+        /// </summary>
+        IMarker ParentElement { get; set; }
+
+        /// <summary>
         /// The name of the parent element.
         /// </summary>
-        /// <remarks>
-        /// The actual parent object can change hands many times in the course of sorting and filtering.
-        /// We just want to remember the name of a class, interface, struct, record, or enum.
-        /// </remarks>
         string ParentElementPath { get; set; }
 
         /// <summary>
@@ -429,7 +430,7 @@ namespace DataTools.CSTools
 
         protected WeakReference<IProjectNode> homeFile;
         protected WeakReference<AtomicGenerationInfo<TMarker, TList>> atomicFile;
-
+        protected WeakReference<IMarker> parentElement;
         protected MarkerKind kind;
 
         protected TList markers = new TList();
@@ -437,7 +438,7 @@ namespace DataTools.CSTools
         protected string name;
         protected string scanHit;
         protected List<string> unknownWords;
-        protected string parentElement;
+        protected string parentElementString;
 
         #endregion Protected Fields
 
@@ -652,10 +653,27 @@ namespace DataTools.CSTools
 
         public virtual string Namespace { get; set; }
 
+        public virtual IMarker ParentElement
+        {
+            get
+            {
+                if (parentElement == null || !parentElement.TryGetTarget(out var target))
+                {
+                    return null;
+                }
+
+                return target;
+            }
+            set
+            {
+                parentElement = new WeakReference<IMarker>(value);
+            }
+        }
+
         public virtual string ParentElementPath
         {
-            get => parentElement;
-            set => parentElement = value;
+            get => parentElementString;
+            set => parentElementString = value;
         }
 
         public virtual string ScanHit
@@ -826,6 +844,9 @@ namespace DataTools.CSTools
         {
             return Clone();
         }
+
+        public abstract TMarker FindParent(MarkerKind parentKind);
+
         public override string ToString()
         {
             return $"{Kind} {Name}{Generics}, Line: {StartLine} to {EndLine}";

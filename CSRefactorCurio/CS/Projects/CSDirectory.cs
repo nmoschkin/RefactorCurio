@@ -36,6 +36,8 @@ namespace DataTools.CSTools
 
         private string title;
 
+        private WeakReference<CurioProject> project;
+
         #endregion Private Fields
 
         #region Public Constructors
@@ -43,8 +45,9 @@ namespace DataTools.CSTools
         /// <summary>
         /// Instantiate a blank, unloaded code file reader.
         /// </summary>
-        public CSCodeFile()
+        public CSCodeFile(CurioProject project)
         {
+            Project = project;
             markers.CollectionChanged += OnChildrenChanged;
         }
 
@@ -126,6 +129,24 @@ namespace DataTools.CSTools
 
             }
         }
+
+        public CurioProject Project
+        {
+            get
+            {
+                if (project == null || !project.TryGetTarget(out var proj))
+                {
+                    return null;
+                }
+                return proj;
+            }
+            protected set
+            {
+                project = new WeakReference<CurioProject>(value);
+            }
+        }
+
+
         public string Title
         {
             get => title;
@@ -143,9 +164,9 @@ namespace DataTools.CSTools
 
         #region Public Methods
 
-        new public static CSCodeFile LoadFromFile(string path, bool lazy)
+        new public static CSCodeFile LoadFromFile(string path, CurioProject project, bool lazy)
         {
-            var cf = new CSCodeFile();
+            var cf = new CSCodeFile(project);
             cf.LoadFile(path, lazy);
             return cf;
         }
@@ -518,7 +539,7 @@ namespace DataTools.CSTools
 
                 if (create)
                 {
-                    var csnew = CSCodeFile.LoadFromFile(filename, true);
+                    var csnew = CSCodeFile.LoadFromFile(filename, Project, true);
 
                     files.Add(csnew);
                     children.Add(csnew);
@@ -662,7 +683,7 @@ namespace DataTools.CSTools
 
                 try
                 {
-                    var parser = CSCodeFile.LoadFromFile(f, true);
+                    var parser = CSCodeFile.LoadFromFile(f, Project, true);
                     outfiles.Add(parser);
                 }
                 catch (Exception ex)
@@ -839,6 +860,23 @@ namespace DataTools.CSTools
     /// </summary>
     public class CSMarker : MarkerBase<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>
     {
+        #region Public Methods
+
+        public override CSMarker FindParent(MarkerKind parentKind)
+        {
+            var p = this.ParentElement as CSMarker;
+
+            while (p != null)
+            {
+                if (p.Kind == parentKind) return p;
+                p = p.ParentElement as CSMarker;
+            }
+
+            return null;
+        }
+
+        #endregion Public Methods
+
         #region Public Events
 
         public event PropertyChangedEventHandler PropertyChanged;

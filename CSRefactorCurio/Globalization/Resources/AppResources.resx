@@ -237,6 +237,9 @@
   <data name="RELOAD" xml:space="preserve">
     <value>Reload</value>
   </data>
+  <data name="REPORTS" xml:space="preserve">
+    <value>Reports</value>
+  </data>
   <data name="REPORT_CHOOSE_RESULT_TYPE" xml:space="preserve">
     <value>Choose Result Type</value>
   </data>
@@ -257,6 +260,9 @@
   </data>
   <data name="RETRY" xml:space="preserve">
     <value>Retry</value>
+  </data>
+  <data name="RUN_SELECTED_REPORT" xml:space="preserve">
+    <value>Run Selected Report</value>
   </data>
   <data name="SCAN" xml:space="preserve">
     <value>Scan</value>

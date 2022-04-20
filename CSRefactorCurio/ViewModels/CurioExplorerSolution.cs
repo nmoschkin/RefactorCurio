@@ -1,4 +1,5 @@
 ﻿
+using CSRefactorCurio.Dialogs;
 using CSRefactorCurio.Reporting;
 
 using DataTools.CSTools;
@@ -20,7 +21,7 @@ using System.Windows.Input;
 
 namespace CSRefactorCurio.ViewModels
 {
-    internal class CurioExplorerSolution : ObservableBase, ICommandOwner
+    internal class CurioExplorerSolution : ObservableBase, ICommandOwner, ISolution
     {
         private EnvDTE.Solution _sln;
         private Cursor cursor = Cursors.Arrow;
@@ -35,9 +36,11 @@ namespace CSRefactorCurio.ViewModels
         private IOwnedCommand clickNamespace;
         private IOwnedCommand clickClasses;
         private IOwnedCommand clickBuild;
+        private IOwnedCommand reportCommand;
         public IOwnedCommand ClickNamespace => clickNamespace;
         public IOwnedCommand ClickClasses => clickClasses;
         public IOwnedCommand ClickBuild => clickBuild;
+        public IOwnedCommand ReportCommand => reportCommand;
 
         public ObservableCollection<IProjectElement> CurrentItems => classMode ? projects : namespaces;
         private Dictionary<string, List<INamespace>> allFQN;
@@ -59,6 +62,12 @@ namespace CSRefactorCurio.ViewModels
             {
                 _sln?.SolutionBuild?.Build();
             }, nameof(ClickBuild));
+
+            reportCommand = new OwnedCommand(this, (o) =>
+            {
+                var dlg = new Report(this);
+                dlg.Show();
+            }, nameof(ReportCommand));
         }
 
         public bool LoadingFlag { get; set; } = false;
@@ -209,6 +218,108 @@ namespace CSRefactorCurio.ViewModels
         }
 
 
+        public EnvDTE.ProjectItem FindProjectItem(IProjectElement elem)
+        {
+            if (elem is CSMarker marker)
+            {
+
+                var hf = marker.HomeFile as CSCodeFile;
+
+                if (hf != null)
+                {
+                    var np = hf.Project.NativeProject;
+                    var fp = hf.Filename.Replace(hf.Project.ProjectRootPath + "\\", "");
+                    
+                    foreach (EnvDTE.ProjectItem item in np.ProjectItems)
+                    {
+                        var test = FindProjectItem(fp, item);
+                        if (test != null) return test;
+                    }
+
+                    
+                }
+
+            }
+
+            return null;
+
+        }
+
+        private EnvDTE.ProjectItem FindProjectItem(string path, EnvDTE.ProjectItem itemSearch, string currPath = null)
+        {
+            string nn;
+
+            if (currPath != null)
+            {
+                nn = currPath + "\\" + itemSearch.Name;
+            }
+            else
+            {
+                nn = itemSearch.Name;
+            }
+
+            if (nn == path) return itemSearch;
+
+            if (itemSearch.ProjectItems.Count > 0)
+            {
+                foreach (EnvDTE.ProjectItem item in itemSearch.ProjectItems)
+                {
+                    if (item == itemSearch) continue;
+                    var test = FindProjectItem(path, item, nn);
+                    if (test != null) return test;
+                }
+            }
+
+            return null;
+        }
+
+        public EnvDTE.ProjectItem FindProjectItem(string path)
+        {
+            var elem = FindByPath(path);
+            if (elem != null)
+            {
+                return FindProjectItem(elem);
+            }
+
+            return null;
+        }
+
+        public IProjectElement FindByPath(string path)
+        {
+
+            foreach (IProjectNode project in Projects)
+            {
+                var s = FindByPath(path, project);
+                if (s != null) return s;
+            }
+
+            return null;
+        }
+
+        private IProjectElement FindByPath(string path, IProjectNode node)
+        {
+            if (node is CSSolutionFolder sf)
+            {
+                foreach (var obj in sf.Children)
+                {
+                    if (obj is IProjectNode projectNode)
+                    {
+                        var s = FindByPath(path, projectNode);
+                        if (s != null) return s;
+
+                    }
+                }
+            }
+            else if (node is CurioProject proj)
+            {
+                var s = proj.RootFolder.Find(path);
+                if (s != null) return s;
+            }
+
+            return null;
+        }
+
+
         public ObservableCollection<IProjectElement> Projects
         {
             get => projects;
@@ -218,6 +329,8 @@ namespace CSRefactorCurio.ViewModels
         {
             get => namespaces;
         }
+        IList<IProjectElement> ISolution.Projects => projects;
+        IList<IProjectElement> ISolution.Namespaces => namespaces;
 
         public bool RequestCanExecute(string commandId)
         {

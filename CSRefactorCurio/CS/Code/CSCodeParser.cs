@@ -323,7 +323,7 @@ namespace DataTools.CSTools
 
                     }
 
-                    //SetParent(markers, default);
+                    SetParent(markers, default);
 
                     ParseSuccess = true;
                     IsLazyLoad = false;
@@ -344,7 +344,7 @@ namespace DataTools.CSTools
 
             string pp = parentPath ?? "";
 
-            if (parent != null && !string.IsNullOrEmpty(parent.Name))
+            if (parent != null && !string.IsNullOrEmpty(parent.Name) && parent.Kind != MarkerKind.Namespace)
             {
                 if (!string.IsNullOrEmpty(pp)) pp = pp + "." + parent.Name;
                 else pp = parent.Name;
@@ -353,6 +353,7 @@ namespace DataTools.CSTools
             foreach (var marker in markers)
             {
                 marker.ParentElementPath = pp;
+                marker.ParentElement = parent;
 
                 if (marker.Children != null && marker.Children.Count > 0)
                 {
@@ -381,7 +382,7 @@ namespace DataTools.CSTools
             "Guid", "DateTime", 
             "string", "char", 
             "void", "var", "dynamic", "object", 
-            "Enum", "Tuple", "bool", "true", "false"
+            "Enum", "Tuple", "bool", "true", "false", "IntPtr", "UIntPtr"
         };
 
         /// <summary>
@@ -494,7 +495,7 @@ namespace DataTools.CSTools
                     
                     if (chars[i] == '\r' || chars[i] == '\n')
                     {
-                        forScan.Append(" ");
+                        forScan.Append(chars[i]);
                     }
                     else
                     {
@@ -589,7 +590,11 @@ namespace DataTools.CSTools
 
                         if ((currPatt == MarkerKind.Enum) || ((currPatt & MarkerKind.IsBlockLevel) != MarkerKind.IsBlockLevel))
                         {
-                            var lookback = TextTools.OneSpace(forScan.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
+                            var fs = forScan.ToString();
+                            startLine += CountLines(fs);
+                            fs = fs.Replace("\r", "").Replace("\n", "");
+                            var lookback = TextTools.OneSpace(fs).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
+
                             Match testEnum = null;
                             
                             if (currPatt == MarkerKind.Enum)
@@ -664,7 +669,11 @@ namespace DataTools.CSTools
 
                         if ((currPatt == MarkerKind.Event) || currPatt == MarkerKind.Property || ((currPatt & MarkerKind.IsBlockLevel) != MarkerKind.IsBlockLevel))
                         {
-                            var lookback = TextTools.OneSpace(forScan.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
+                            var fs = forScan.ToString();
+                            startLine += CountLines(fs);
+                            fs = fs.Replace("\r", "").Replace("\n", "");
+
+                            var lookback = TextTools.OneSpace(fs).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
                             Match cons = currCons?.Match(lookback) ?? null;
                             Match ops = patterns[MarkerKind.Operator].Match(lookback);
                             
@@ -1632,6 +1641,19 @@ namespace DataTools.CSTools
 
             return AccessModifiers.None;
 
+        }
+
+        private int CountLines(string text)
+        {
+            int count = 0;
+            foreach(var ch in text)
+            {
+                if (ch == '\n') count++;
+                else if (ch == '\r') continue;
+                else if (!char.IsWhiteSpace(ch)) return count;
+            }
+
+            return count;
         }
 
         /// <summary>

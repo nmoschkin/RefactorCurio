@@ -1,12 +1,20 @@
-﻿using Microsoft.VisualStudio.PlatformUI;
+﻿using CSRefactorCurio.ViewModels;
+
+using DataTools.CSTools;
+
+using Microsoft.VisualStudio.PlatformUI;
 
 namespace CSRefactorCurio.Dialogs
 {
     public partial class Report : DialogWindow
     {
-        public Report()
+        ReportViewModel vm;
+        public Report(ISolution solution)
         {
             InitializeComponent();
+            DataContext = vm = new ReportViewModel(solution);
         }
+
     }
+
 }

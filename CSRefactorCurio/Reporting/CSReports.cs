@@ -1,12 +1,15 @@
-﻿using CSRefactorCurio.ViewModels;
+﻿using CSRefactorCurio.Globalization.Resources;
+using CSRefactorCurio.ViewModels;
 
 using DataTools.CSTools;
+using DataTools.SortedLists;
 
 using Microsoft.Build.Framework.XamlTypes;
 using Microsoft.VisualStudio.OLE.Interop;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -145,7 +148,7 @@ namespace CSRefactorCurio.Reporting
                     }
                 }
             }
-
+            
             var lt = new List<(CSMarker, CSMarker)>();
 
             foreach(var s in combos)
@@ -187,17 +190,16 @@ namespace CSRefactorCurio.Reporting
                 {
                     switch (mkt.Kind)
                     {
-                        case MarkerKind.Class:
-                        case MarkerKind.Interface:
-                        case MarkerKind.Struct:
-                        case MarkerKind.Enum:
-                        case MarkerKind.Record:
-                        case MarkerKind.Event:
-                        case MarkerKind.Delegate:
-                            break;
+                        case MarkerKind.Operator:
+                        case MarkerKind.Using:
+                        case MarkerKind.Namespace:
+                        case MarkerKind.XMLDoc:
+                        case MarkerKind.BlockComment:
+                        case MarkerKind.LineComment:                        
+                            continue;
 
                         default:
-                            continue;
+                            break;
                     }
                 }
 
@@ -229,29 +231,127 @@ namespace CSRefactorCurio.Reporting
 
     public class HeaviestReferencesReport : CSReportBase
     {
-        public override string ReportName { get; }
-        public override string AssociatedReason { get; }
-        public override IList<IReportNode<CSMarker>> Reports { get; }
-        public override int ReportId { get; }
+        IList<IReportNode<INamespace>> reports;
 
-        public override void CompileReport(IList<IProjectElement> context)
+        [Browsable(true)]
+        public override string ReportName { get; } = AppResources.REPORT_MOST_REFERENCED_OBJECTS;
+
+        [Browsable(true)]
+        public override string AssociatedReason { get; }
+
+        [Browsable(true)]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public override IList<IReportNode<INamespace>> Reports => reports;
+
+        [Browsable(true)]
+        public override int ReportId { get; } = 1;
+
+        [Browsable(true)]
+        public override int Count => reports?.Count ?? 0;
+
+        public HeaviestReferencesReport(ISolution solution, string associated) : base(solution)
         {
-            foreach (var item in context)
+            AssociatedReason = associated;
+        }
+        public HeaviestReferencesReport(ISolution solution) : this(solution, "DEFAULT")
+        {
+        }
+
+        public override void CompileReport(IList<INamespace> context)
+        {
+            var allFQN = ReportHelper.AllFullyQualifiedNames(context);
+
+            var allref = ReportHelper.GetReferences(Solution.Projects, allFQN);
+
+            allref.Sort((a, b) =>
             {
-                if (item is CSMarker marker)
+                var c = string.Compare(a.Item2.FullyQualifiedName, b.Item2.FullyQualifiedName);
+                if (c == 0)
                 {
+                    c = string.Compare(a.Item2.Generics, b.Item2.Generics);
+
+                    if (c == 0)
+                    {
+                        c = string.Compare(a.Item1.FullyQualifiedName, b.Item1.FullyQualifiedName);
+
+                        if (c == 0)
+                        {
+                            c = string.Compare(a.Item2.Generics, b.Item2.Generics);
+                        }
+
+                    }
 
                 }
-                else if (item is INamespace ns)
-                {
 
+                if (c == 0)
+                {
+                    if (a != b)
+                    {
+                        return -1;
+                    }
+                }
+
+                return c;
+            });
+
+            var rpts = new List<IReportNode<INamespace>>();
+
+            CSMarker curr = null;
+
+            List<CSMarker> markers = new List<CSMarker>();
+
+            foreach (var item in allref)
+            {
+                if (curr != item.Item2)
+                {
+                    if (markers.Count > 0)
+                    {
+                        var rpt = new CSReportNode()
+                        {
+                            AssociatedList = markers.ToArray(),
+                            Element = curr
+                        };
+
+                        rpts.Add(rpt);
+                        markers = new List<CSMarker>();
+                    }
+                    
+                    curr = item.Item2;
+                }
+
+                if (!markers.Contains(item.Item1)) markers.Add(item.Item1);
+            }
+
+            if (curr != null)
+            {
+                if (markers.Count > 0)
+                {
+                    var rpt = new CSReportNode()
+                    {
+                        AssociatedList = markers.ToArray(),
+                        Element = curr
+                    };
+
+                    rpts.Add(rpt);
+                    markers = new List<CSMarker>();
                 }
             }
+
+            reports = rpts;
+            Sort();
+
+            OnPropertyChanged(nameof(Reports));
+            OnPropertyChanged(nameof(Count));
         }
 
         public override void Sort()
         {
-            throw new NotImplementedException();
+            QuickSort.Sort(reports, (a, b) =>
+            {
+                if (a.AssociatedList.Count > b.AssociatedList.Count) return -1;
+                if (a.AssociatedList.Count < b.AssociatedList.Count) return 1;
+                return 0;
+            });
         }
     }
 

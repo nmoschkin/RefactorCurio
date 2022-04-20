@@ -1,5 +1,5 @@
 ﻿using DataTools.CSTools;
-
+using static DataTools.Text.TextTools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +13,7 @@ namespace Experiments
     {
         static void Main(string[] args)
         {
-            var path = @"C:\Users\theim\Desktop\Projects\Personal Projects\Repos\DataTools\DataTools.Win32.Disk\Disk\Partition\Interfaces\IDiskLayout.cs";
+            var path = @"C:\Users\theim\Desktop\Projects\Personal Projects\Repos\RefactorCurio\Experiments\Program.cs";
 
 
             var data = File.ReadAllText(path);

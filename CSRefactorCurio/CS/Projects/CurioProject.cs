@@ -114,6 +114,13 @@ namespace DataTools.CSTools
         #endregion Public Properties
     }
 
+    public interface ISolution
+    {
+        IList<IProjectElement> Namespaces { get; }
+
+        IList<IProjectElement> Projects { get; }
+    }
+
     /// <summary>
     /// Represents a project element with child elements.
     /// </summary>

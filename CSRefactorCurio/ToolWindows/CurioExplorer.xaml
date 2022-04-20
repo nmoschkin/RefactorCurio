@@ -60,6 +60,8 @@
             Grid.Row="1"
             Background="Transparent"
             ItemsSource="{Binding CurrentItems}"
+            MouseDoubleClick="ProjTree_MouseDoubleClick"
+            SelectedItemChanged="ProjTree_SelectedItemChanged"
             >
 
             <TreeView.Resources>
@@ -358,7 +360,7 @@
 
             </TreeView.Resources>
             <TreeView.ContextMenu>
-                <ContextMenu>
+                <ContextMenu Background="Transparent">
                     <ContextMenu.Resources />
 
                     <MenuItem Command="{Binding ClickBuild}">
@@ -386,7 +388,10 @@
 
                         </MenuItem.Header>
                     </MenuItem>
-
+                    <MenuItem
+                        Command="{Binding ReportCommand}"
+                        Header="{glob:Translate ResourceKey=REPORTS}"
+                        />
 
                 </ContextMenu>
             </TreeView.ContextMenu>

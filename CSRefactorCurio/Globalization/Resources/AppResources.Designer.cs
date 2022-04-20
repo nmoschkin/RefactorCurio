@@ -457,6 +457,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reports.
+        /// </summary>
+        internal static string REPORTS {
+            get {
+                return ResourceManager.GetString("REPORTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rescan.
         /// </summary>
         internal static string RESCAN {
@@ -480,6 +489,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string RETRY {
             get {
                 return ResourceManager.GetString("RETRY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run Selected Report.
+        /// </summary>
+        internal static string RUN_SELECTED_REPORT {
+            get {
+                return ResourceManager.GetString("RUN_SELECTED_REPORT", resourceCulture);
             }
         }
         
