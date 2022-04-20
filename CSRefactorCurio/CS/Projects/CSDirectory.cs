@@ -5,6 +5,8 @@ using DataTools.MathTools;
 using DataTools.Observable;
 using DataTools.SortedLists;
 
+using Microsoft.Build.Framework.XamlTypes;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -859,8 +861,44 @@ namespace DataTools.CSTools
 
         }
 
-        #endregion Public Properties
+        public string[] ExtractAllUsings()
+        {
 
+            List<string> usings = new List<string>();
+
+            if (kind == MarkerKind.Using)
+            {
+                usings.Add(Name);
+            }
+
+            foreach(var c in Children)
+            {
+                usings.AddRange(c.ExtractAllUsings());
+            }
+
+            return usings.ToArray();
+        }
+
+
+        public string[] ExtractAllGlobalUsings()
+        {
+
+            List<string> usings = new List<string>();
+
+            if (kind == MarkerKind.Using && AccessModifiers == AccessModifiers.Global)
+            {
+                usings.Add(Name);
+            }
+
+            foreach (var c in Children)
+            {
+                usings.AddRange(c.ExtractAllUsings());
+            }
+
+            return usings.ToArray();
+        }
+
+        #endregion Public Properties
 
         #region Protected Methods
 

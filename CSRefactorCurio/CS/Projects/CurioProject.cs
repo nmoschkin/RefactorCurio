@@ -243,7 +243,7 @@ namespace DataTools.CSTools
         {
             _project = nativeProject;
             PopulateProjectProperties();
-
+            
             if (filename == null || !File.Exists(filename)) throw new FileNotFoundException();
 
             ProjectRootPath = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "");

@@ -339,14 +339,24 @@ namespace DataTools.CSTools
             
         }
         
-        private void SetParent(TList markers, TMarker parent)
+        private void SetParent(TList markers, TMarker parent, string parentPath = null)
         {
+
+            string pp = parentPath ?? "";
+
+            if (parent != null && !string.IsNullOrEmpty(parent.Name))
+            {
+                if (!string.IsNullOrEmpty(pp)) pp = pp + "." + parent.Name;
+                else pp = parent.Name;
+            }
+
             foreach (var marker in markers)
             {
-                marker.ParentElementName = parent?.Name ?? "";
+                marker.ParentElementPath = pp;
+
                 if (marker.Children != null && marker.Children.Count > 0)
                 {
-                    SetParent(marker.Children, marker);
+                    SetParent(marker.Children, marker, pp);
                 }
             }
         }
@@ -596,7 +606,7 @@ namespace DataTools.CSTools
                                     StartPos = startPos,
                                     StartLine = startLine,
                                     StartColumn = ColumnFromHere(chars, startPos),
-                                    ParentElementName = currName,
+                                    ParentElementPath = currName,
                                     EndPos = i - 1,
                                     EndLine = currLine,
                                     EndColumn = ColumnFromHere(chars, i - 1),
@@ -614,7 +624,7 @@ namespace DataTools.CSTools
                                     StartPos = startPos,
                                     StartLine = startLine,
                                     StartColumn = ColumnFromHere(chars, startPos),
-                                    ParentElementName = currName,
+                                    ParentElementPath = currName,
                                     EndPos = i,
                                     EndLine = currLine,
                                     EndColumn = ColumnFromHere(chars, i),
@@ -667,7 +677,7 @@ namespace DataTools.CSTools
                                     StartLine = startLine,
                                     StartColumn = ColumnFromHere(chars, startPos),
                                     Kind = MarkerKind.Constructor,
-                                    ParentElementName = currName,
+                                    ParentElementPath = currName,
                                     Name = currName,
                                     MethodParamsString = cons.Groups[1].Value,
                                     Level = currLevel,
@@ -694,7 +704,7 @@ namespace DataTools.CSTools
                                         MethodParamsString = "()",
                                         Name = currName,
                                         Level = currLevel,
-                                        ParentElementName = currName,
+                                        ParentElementPath = currName,
                                         ScanHit = lookback,
                                         Attributes = attrs
                                     };
@@ -713,7 +723,7 @@ namespace DataTools.CSTools
                                         StartColumn = ColumnFromHere(chars, startPos),
                                         Level = currLevel,
                                         ScanHit = lookback,
-                                        ParentElementName = currName,
+                                        ParentElementPath = currName,
                                         Attributes = attrs
                                     };
 
@@ -778,7 +788,7 @@ namespace DataTools.CSTools
                                     Namespace = currNS,
                                     StartPos = startPos,
                                     StartLine = startLine,
-                                    ParentElementName = currName,
+                                    ParentElementPath = currName,
                                     StartColumn = ColumnFromHere(chars, startPos),
                                     EndPos = i - 1,
                                     EndLine = currLine,
@@ -841,7 +851,7 @@ namespace DataTools.CSTools
                             StartLine = currLine,
                             StartPos = i,
                             Level = currLevel,
-                            ParentElementName = currName,
+                            ParentElementPath = currName,
                             Namespace = currNS
                         };
 
@@ -896,7 +906,7 @@ namespace DataTools.CSTools
                             StartLine = currLine,
                             StartPos = i,
                             Level = currLevel,
-                            ParentElementName = currName,
+                            ParentElementPath = currName,
                             Namespace = currNS
 
                         };

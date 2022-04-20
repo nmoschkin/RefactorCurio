@@ -1,4 +1,6 @@
 ﻿
+using CSRefactorCurio.Reporting;
+
 using DataTools.CSTools;
 using DataTools.Observable;
 
@@ -38,7 +40,7 @@ namespace CSRefactorCurio.ViewModels
         public IOwnedCommand ClickBuild => clickBuild;
 
         public ObservableCollection<IProjectElement> CurrentItems => classMode ? projects : namespaces;
-        private List<string> allFQN;
+        private Dictionary<string, List<INamespace>> allFQN;
 
         public CurioExplorerSolution()
         {
@@ -146,8 +148,17 @@ namespace CSRefactorCurio.ViewModels
             namespacesMap.Clear();
             namespaces = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
 
-            allFQN = AllFullyQualifiedNames(namespacesMap.Values).Distinct().ToList();
-            allFQN.Sort();
+            allFQN = ReportHelper.AllFullyQualifiedNames(namespacesMap.Values.ToArray());
+            var duplicates = allFQN.Where((x) => x.Value.Count > 1).ToList();
+            
+            var allref  = ReportHelper.GetReferences(this, allFQN);
+
+            allref.Sort((a, b) =>
+            {
+                return string.Compare(a.Item2.FullyQualifiedName, b.Item2.FullyQualifiedName);
+            });
+
+            var cfn = ReportHelper.CountFilesForNamespaces(allFQN);
 
             OnPropertyChanged(nameof(Namespaces));
 
@@ -156,33 +167,7 @@ namespace CSRefactorCurio.ViewModels
             Cursor = null;
         }
 
-        private List<string> AllFullyQualifiedNames(IEnumerable<CSNamespace> namespaces)
-        {
-            List<string> myfqs = new List<string>();
-
-            foreach (var ns in namespaces)
-            {
-                myfqs.Add(ns.Name);
-                myfqs.AddRange(AllFullyQualifiedNames(ns.Markers));
-                myfqs.AddRange(AllFullyQualifiedNames(ns.Namespaces));
-            }
-
-            return myfqs;
-        } 
-
-        private List<string> AllFullyQualifiedNames(IEnumerable<CSMarker> markers)
-        {
-            List<string> myfqs = new List<string>();
-
-            foreach (var item in markers)
-            {
-                myfqs.Add(item.FullyQualifiedName);
-                myfqs.AddRange(AllFullyQualifiedNames(item.Children));
-            }
-
-            return myfqs;
-        }
-
+       
         public CurioExplorerSolution(EnvDTE.Solution sln) : this()
         {
             _sln = sln;

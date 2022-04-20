@@ -213,7 +213,7 @@ namespace DataTools.CSTools
         /// The actual parent object can change hands many times in the course of sorting and filtering.
         /// We just want to remember the name of a class, interface, struct, record, or enum.
         /// </remarks>
-        string ParentElementName { get; set; }
+        string ParentElementPath { get; set; }
 
         /// <summary>
         /// The scanned text that was used to determine the nature of the current element.
@@ -550,7 +550,14 @@ namespace DataTools.CSTools
         {
             get
             {
-                return $"{Namespace}.{Name}";
+                if (!string.IsNullOrEmpty(ParentElementPath))
+                {
+                    return $"{Namespace}.{ParentElementPath}.{Name}";
+                }
+                else
+                {
+                    return $"{Namespace}.{Name}";
+                }
             }
         }
 
@@ -645,7 +652,7 @@ namespace DataTools.CSTools
 
         public virtual string Namespace { get; set; }
 
-        public virtual string ParentElementName
+        public virtual string ParentElementPath
         {
             get => parentElement;
             set => parentElement = value;
