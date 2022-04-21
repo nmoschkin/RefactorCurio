@@ -21,17 +21,18 @@ using System.Windows.Input;
 
 namespace CSRefactorCurio.ViewModels
 {
+
+
     internal class CurioExplorerSolution : ObservableBase, ICommandOwner, ISolution
     {
         private EnvDTE.Solution _sln;
         private Cursor cursor = Cursors.Arrow;
 
-        private ObservableCollection<IProjectElement> projects = new ObservableCollection<IProjectElement>();
-        private ObservableCollection<IProjectElement> namespaces = new ObservableCollection<IProjectElement>();
+        private List<ObservableCollection<IProjectElement>> classModes;
 
         private Dictionary<string, CSNamespace> namespacesMap = new Dictionary<string, CSNamespace>();
 
-        private bool classMode = true;
+        private int classMode = 0;
 
         private IOwnedCommand clickNamespace;
         private IOwnedCommand clickClasses;
@@ -42,21 +43,34 @@ namespace CSRefactorCurio.ViewModels
         public IOwnedCommand ClickBuild => clickBuild;
         public IOwnedCommand ReportCommand => reportCommand;
 
-        public ObservableCollection<IProjectElement> CurrentItems => classMode ? projects : namespaces;
+        public ObservableCollection<IProjectElement> CurrentItems => classModes[classMode];
+
+
         private Dictionary<string, List<INamespace>> allFQN;
 
         public CurioExplorerSolution()
         {
-            projects.CollectionChanged += Projects_CollectionChanged;
+
+            classModes = new List<ObservableCollection<IProjectElement>>()
+            {
+                new ObservableCollection<IProjectElement>(),
+                new ObservableCollection<IProjectElement>(),
+                new ObservableCollection<IProjectElement>()
+            };
+
+            foreach(var col in classModes)
+            {
+                col.CollectionChanged += Projects_CollectionChanged;
+            }
 
             clickNamespace = new OwnedCommand(this, (o) =>
             {
-                ClassMode = false;
+                ClassMode = 1;
             }, nameof(ClickNamespace));
 
             clickClasses = new OwnedCommand(this, (o) =>
             {
-                ClassMode = true;
+                ClassMode = 0;
             }, nameof(ClickClasses));
             clickBuild = new OwnedCommand(this, (o) =>
             {
@@ -76,11 +90,10 @@ namespace CSRefactorCurio.ViewModels
         {
             LoadingFlag = true;
 
-            projects.Clear();
-            namespaces.Clear();
+            foreach (var col in classModes) col.Clear();
             namespacesMap.Clear();
 
-            classMode = true;
+            classMode = 0;
             LoadingFlag = false;
         }
 
@@ -124,12 +137,12 @@ namespace CSRefactorCurio.ViewModels
             PopulateFrom(Projects, dte.Solution);
 
             LoadingFlag = false;
-            if (!classMode) RefreshNamespaces();
+            if (classMode != 0) RefreshNamespaces();
         }
 
         private void Projects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (!classMode && !LoadingFlag) RefreshNamespaces();
+            if (classMode != 0 && !LoadingFlag) RefreshNamespaces();
         }
 
         private List<CurioProject> GetAllProjects(IList<IProjectElement> fromList)
@@ -153,25 +166,28 @@ namespace CSRefactorCurio.ViewModels
 
         public void RefreshNamespaces()
         {
+
+            //var project = GetAllProjects(Projects).FirstOrDefault();
+
+            //project.ReadTheFile();
+
+
             Cursor = Cursors.Wait;
             namespacesMap.Clear();
-            namespaces = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
 
-            allFQN = ReportHelper.AllFullyQualifiedNames(namespacesMap.Values.ToArray());
-            var duplicates = allFQN.Where((x) => x.Value.Count > 1).ToList();
+            var rpt = new MostSpreadOutNamespacesReport(this);
             
-            var allref  = ReportHelper.GetReferences(this, allFQN);
+            
+            classModes[1] = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
+            
+            rpt.CompileReport(namespacesMap.Values.ToArray());
 
-            allref.Sort((a, b) =>
-            {
-                return string.Compare(a.Item2.FullyQualifiedName, b.Item2.FullyQualifiedName);
-            });
-
-            var cfn = ReportHelper.CountFilesForNamespaces(allFQN);
+            classModes[2] = new ObservableCollection<IProjectElement>(rpt.Reports.Select((x) => (IProjectElement)x));
 
             OnPropertyChanged(nameof(Namespaces));
+            OnPropertyChanged(nameof(MostUsedMap));
 
-            if (!classMode) OnPropertyChanged(nameof(CurrentItems));
+            if (classMode == 1) OnPropertyChanged(nameof(CurrentItems));
 
             Cursor = null;
         }
@@ -191,14 +207,14 @@ namespace CSRefactorCurio.ViewModels
             }
         }
 
-        public bool ClassMode
+        public int ClassMode
         {
             get => classMode;
             set
             {
                 if (SetProperty(ref classMode, value))
                 {
-                    if (!classMode)
+                    if (classMode != 0)
                     {
                         RefreshNamespaces();
                     }
@@ -322,15 +338,22 @@ namespace CSRefactorCurio.ViewModels
 
         public ObservableCollection<IProjectElement> Projects
         {
-            get => projects;
+            get => classModes[0];
         }
 
         public ObservableCollection<IProjectElement> Namespaces
         {
-            get => namespaces;
+            get => classModes[1];
         }
-        IList<IProjectElement> ISolution.Projects => projects;
-        IList<IProjectElement> ISolution.Namespaces => namespaces;
+
+        public ObservableCollection<IProjectElement> MostUsedMap
+        {
+            get => classModes[1];
+        }
+
+        IList<IProjectElement> ISolution.Projects => classModes[0];
+
+        IList<IProjectElement> ISolution.Namespaces => classModes[1];
 
         public bool RequestCanExecute(string commandId)
         {

@@ -147,9 +147,19 @@ namespace DataTools.CSTools
         bool IsAsync { get; set; }
 
         /// <summary>
+        /// Element is marked explicit
+        /// </summary>
+        bool IsExplicit { get; set; }
+
+        /// <summary>
         /// Element is marked extern.
         /// </summary>
         bool IsExtern { get; set; }
+
+        /// <summary>
+        /// Element is marked implicit
+        /// </summary>
+        bool IsImplicit { get; set; }
 
         /// <summary>
         /// Element is marked new.
@@ -460,8 +470,11 @@ namespace DataTools.CSTools
                 }
 
                 if (IsStatic) amstr += "static ";
+                if (IsImplicit) amstr += "implicit ";
+                if (IsExplicit) amstr += "explicit ";
 
                 if (IsAbstract) amstr += "abstract ";
+                if (IsExtern) amstr += "extern ";
                 if (IsSealed) amstr += "sealed ";
                 if (IsOverride) amstr += "override ";
                 if (IsVirtual) amstr += "virtual ";
@@ -591,7 +604,11 @@ namespace DataTools.CSTools
 
         public virtual bool IsAsync { get; set; }
 
+        public virtual bool IsExplicit { get; set; }
+
         public virtual bool IsExtern { get; set; }
+
+        public virtual bool IsImplicit { get; set; }
 
         public virtual bool IsNew { get; set; }
 

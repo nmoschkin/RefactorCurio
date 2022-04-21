@@ -51,9 +51,13 @@
     <Compile Include="Commands\OwnedCommand.cs" />
     <Compile Include="Commands\ShowClassFromJsonCommand.cs" />
     <Compile Include="Commands\ShowClassFromJsonFileCommand.cs" />
+    <Compile Include="Controls\ToggleGroupBox.xaml.cs">
+      <DependentUpon>ToggleGroupBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\BoolConverter.cs" />
     <Compile Include="Converters\ColorPropertyToBrushExtension.cs" />
     <Compile Include="Converters\MarkerKindToMonikerConverter.cs" />
+    <Compile Include="Converters\SelectionGroupConverter.cs" />
     <Compile Include="CS\Code\CodeParserBase.cs" />
     <Compile Include="CS\Code\CSCodeParser.cs" />
     <Compile Include="CS\Code\FilterRules.cs" />
@@ -63,6 +67,7 @@
     <Compile Include="CS\Projects\CSDirectory.cs" />
     <Compile Include="CS\Projects\CSNamespace.cs" />
     <Compile Include="CS\Projects\CurioProject.cs" />
+    <Compile Include="CS\Projects\ProjectView.cs" />
     <Compile Include="DataTools\Crc32.cs" />
     <Compile Include="DataTools\DataSet.cs" />
     <Compile Include="DataTools\FileSystemMonitor.cs" />
@@ -142,6 +147,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ToolWindows\CurioExplorerToolWindow.cs" />
+    <Page Include="Controls\ToggleGroupBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\ToolWindows\JsonOptionsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

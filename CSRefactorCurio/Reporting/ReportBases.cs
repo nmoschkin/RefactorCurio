@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,40 +12,66 @@ using DataTools.Observable;
 
 namespace CSRefactorCurio.Reporting
 {
-    public interface IReportNode<T> : INotifyPropertyChanged where T : INamespace
+    public interface IReportNode : INotifyPropertyChanged, IProjectElement
     {
-        T Element { get; }
+        object Element { get; }
 
-        IList<T> AssociatedList { get; }
+        IList AssociatedList { get; }
+    }
+
+
+    public interface IReportNode<T> : IReportNode, INotifyPropertyChanged 
+    {
+        new T Element { get; }
+
+        new IList<T> AssociatedList { get; }
 
     }
 
-    public interface IReport<T> : INotifyPropertyChanged where T : INamespace
+    public interface IReport : INotifyPropertyChanged
     {
         ISolution Solution { get; }
 
         int Count { get; }
-        
+
         int ReportId { get; }
 
         string ReportName { get; }
 
         string AssociatedReason { get; }
 
-        IList<IReportNode<T>> Reports { get; }
+        IList Reports { get; }
 
-        void CompileReport(IList<T> context);
+        void CompileReport<T>(IList<T> context) where T : INamespace;
 
         void Sort();
     }
 
-    public class ReportNodeBase<T> : ObservableBase, IReportNode<T> where T : INamespace
+    public interface IReport<TRpt> : IReport
     {
-        protected T element;
-        protected IList<T> associatedList;
+        new IList<TRpt> Reports { get; }
+    }
+
+    public class ReportNode : ObservableBase, IReportNode
+    {
+        protected object element;
+        protected IList associatedList;
+        protected string title;
+
+        public ElementType ElementType => ElementType.ReportNode;
 
         [Browsable(true)]
-        public virtual T Element 
+        public virtual string Title
+        {
+            get => title;
+            set
+            {
+                SetProperty(ref title, value);
+            }
+        }
+
+        [Browsable(true)]
+        public object Element 
         {
             get => element;
             protected internal set
@@ -55,7 +82,7 @@ namespace CSRefactorCurio.Reporting
 
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public virtual IList<T> AssociatedList
+        public IList AssociatedList
         {
             get => associatedList;
             set
@@ -63,20 +90,50 @@ namespace CSRefactorCurio.Reporting
                 SetProperty(ref associatedList, value);
             }
         }
-
-        public ReportNodeBase()
-        {
-            AssociatedList = new ObservableCollection<T>();
-        }
-
-        public override string ToString()
-        {
-            return element?.FullyQualifiedName ?? base.ToString();
-        }
     }
 
-    public abstract class ReportBase<T> : ObservableBase, IReport<T> where T : INamespace
+
+    public class ReportNode<T> : ReportNode, IReportNode<T> where T : IProjectElement
     {
+        new private T element;
+        new private IList<T> associatedList;
+
+        public override string Title
+        {
+            get => element?.Title ?? base.Title;
+            set
+            {
+                base.Title = value;
+            }
+        }
+
+        [Browsable(true)]
+        new public virtual T Element
+        {
+            get => element;
+            protected internal set
+            {
+                if (SetProperty(ref element, value)) base.element = value;
+            }
+        }
+
+        [Browsable(true)]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        new public virtual IList<T> AssociatedList
+        {
+            get => associatedList;
+            set
+            {
+                if (SetProperty(ref associatedList, value)) base.associatedList = (IList)value;
+            }
+        }
+
+    }
+
+    public abstract class ReportBase : ObservableBase, IReport 
+    {
+        protected IList reports;
+
         [Browsable(true)]
         public ISolution Solution { get; }
 
@@ -91,12 +148,19 @@ namespace CSRefactorCurio.Reporting
 
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public abstract IList<IReportNode<T>> Reports { get; }
+        public IList Reports
+        {
+            get => reports; 
+            set
+            {
+                SetProperty(ref reports, value);
+            }
+        }
 
         [Browsable(true)]
         public abstract int ReportId { get; }
 
-        public abstract void CompileReport(IList<T> context);
+        public abstract void CompileReport<T>(IList<T> context) where T: INamespace;
 
         public abstract void Sort();
 
@@ -113,13 +177,28 @@ namespace CSRefactorCurio.Reporting
 
     }
 
-    public class CSReportNode : ReportNodeBase<INamespace>
+    public abstract class ReportBase<T> : ReportBase, IReport<T> where T : IReportNode, new()
     {
-    }
+        new private IList<T> reports;
 
-    public abstract class CSReportBase : ReportBase<INamespace>
-    {
-        public CSReportBase(ISolution solution) : base(solution)
+        public override int Count => reports?.Count ?? 0;
+
+        [Browsable(true)]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        new public virtual IList<T> Reports 
+        {
+            get => reports;
+            set
+            {
+                if (SetProperty(ref reports, value))
+                {
+                    base.reports = (IList)value;
+                    OnPropertyChanged(nameof(Count));
+                }
+            }
+        }
+
+        public ReportBase(ISolution solution) : base(solution)
         {
         }
 

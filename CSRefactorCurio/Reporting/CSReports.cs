@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 namespace CSRefactorCurio.Reporting
 {
 
+    public delegate bool ItemFilterFunc(INamespace item);
+
     public static class ReportHelper
     {
         internal static Dictionary<string, List<CSCodeFile>> CountFilesForNamespaces(Dictionary<string, List<INamespace>> allfqn)
@@ -175,53 +177,75 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        public static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces) where T : INamespace
+        public static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, ItemFilterFunc filter) where T : INamespace
         {
             var dict = new Dictionary<string, List<INamespace>>();
-            return AllFullyQualifiedNames(namespaces, dict);
+            return AllFullyQualifiedNames(namespaces, dict, filter);
         }
 
-        private static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> items, Dictionary<string, List<INamespace>> currDict) where T : INamespace
+        public static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, MarkerKind[] filter = null) where T : INamespace
         {
+            if (filter == null || filter.Length == 0)
+            {
+                filter = new[]
+                {
+                    MarkerKind.Namespace,
+                    MarkerKind.Class,
+                    MarkerKind.Interface,
+                    MarkerKind.Struct,
+                    MarkerKind.Record,
+                    MarkerKind.Enum,
+                    MarkerKind.Method,
+                    MarkerKind.Property,
+                    MarkerKind.Delegate,
+                    MarkerKind.Const
+                };
+            }
+
+            var dict = new Dictionary<string, List<INamespace>>();
+            
+            return AllFullyQualifiedNames(namespaces, dict, (t) => {
+                
+                if (t is IMarker marker)
+                {
+                    return filter.Contains(marker.Kind);
+                }
+                else
+                {
+                    return true;
+                }
+                
+            });
+        }
+
+
+        private static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> items, Dictionary<string, List<INamespace>> currDict, ItemFilterFunc filter) where T : INamespace
+        {
+
             foreach (var nsobj in items)
             {
-
-                if (nsobj is IMarker mkt)
+                if (filter(nsobj))
                 {
-                    switch (mkt.Kind)
+                    if (!currDict.TryGetValue(nsobj.FullyQualifiedName, out List<INamespace> myf))
                     {
-                        case MarkerKind.Operator:
-                        case MarkerKind.Using:
-                        case MarkerKind.Namespace:
-                        case MarkerKind.XMLDoc:
-                        case MarkerKind.BlockComment:
-                        case MarkerKind.LineComment:                        
-                            continue;
+                        myf = new List<INamespace>();
+                        currDict.Add(nsobj.FullyQualifiedName, myf);
+                    }
 
-                        default:
-                            break;
+                    if (!myf.Contains(nsobj))
+                    {
+                        myf.Add(nsobj);
                     }
                 }
 
-                if (!currDict.TryGetValue(nsobj.FullyQualifiedName, out List<INamespace> myf))
-                {
-                    myf = new List<INamespace>();
-                    currDict.Add(nsobj.FullyQualifiedName, myf);
-                }
-
-                if (!myf.Contains(nsobj))
-                {
-                    myf.Add(nsobj);
-                }
-                
                 if (nsobj is CSNamespace ns)
                 {
-                    AllFullyQualifiedNames(ns.Markers, currDict);
-                    AllFullyQualifiedNames(ns.Namespaces, currDict);
+                    AllFullyQualifiedNames(ns.Markers, currDict, filter);
+                    AllFullyQualifiedNames(ns.Namespaces, currDict, filter);
                 }
                 else if (nsobj is IMarker mk)
                 {
-                    AllFullyQualifiedNames((IEnumerable<IMarker>)mk.Children, currDict);
+                    AllFullyQualifiedNames((IEnumerable<IMarker>)mk.Children, currDict, filter);
                 }
             }
 
@@ -229,10 +253,8 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    public class HeaviestReferencesReport : CSReportBase
+    public class HeaviestReferencesReport : ReportBase<ReportNode<INamespace>>
     {
-        IList<IReportNode<INamespace>> reports;
-
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_REFERENCED_OBJECTS;
 
@@ -240,14 +262,7 @@ namespace CSRefactorCurio.Reporting
         public override string AssociatedReason { get; }
 
         [Browsable(true)]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        public override IList<IReportNode<INamespace>> Reports => reports;
-
-        [Browsable(true)]
         public override int ReportId { get; } = 1;
-
-        [Browsable(true)]
-        public override int Count => reports?.Count ?? 0;
 
         public HeaviestReferencesReport(ISolution solution, string associated) : base(solution)
         {
@@ -257,7 +272,7 @@ namespace CSRefactorCurio.Reporting
         {
         }
 
-        public override void CompileReport(IList<INamespace> context)
+        public override void CompileReport<T>(IList<T> context)
         {
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
@@ -294,7 +309,7 @@ namespace CSRefactorCurio.Reporting
                 return c;
             });
 
-            var rpts = new List<IReportNode<INamespace>>();
+            var rpts = new List<ReportNode<INamespace>>();
 
             CSMarker curr = null;
 
@@ -306,7 +321,7 @@ namespace CSRefactorCurio.Reporting
                 {
                     if (markers.Count > 0)
                     {
-                        var rpt = new CSReportNode()
+                        var rpt = new ReportNode<INamespace>()
                         {
                             AssociatedList = markers.ToArray(),
                             Element = curr
@@ -326,7 +341,7 @@ namespace CSRefactorCurio.Reporting
             {
                 if (markers.Count > 0)
                 {
-                    var rpt = new CSReportNode()
+                    var rpt = new ReportNode<INamespace>()
                     {
                         AssociatedList = markers.ToArray(),
                         Element = curr
@@ -337,16 +352,13 @@ namespace CSRefactorCurio.Reporting
                 }
             }
 
-            reports = rpts;
+            Reports = rpts;
             Sort();
-
-            OnPropertyChanged(nameof(Reports));
-            OnPropertyChanged(nameof(Count));
         }
 
         public override void Sort()
         {
-            QuickSort.Sort(reports, (a, b) =>
+            QuickSort.Sort(Reports, (a, b) =>
             {
                 if (a.AssociatedList.Count > b.AssociatedList.Count) return -1;
                 if (a.AssociatedList.Count < b.AssociatedList.Count) return 1;
@@ -354,5 +366,82 @@ namespace CSRefactorCurio.Reporting
             });
         }
     }
+
+
+
+
+    public class MostSpreadOutNamespacesReport : ReportBase<ReportNode<IProjectNode>>
+    {
+
+        [Browsable(true)]
+        public override string ReportName { get; } = AppResources.REPORT_MOST_SPREAD_OUT;
+
+        [Browsable(true)]
+        public override string AssociatedReason { get; }
+                
+        [Browsable(true)]
+        public override int ReportId { get; } = 1;
+
+        public MostSpreadOutNamespacesReport(ISolution solution, string associated) : base(solution)
+        {
+            AssociatedReason = associated;
+        }
+        public MostSpreadOutNamespacesReport(ISolution solution) : this(solution, "DEFAULT")
+        {
+        }
+
+        public override void CompileReport<T>(IList<T> context) 
+        {
+            var allFQN = ReportHelper.AllFullyQualifiedNames(context);
+
+            var allref = ReportHelper.CountFilesForNamespaces(allFQN);
+
+            var rpts = new List<ReportNode<IProjectNode>>();
+
+            CSMarker curr = null;
+
+            List<CSMarker> markers = new List<CSMarker>();
+
+            foreach (var item in allref)
+            {
+                var rpt = new ReportNode<IProjectNode>()
+                {
+                    AssociatedList = new List<IProjectNode>(item.Value.Select((x) => (IProjectNode)x)),
+                    Element = allFQN.Where((x) => x.Key == item.Key).First().Value.First(),
+                };
+
+                rpts.Add(rpt);
+            }
+
+            if (curr != null)
+            {
+                if (markers.Count > 0)
+                {
+                    var rpt = new ReportNode<IProjectNode>()
+                    {
+                        AssociatedList = markers.ToArray(),
+                        Element = curr
+                    };
+
+                    rpts.Add(rpt);
+                    markers = new List<CSMarker>();
+                }
+            }
+
+            Reports = rpts;
+            Sort();
+        }
+
+        public override void Sort()
+        {
+            QuickSort.Sort(Reports, (a, b) =>
+            {
+                if (a.AssociatedList.Count > b.AssociatedList.Count) return -1;
+                if (a.AssociatedList.Count < b.AssociatedList.Count) return 1;
+                return 0;
+            });
+        }
+    }
+
 
 }

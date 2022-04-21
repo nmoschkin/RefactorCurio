@@ -392,6 +392,7 @@ namespace DataTools.CSTools
             "global", "ref", "sealed", "class", "interface", "record", "struct", 
             "namespace", "public", "private", "static", "async", "abstract", "const", 
             "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", 
+            "extern", 
             "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         static CSCodeParser()
@@ -495,7 +496,7 @@ namespace DataTools.CSTools
                     
                     if (chars[i] == '\r' || chars[i] == '\n')
                     {
-                        forScan.Append(chars[i]);
+                        forScan.Append(chars[i]); 
                     }
                     else
                     {
@@ -649,14 +650,7 @@ namespace DataTools.CSTools
                         
                         prevWord = "";
 
-                        if (i < c - 1 && chars[i + 1] == '\n')
-                        {
-                            startLine = currLine + 1;
-                        }
-                        else
-                        {
-                            startLine = currLine;
-                        }
+                        startLine = currLine;
                         attrs = null;
                     }
                     else if (chars[i] == '{')
@@ -771,15 +765,7 @@ namespace DataTools.CSTools
                         forScan.Clear();
                         prevWord = "";
 
-                        if (i < c - 1 && chars[i + 1] == '\n')
-                        {
-                            startLine = currLine + 1;
-                        }
-                        else
-                        {
-                            startLine = currLine;
-                        }
-
+                        startLine = currLine;
                         attrs = null;
                     }
                     else if (chars[i] == '}')
@@ -839,14 +825,7 @@ namespace DataTools.CSTools
                         forScan.Clear();
                         prevWord = "";
 
-                        if (i < c - 1 && chars[i + 1] == '\n')
-                        {
-                            startLine = currLine + 1;
-                        }
-                        else
-                        {
-                            startLine = currLine;
-                        }
+                        startLine = currLine;
 
                     }
                     else if ((i < c - 1) && ((chars[i] == '/' && chars[i + 1] == '/') || (chars[i] == '#')))
@@ -876,10 +855,12 @@ namespace DataTools.CSTools
                             {
                                 docs = true;
                             }
+
                             sb.Append(chars[j]);
 
                             if (chars[j] == '\n')
                             {
+                                forScan.Append('\n');
                                 currMarker.EndColumn = ColumnFromHere(chars, j - 1);
                                 currMarker.EndLine = currLine;
                                 currMarker.EndPos = j - 1;
@@ -887,14 +868,13 @@ namespace DataTools.CSTools
                                 currMarker.Kind = docs ? MarkerKind.XMLDoc : MarkerKind.LineComment;
 
                                 markers.Add(currMarker);
-
                                 currLine++;
 
-                                if (docs)
-                                {
-                                    startPos = scanStartPos = j + 1;
-                                    startLine = currLine;
-                                }
+                                //if (docs)
+                                //{
+                                //    startPos = scanStartPos = j + 1;
+                                //}
+
                                 break;
                             }
 
@@ -942,20 +922,12 @@ namespace DataTools.CSTools
                                 markers.Add(currMarker);
 
                                 scanStartPos = j + 2;
-                                if (i < c - 2 && chars[i + 2] == '\n')
-                                {
-                                    startLine = currLine + 1;
-                                }
-                                else
-                                {
-                                    startLine = currLine;
-                                }
+                                startLine = currLine;
                                 break;
                             }
                             else if (chars[j] == '\n')
                             {
                                 currLine++;
-
                                 continue;
                             }
 
@@ -1140,6 +1112,7 @@ namespace DataTools.CSTools
                                 case "enum":
                                 case "namespace":
                                 case "using":
+                                case "operator":
                                     marker.Kind = (MarkerKind)Enum.Parse(typeof (MarkerKind), TextTools.TitleCase(del));
                                     break;
 
@@ -1260,6 +1233,17 @@ namespace DataTools.CSTools
                             i++;
                         }
                         marker.Kind = MarkerKind.Operator;
+
+                        if (marker.DataType == "explicit")
+                        {
+                            marker.IsExplicit = true;
+                            marker.DataType = null;
+                        }
+                        else if (marker.DataType == "implicit")
+                        {
+                            marker.IsImplicit = true;
+                            marker.DataType = null;
+                        }
                     }
 
                     break;
@@ -1271,6 +1255,11 @@ namespace DataTools.CSTools
                 marker.Name = nsb.ToString();   
             }
             
+            if (marker.DataType == null && marker.Kind == MarkerKind.Operator)
+            {
+                marker.DataType = marker.Name;
+            }
+
             bool inh = false;
 
             var retVal = 1;

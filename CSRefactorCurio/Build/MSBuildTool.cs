@@ -17,6 +17,7 @@ namespace DataTools.CSTools
 
         public const string FindMSBuildCmd = "\"%ProgramFiles(x86)%\\Microsoft Visual Studio\\Installer\\vswhere.exe\"";
         public const string FindMSBuildParams = "-latest -prerelease -products * -requires Microsoft.Component.MSBuild -find MSBuild\\**\\Bin\\MSBuild.exe";
+        public const string FindILDasmParams = "-latest -prerelease -products * -requires Microsoft.Component.ILDasm -find MSBuild\\**\\Bin\\ILDasm.exe";
 
         private string msBuild;
 
@@ -44,7 +45,10 @@ namespace DataTools.CSTools
           
         }
 
-
+        public string FindILDasm()
+        {
+            return @"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\ildasm.exe";
+        }
 
         public string FindMSBuild()
         {
@@ -54,6 +58,7 @@ namespace DataTools.CSTools
             proc.StartInfo.Arguments = FindMSBuildParams;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.UseShellExecute = false;
 
             proc.Start();
             proc.WaitForExit();

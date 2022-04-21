@@ -57,10 +57,24 @@ namespace DataTools.CSTools
         /// <summary>
         /// Elements inside of a file or document.
         /// </summary>
-        Marker = 0x20
+        Marker = 0x20,
+
+        /// <summary>
+        /// This is a report node.
+        /// </summary>
+        ReportNode = 0x40,
+
+
+        /// <summary>
+        /// This is a project view layout.
+        /// </summary>
+        ProjectView = 0x80,
+
+
+        Any = 0xff
     }
 
-    public interface INamespace
+    public interface INamespace : IProjectNode
     {
         /// <summary>
         /// Home namespace of this element.
@@ -464,6 +478,32 @@ namespace DataTools.CSTools
         #endregion Public Methods
 
         #region Protected Methods
+
+        internal void ReadTheFile()
+        {
+            var path = ProjectRootPath + "\\bin\\Debug";
+            var files = new List<string>(Directory.GetFiles(path, Title + ".dll"));
+            var dirs = Directory.GetDirectories(path);
+
+            if (files.Count == 0)
+            {
+                foreach (var dir in dirs)
+                {
+                    var f = Directory.GetFiles(dir, Title + ".dll");
+                    if (f.Length > 0)
+                    {
+                        files.AddRange(f);
+                        break;
+                    }
+                }
+            }
+
+            var file = files.FirstOrDefault();
+
+            
+
+
+        }
 
         /// <summary>
         /// Raised by the directory watcher to indicate that contents of the folder have changed.

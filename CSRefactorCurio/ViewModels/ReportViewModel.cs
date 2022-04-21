@@ -23,14 +23,14 @@ namespace CSRefactorCurio.ViewModels
         public ISolution Solution => solution;
 
         private IOwnedCommand runReport;
-        private CSReportBase selReport;
-        private ObservableCollection<CSReportBase> reports = new ObservableCollection<CSReportBase>();
+        private ReportBase selReport;
+        private ObservableCollection<ReportBase> reports = new ObservableCollection<ReportBase>();
 
-        public ObservableCollection<CSReportBase> Reports => reports;
+        public ObservableCollection<ReportBase> Reports => reports;
 
         public IOwnedCommand RunReportCommand => runReport;
 
-        public CSReportBase SelectedReport
+        public ReportBase SelectedReport
         {
             get => selReport;
             set
@@ -45,6 +45,7 @@ namespace CSRefactorCurio.ViewModels
             this.solution = solution;
 
             reports.Add(new HeaviestReferencesReport(this.Solution));
+            reports.Add(new MostSpreadOutNamespacesReport(this.Solution));
             runReport = new OwnedCommand(this, (o) =>
             {
                 var b = solution.Namespaces.Where(o => o is INamespace).Select(o => o as INamespace).ToList();

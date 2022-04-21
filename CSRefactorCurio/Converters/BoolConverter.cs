@@ -27,6 +27,10 @@ namespace CSRefactorCurio.Converters
 
         public Visibility HiddenVisibility { get; set; } = Visibility.Collapsed;
 
+        public int NumberValue { get; set; } = 1;
+
+        public int ConvertBackInverseValue { get; set; } = 0;
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
 
@@ -43,10 +47,20 @@ namespace CSRefactorCurio.Converters
                     return value == null;
 
                 case BoolConverterModes.Number:
-                    return NumDetect(value);
+                    
+                    if (value is int i)
+                    {
+                        return (i == NumberValue);
+                    }
+                    break;
 
                 case BoolConverterModes.InverseNumber:
-                    return !NumDetect(value);
+
+                    if (value is int i2)
+                    {
+                        return (i2 != NumberValue);
+                    }
+                    break;
 
                 case BoolConverterModes.Visibility:
 
@@ -87,76 +101,28 @@ namespace CSRefactorCurio.Converters
 
         }
 
-        private bool NumDetect(object value)
-        {
-
-            if (value is decimal de)
-            {
-                return de != 0;
-            }
-            else if (value is double db)
-            {
-                return db != 0;
-            }
-            else if (value is float f)
-            {
-                return f != 0;
-            }
-            else if (value is ulong ul)
-            {
-                return ul != 0;
-            }
-            else if (value is long l)
-            {
-                return l != 0;
-            }
-            else if (value is uint ui)
-            {
-                return ui != 0;
-            }
-            else if (value is int i)
-            {
-                return i != 0;
-            }
-            else if (value is ushort us)
-            {
-                return us != 0;
-            }
-            else if (value is short s)
-            {
-                return s != 0;
-            }
-            else if (value is byte b)
-            {
-                return b != 0;
-            }
-            else if (value is sbyte sb)
-            {
-                return sb != 0;
-            }
-            else if (value is char ch)
-            {
-                return ch != 0;
-            }            
-            else
-            {
-                return false;
-            }
-        }
-
+        
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             switch (Mode)
             {
+                case BoolConverterModes.Number:
+                    if (value is bool b1 && b1) return NumberValue;
+                    else return ConvertBackInverseValue;
+
+                case BoolConverterModes.InverseNumber:
+                    if (value is bool b2 && !b2) return ConvertBackInverseValue;
+                    else return NumberValue;
+
                 case BoolConverterModes.InverseBool:
-                    if (value is bool b) return !b;
+                    if (value is bool b3) return !b3;
                     else throw new InvalidCastException();
 
                 case BoolConverterModes.Visibility:
 
-                    if (value is Visibility b2)
+                    if (value is Visibility v1)
                     {
-                        if (b2 == Visibility.Visible)
+                        if (v1 == Visibility.Visible)
                         {
                             return true;
                         }
@@ -169,9 +135,9 @@ namespace CSRefactorCurio.Converters
 
                 case BoolConverterModes.InverseVisibility:
 
-                    if (value is Visibility b3)
+                    if (value is Visibility v2)
                     {
-                        if (b3 == HiddenVisibility)
+                        if (v2 == HiddenVisibility)
                         {
                             return true;
                         }
