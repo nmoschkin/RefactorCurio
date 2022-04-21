@@ -885,6 +885,11 @@ namespace DataTools.CSTools
 
         #region Public Properties
 
+        new public CSCodeFile HomeFile {
+            get => (CSCodeFile)base.HomeFile;
+            set => base.HomeFile = value;
+        }
+
         public override ObservableMarkerList<CSMarker> Children 
         { 
             get => base.Children;

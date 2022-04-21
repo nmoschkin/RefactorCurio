@@ -34,6 +34,8 @@ namespace CSRefactorCurio.ViewModels
 
         private int classMode = 0;
 
+        private bool[] isActive = new bool[3];
+
         private IOwnedCommand clickNamespace;
         private IOwnedCommand clickClasses;
         private IOwnedCommand clickBuild;
@@ -82,6 +84,8 @@ namespace CSRefactorCurio.ViewModels
                 var dlg = new Report(this);
                 dlg.Show();
             }, nameof(ReportCommand));
+
+            isActive[classMode] = true;
         }
 
         public bool LoadingFlag { get; set; } = false;
@@ -218,8 +222,17 @@ namespace CSRefactorCurio.ViewModels
                     {
                         RefreshNamespaces();
                     }
+                    for (int i = 0; i < isActive.Length; i++)
+                    {
+                        if (i == value) isActive[i] = true;
+                        else isActive[i] = false;
+                    }
 
                     OnPropertyChanged(nameof(CurrentItems));
+
+                    OnPropertyChanged(nameof(IsActive1));
+                    OnPropertyChanged(nameof(IsActive2));
+                    OnPropertyChanged(nameof(IsActive3));
                 }
             }
         }
@@ -350,6 +363,46 @@ namespace CSRefactorCurio.ViewModels
         {
             get => classModes[1];
         }
+
+        public bool IsActive1
+        {
+            get => isActive[0];
+            set
+            {
+                if (!value) return;
+                if (SetProperty(ref isActive[0], value) && value && classMode != 0)
+                {
+                    ClassMode = 0;
+                } 
+            }
+        }
+
+        public bool IsActive2
+        {
+            get => isActive[1];
+            set
+            {
+                if (!value) return;
+                if (SetProperty(ref isActive[1], value) && value && classMode != 1)
+                {
+                    ClassMode = 1;
+                }
+            }
+        }
+
+        public bool IsActive3
+        {
+            get => isActive[2];
+            set
+            {
+                if (!value) return;
+                if (SetProperty(ref isActive[2], value) && value && classMode != 2)
+                {
+                    ClassMode = 2;
+                }
+            }
+        }
+
 
         IList<IProjectElement> ISolution.Projects => classModes[0];
 

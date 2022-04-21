@@ -43,7 +43,7 @@
             <ToggleButton
                 x:Name="Button1"
                 toolkit:Themes.UseVsTheme="True"
-                Checked="Button1_Checked"
+                IsChecked="{Binding IsActive1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 >
                 <imaging:CrispImage
                     Width="16"
@@ -54,7 +54,7 @@
             <ToggleButton
                 x:Name="Button2"
                 toolkit:Themes.UseVsTheme="True"
-                Checked="Button2_Checked"
+                IsChecked="{Binding IsActive2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 >
                 <imaging:CrispImage
                     Width="16"
@@ -65,7 +65,7 @@
             <ToggleButton
                 x:Name="Button3"
                 toolkit:Themes.UseVsTheme="True"
-                Checked="Button3_Checked"
+                IsChecked="{Binding IsActive3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 >
                 <imaging:CrispImage
                     Width="16"
@@ -292,6 +292,7 @@
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
                                             <Label Content="{Binding HomeFile}" />
+                                            <Label Content="{Binding HomeFile.Project}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -310,6 +311,7 @@
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
                                             <Label Content="{Binding HomeFile}" />
+                                            <Label Content="{Binding HomeFile.Project}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -327,6 +329,7 @@
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
                                             <Label Content="{Binding HomeFile}" />
+                                            <Label Content="{Binding HomeFile.Project}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -343,6 +346,7 @@
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
                                             <Label Content="{Binding HomeFile}" />
+                                            <Label Content="{Binding HomeFile.Project}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -360,6 +364,7 @@
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
                                             <Label Content="{Binding HomeFile}" />
+                                            <Label Content="{Binding HomeFile.Project}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -377,6 +382,7 @@
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
                                             <Label Content="{Binding HomeFile}" />
+                                            <Label Content="{Binding HomeFile.Project}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
@@ -393,6 +399,7 @@
                                             <Label Content="{Binding Title}" />
                                             <Label Content="{Binding}" />
                                             <Label Content="{Binding HomeFile}" />
+                                            <Label Content="{Binding HomeFile.Project}" />
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
