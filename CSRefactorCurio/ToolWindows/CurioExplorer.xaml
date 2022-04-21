@@ -87,6 +87,7 @@
 
             <TreeView.Resources>
 
+
                 <Style TargetType="ToolTip">
                     <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ToolWindowBackgroundKey}}" />
                 </Style>
@@ -411,38 +412,65 @@
 
             </TreeView.Resources>
             <TreeView.ContextMenu>
-                <ContextMenu Background="Transparent">
-                    <ContextMenu.Resources />
 
-                    <MenuItem Command="{Binding ClickBuild}">
-                        <MenuItem.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
+                <ContextMenu toolkit:Themes.UseVsTheme="True">
 
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
+                    <ContextMenu.Resources>
 
-                                <imaging:CrispImage
-                                    Width="16"
-                                    Height="16"
-                                    Margin="2"
-                                    Moniker="{x:Static catalog:KnownMonikers.BuildSolution}"
-                                    />
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.MenuTextKey}}" />
+                            <Setter Property="Height" Value="24" />
+                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="Padding" Value="4,2" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </ContextMenu.Resources>
 
-                                <TextBlock
-                                    Grid.Column="1"
-                                    Text="{glob:Translate ResourceKey=MI_BUILD_SOLUTION}"
-                                    />
 
-                            </Grid>
-
-                        </MenuItem.Header>
-                    </MenuItem>
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="ItemsControl">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="Padding" Value="0" />
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
                     <MenuItem
+                        toolkit:Themes.UseVsTheme="True"
+                        Command="{Binding ClickBuild}"
+                        Header="{glob:Translate ResourceKey=MI_BUILD_SOLUTION}"
+                        >
+                        <MenuItem.Icon>
+                            <imaging:CrispImage
+                                Width="16"
+                                Height="16"
+                                Margin="4"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Moniker="{x:Static catalog:KnownMonikers.BuildSolution}"
+                                />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <MenuItem
+                        toolkit:Themes.UseVsTheme="True"
                         Command="{Binding ReportCommand}"
                         Header="{glob:Translate ResourceKey=REPORTS}"
-                        />
+                        >
+                        <MenuItem.Icon>
+                            <imaging:CrispImage
+                                Width="16"
+                                Height="16"
+                                Margin="4"
+                                Moniker="{x:Static catalog:KnownMonikers.Report}"
+                                />
+                        </MenuItem.Icon>
+                    </MenuItem>
 
                 </ContextMenu>
             </TreeView.ContextMenu>

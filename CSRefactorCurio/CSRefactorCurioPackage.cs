@@ -27,6 +27,9 @@ namespace CSRefactorCurio
     [ProvideToolWindow(typeof(CurioExplorerToolWindow.Pane), Style = VsDockStyle.Tabbed, Window = WindowGuids.SolutionExplorer)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(PackageGuids.CSRefactorCurioString)]
+    // Register the options with this attribute on your package class:
+    [ProvideOptionPage(typeof(Options.OptionsProvider.CSAppOptionsOptions), "Curio Refactor Studio", "JSON to C# Generation", 0, 0, true)]
+    [ProvideProfile(typeof(Options.OptionsProvider.CSAppOptionsOptions), "Curio Refactor Studio", "JSON to C# Generation", 0, 0, true)]
     [ProvideUIContextRule(JsonItemContextGuid,
     name: "Filter For JSON Files",
     expression: "JsonSel",

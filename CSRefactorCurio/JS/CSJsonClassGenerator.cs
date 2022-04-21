@@ -52,7 +52,7 @@ namespace DataTools.CSTools
     /// <summary>
     /// Json to C# Class Generator
     /// </summary>
-    public class CSJsonClassGenerator : ObservableBase
+    public class CSJsonClassGenerator : ObservableBase, IJsonCSSettings
     {
         private ObservableCollection<string> jsonComments = new ObservableCollection<string>();
         int ipidx = 0;
@@ -69,6 +69,7 @@ namespace DataTools.CSTools
         bool isInvalid = true;
         bool genTC = true;
         bool mvvm = false;
+        bool generateDocStrings = true;
 
         bool hastime = false;
 
@@ -85,6 +86,19 @@ namespace DataTools.CSTools
             set
             {
                 SetProperty(ref genTC, value);
+            }
+        }
+
+
+        /// <summary>
+        /// Generate XML Document Markup
+        /// </summary>
+        public bool GenerateDocStrings
+        {
+            get => generateDocStrings;
+            set
+            {
+                SetProperty(ref generateDocStrings, value); 
             }
         }
 
@@ -108,7 +122,7 @@ namespace DataTools.CSTools
             get => isInvalid;
             protected set
             {
-                SetProperty(ref isInvalid, value);  
+                SetProperty(ref isInvalid, value);
             }
         }
 
@@ -183,7 +197,7 @@ namespace DataTools.CSTools
                 SetProperty(ref mvvm, value);
             }
         }
-        
+
         /// <summary>
         /// The generated C# class code.
         /// </summary>
@@ -796,11 +810,14 @@ namespace DataTools.CSTools
 
             if (ipidx < jsonComments.Count) txt = jsonComments[ipidx++];
 
-            sb.AppendLine(ns + $"");
-            sb.AppendLine(ns + $"    /// <summary>");
-            sb.AppendLine(ns + $"    /// {txt}");
-            sb.AppendLine(ns + $"    /// </summary>");
-            sb.AppendLine(ns + $"    [JsonProperty(\"{prop.VariableName}\")]");
+            if (generateDocStrings)
+            {
+                sb.AppendLine(ns + $"");
+                sb.AppendLine(ns + $"    /// <summary>");
+                sb.AppendLine(ns + $"    /// {txt}");
+                sb.AppendLine(ns + $"    /// </summary>");
+                sb.AppendLine(ns + $"    [JsonProperty(\"{prop.VariableName}\")]");
+            }
 
             if (prop.DateProperty != null)
             {
