@@ -1385,7 +1385,7 @@ namespace DataTools.CSTools
                 str = str.Substring(i).Trim();
                 w = str.ToCharArray();
                 c = str.Length;
-                char xz = ' ';
+                char lastNonspace = ' ';
                 x = -1;
                 List<string> ihits = new List<string>();
                 if (str[0] == ':' || str[0] == 'w')
@@ -1427,7 +1427,7 @@ namespace DataTools.CSTools
                         else if (!AllowedChar(ch, true))
                         {
                             // there's this crazy edge case where you can have a class named 'where'
-                            if (tsb.ToString() == "where" && xz != ',' && xz != ':')
+                            if (tsb.ToString() == "where" && lastNonspace != ',' && lastNonspace != ':')
                             {
                                 x = i - 5;
                                 tsb.Clear();
@@ -1443,7 +1443,7 @@ namespace DataTools.CSTools
                             }
                         }
 
-                        if (!char.IsWhiteSpace(ch)) xz = ch;
+                        if (!char.IsWhiteSpace(ch)) lastNonspace = ch;
                     }
 
                     if (tsb.Length > 0)
@@ -1503,6 +1503,46 @@ namespace DataTools.CSTools
             }
 
             return retVal;
+        }
+
+        private List<string> ParseGenerics(char[] chars, int startIndx)
+        {
+            int i = 0;
+            List<string> retval = new List<string>();
+            var generics = TextTools.TextBetween(chars, startIndx, ref i, '<', '>', out int? startIdx, out int? stopIdx);
+
+            if (generics == null) return retval;
+
+            var sp = TextTools.Split(generics, ",");
+            var sb = new StringBuilder();
+
+            foreach (var s in sp)
+            {
+                var g = s.Trim();
+
+                if (g[0] == '<')
+                {
+                    retval.AddRange(ParseGenerics(chars, (int)startIdx));
+                }
+                else
+                {
+                    foreach(var ch in g)
+                    {
+                        if (AllowedChar(ch, true))
+                        {
+                            sb.Append(ch);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (sb.Length > 0) retval.Add(sb.ToString());
+                }
+            }
+
+            return retval;
         }
 
         /// <summary>
