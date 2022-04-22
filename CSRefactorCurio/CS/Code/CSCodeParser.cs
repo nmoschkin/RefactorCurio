@@ -792,7 +792,12 @@ namespace DataTools.CSTools
                         clo = false;
                         if (currPatt == MarkerKind.Enum)
                         {
-                            var lookback = TextTools.OneSpace(forScan.ToString()).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
+                            forScan.Remove(forScan.Length - 1, 1);
+                            var fs = forScan.ToString();
+                            startLine += CountLines(fs);
+                            fs = fs.Replace("\r", "").Replace("\n", "");
+
+                            var lookback = TextTools.OneSpace(fs).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
                             var testEnum = patterns[MarkerKind.EnumValue].Match(lookback);
 
                             if (testEnum.Success)

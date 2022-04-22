@@ -79,6 +79,7 @@
         <TreeView
             Name="ProjTree"
             Grid.Row="1"
+            toolkit:Themes.UseVsTheme="True"
             Background="Transparent"
             ItemsSource="{Binding CurrentItems}"
             MouseDoubleClick="ProjTree_MouseDoubleClick"
@@ -86,7 +87,6 @@
             >
 
             <TreeView.Resources>
-
 
                 <Style TargetType="ToolTip">
                     <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ToolWindowBackgroundKey}}" />
@@ -428,9 +428,9 @@
                             <Setter Property="Padding" Value="4,2" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
                         </Style>
                     </ContextMenu.Resources>
-
 
                     <ContextMenu.ItemContainerStyle>
                         <Style TargetType="ItemsControl">
@@ -438,6 +438,7 @@
                             <Setter Property="BorderThickness" Value="0" />
                             <Setter Property="Margin" Value="0" />
                             <Setter Property="Padding" Value="0" />
+                            <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
                         </Style>
                     </ContextMenu.ItemContainerStyle>
                     <MenuItem
@@ -458,6 +459,7 @@
                     </MenuItem>
 
                     <MenuItem
+                        x:Name="TreeCtx"
                         toolkit:Themes.UseVsTheme="True"
                         Command="{Binding ReportCommand}"
                         Header="{glob:Translate ResourceKey=REPORTS}"

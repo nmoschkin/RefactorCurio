@@ -98,6 +98,7 @@
     <Compile Include="Globalization\TranslateExtension.cs" />
     <Compile Include="Helpers\EnumListProvider.cs" />
     <Compile Include="Helpers\PropertyHelper.cs" />
+    <Compile Include="Helpers\ThemeHelper.cs" />
     <Compile Include="IPropertiesContainer.cs" />
     <Compile Include="JS\CSJsonClassGenerator.cs" />
     <Compile Include="JS\IJsonCSSettings.cs" />

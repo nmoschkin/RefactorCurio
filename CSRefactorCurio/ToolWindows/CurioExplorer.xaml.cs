@@ -1,4 +1,5 @@
 ﻿using CSRefactorCurio.ViewModels;
+using CSRefactorCurio.Helpers;
 
 using DataTools.CSTools;
 
@@ -17,12 +18,17 @@ namespace CSRefactorCurio
         public CurioExplorer()
         {
             InitializeComponent();
-
+            Loaded += CurioExplorer_Loaded;
             lock (CSRefactorCurioPackage.SyncRoot)
             {
                 DataContext = vm = CSRefactorCurioPackage.Instance.CurioSolution;
             }
         }
+
+        private void CurioExplorer_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
+    
 
         private void ProjTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
