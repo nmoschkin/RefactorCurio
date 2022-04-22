@@ -20,7 +20,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 namespace DataTools.CSTools
 {
 
-
     /// <summary>
     /// Code Parser Output File
     /// </summary>
@@ -380,7 +379,7 @@ namespace DataTools.CSTools
             "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", 
             "float", "double", "decimal", 
             "Guid", "DateTime", 
-            "string", "char", 
+            "string", "char", "this", "base",
             "void", "var", "dynamic", "object", 
             "Enum", "Tuple", "bool", "true", "false", "IntPtr", "UIntPtr"
         };
@@ -487,7 +486,6 @@ namespace DataTools.CSTools
                 MarkerKind currPatt = MarkerKind.Code;
 
                 List<string> attrs = null;
-                List<string> currUnknowns = new List<string>();
 
                 unrecognizedWords.Clear();
 
@@ -517,10 +515,18 @@ namespace DataTools.CSTools
                                         unrecognizedWords.Add(cw);
                                     }
 
-                                    if (!currUnknowns.Contains(cw))
+                                    if (currMarker != null)
                                     {
-                                        currUnknowns.Add(cw);
+                                        if (currMarker.UnknownWords == null)
+                                        {
+                                            currMarker.UnknownWords = new List<string>();
+                                        }
+                                        if (!currMarker.UnknownWords.Contains(cw))
+                                        {
+                                            currMarker.UnknownWords.Add(cw);
+                                        }
                                     }
+                                    
                                 }
 
                             }
@@ -577,6 +583,19 @@ namespace DataTools.CSTools
                             if (!FilterType1.Contains(attr) && !unrecognizedWords.Contains(attr))
                             {
                                 unrecognizedWords.Add(attr);
+                                
+                                if (currMarker != null)
+                                {
+                                    if (currMarker.UnknownWords == null)
+                                    {
+                                        currMarker.UnknownWords = new List<string>();
+                                    }
+
+                                    if (!currMarker.UnknownWords.Contains(attr))
+                                    {
+                                        currMarker.UnknownWords.Add(attr);
+                                    }
+                                }
                             }
                         }
 
@@ -809,15 +828,9 @@ namespace DataTools.CSTools
                             currMarker.EndPos = i;
                             currMarker.EndLine = currLine;
                             currMarker.EndColumn = ColumnFromHere(chars, i);
-
-                            if (currPatt == MarkerKind.Class || currPatt == MarkerKind.Struct || currPatt == MarkerKind.Record || currPatt == MarkerKind.Interface)
-                            {
-                                currMarker.UnknownWords = currUnknowns;
-                                currUnknowns = new List<string>();
-                            }
+                            currMarker.Children = markers;
                         }
 
-                        currMarker.Children = markers;
                         markers = listStack.Pop();
 
                         scanStartPos = startPos = i + 1;
@@ -868,6 +881,7 @@ namespace DataTools.CSTools
                                 currMarker.Kind = docs ? MarkerKind.XMLDoc : MarkerKind.LineComment;
 
                                 markers.Add(currMarker);
+                                currMarker = default;
                                 currLine++;
 
                                 //if (docs)
@@ -920,6 +934,7 @@ namespace DataTools.CSTools
                                 currMarker.Kind = MarkerKind.BlockComment;
 
                                 markers.Add(currMarker);
+                                currMarker = default;
 
                                 scanStartPos = j + 2;
                                 startLine = currLine;
@@ -1260,6 +1275,19 @@ namespace DataTools.CSTools
                 marker.DataType = marker.Name;
             }
 
+            if (!string.IsNullOrEmpty(marker.DataType) && !FilterType1.Contains(marker.DataType))
+            {
+                if (marker.UnknownWords == null)
+                {
+                    marker.UnknownWords = new List<string>();
+                }
+
+                if (!marker.UnknownWords.Contains(marker.DataType))
+                {
+                    marker.UnknownWords.Add(marker.DataType);
+                }
+            }
+
             bool inh = false;
 
             var retVal = 1;
@@ -1445,6 +1473,21 @@ namespace DataTools.CSTools
               
             }
 
+            if (marker.Inheritances != null)
+            {
+                if (marker.UnknownWords == null)
+                {
+                    marker.UnknownWords = new List<string>();
+                }
+                foreach(var s in marker.Inheritances)
+                {
+                    if (!string.IsNullOrEmpty(s) && !marker.UnknownWords.Contains(s))
+                    {
+                        marker.UnknownWords.Add(s);
+                    }
+                }
+            }
+
             if (marker.Kind == MarkerKind.Code)
             {
                 if (retVal == 2)
@@ -1494,10 +1537,10 @@ namespace DataTools.CSTools
             {
                 if (markers[i].Children != null) PostScanTasks(markers[i].Children);
 
-                if (unrecognizedWords.Contains(markers[i].Name))
-                {
-                    unrecognizedWords.Remove(markers[i].Name);
-                }
+                //if (unrecognizedWords.Contains(markers[i].Name))
+                //{
+                //    unrecognizedWords.Remove(markers[i].Name);
+                //}
 
                 if (i < c - 1)
                 {

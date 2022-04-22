@@ -43,7 +43,7 @@
             >
             <DataGrid.Columns>
                 <DataGridTextColumn
-                    Binding="{Binding Element.FullyQualifiedName}"
+                    Binding="{Binding Element.NameWithGenerics}"
                     Header="{glob:Translate ResourceKey=OBJECT}"
                     IsReadOnly="True"
                     />

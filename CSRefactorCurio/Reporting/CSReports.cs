@@ -20,8 +20,78 @@ namespace CSRefactorCurio.Reporting
 
     public delegate bool ItemFilterFunc(INamespace item);
 
+    public class CSReference<T> where T : IMarker
+    {
+
+        public T ReferencedObject { get; set; }
+
+        public T CallingObject { get; set; }
+
+
+        public CSReference(T calling, T referenced)
+        {
+            ReferencedObject = referenced;
+            CallingObject = calling;
+        }
+
+        public CSReference()
+        {
+        }
+
+        public override string ToString()
+        {
+            return $"{CallingObject.Title} => {ReferencedObject.Title}";
+        }
+
+    }
+
     public static class ReportHelper
     {
+        
+        /// <summary>
+        /// Gets the default sort order for filters, lists, and rules.
+        /// </summary>
+        public static readonly MarkerKind[] DefaultSortOrder = new MarkerKind[] {
+            MarkerKind.Interface,
+            MarkerKind.Class,
+            MarkerKind.Record,
+            MarkerKind.Struct,
+            MarkerKind.Enum,
+            MarkerKind.Const,
+            MarkerKind.Delegate,
+            MarkerKind.Constructor,
+            MarkerKind.Destructor,
+            MarkerKind.Method,
+            MarkerKind.Property,
+            MarkerKind.Field,
+            MarkerKind.Operator,
+            MarkerKind.EnumValue,
+            MarkerKind.FieldValue,
+            MarkerKind.Event,
+            MarkerKind.Get,
+            MarkerKind.Set,
+            MarkerKind.Add,
+            MarkerKind.Remove
+        };
+
+        public static readonly MarkerKind[] DefaultFQNFilter = new[]
+        {
+            MarkerKind.Namespace,
+            MarkerKind.Class,
+            MarkerKind.Interface,
+            MarkerKind.Struct,
+            MarkerKind.Record,
+            MarkerKind.Enum,
+            MarkerKind.Method,
+            MarkerKind.Property,
+            MarkerKind.Delegate,
+            MarkerKind.Const,
+            MarkerKind.Get,
+            MarkerKind.Set,
+            MarkerKind.Add,
+            MarkerKind.Remove,
+        };
+
         internal static Dictionary<string, List<CSCodeFile>> CountFilesForNamespaces(Dictionary<string, List<INamespace>> allfqn)
         {
             var outDict = new Dictionary<string, List<CSCodeFile>>();
@@ -67,14 +137,14 @@ namespace CSRefactorCurio.Reporting
         }
 
 
-        internal static List<(CSMarker, CSMarker)> GetReferences(CurioExplorerSolution sln, Dictionary<string, List<INamespace>> allfqn)
+        internal static List<CSReference<CSMarker>> GetReferences(CurioExplorerSolution sln, Dictionary<string, List<INamespace>> allfqn)
         {
             return GetReferences(sln.Projects, allfqn);
         }
 
-        public static List<(CSMarker, CSMarker)> GetReferences(IEnumerable<IProjectElement> projects, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(IEnumerable<IProjectElement> projects, Dictionary<string, List<INamespace>> allfqn)
         {
-            var lt = new List<(CSMarker, CSMarker)>();
+            var lt = new List<CSReference<CSMarker>>();
 
             foreach (var elem in projects)
             {
@@ -91,14 +161,14 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        public static List<(CSMarker, CSMarker)> GetReferences(CurioProject proj, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CurioProject proj, Dictionary<string, List<INamespace>> allfqn)
         {
             return GetReferences(proj.RootFolder, allfqn);
         }
 
-        public static List<(CSMarker, CSMarker)> GetReferences(CSDirectory dir, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CSDirectory dir, Dictionary<string, List<INamespace>> allfqn)
         {
-            var lt = new List<(CSMarker, CSMarker)>();
+            var lt = new List<CSReference<CSMarker>>();
 
             foreach (var file in dir.Files)
             {
@@ -113,9 +183,9 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        public static List<(CSMarker, CSMarker)> GetReferences(CSCodeFile file, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CSCodeFile file, Dictionary<string, List<INamespace>> allfqn)
         {
-            var lt = new List<(CSMarker, CSMarker)>();
+            var lt = new List<CSReference<CSMarker>>();
 
             var usings = new List<string>();
 
@@ -132,42 +202,45 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        private static List<(CSMarker, CSMarker)> GetReferences(List<string> usings, CSMarker marker, Dictionary<string, List<INamespace>> allfqn)
+        private static List<CSReference<CSMarker>> GetReferences(List<string> usings, CSMarker marker, Dictionary<string, List<INamespace>> allfqn)
         {
             var nsi = usings;
-            if (nsi == null || nsi.Count == 0) return new List<(CSMarker, CSMarker)>();
+            if (nsi == null || nsi.Count == 0) return new List<CSReference<CSMarker>>();
 
             List<string> combos = new List<string>();
+            var lt = new List<CSReference<CSMarker>>();
 
-            foreach (var s in nsi)
+            if (marker.UnknownWords != null)
             {
-                if (marker.UnknownWords == null) continue;
                 foreach (var s2 in marker.UnknownWords)
                 {
-                    if (s != "")
+                    combos.Add(s2);
+
+                    foreach (var s in nsi)
                     {
-                        combos.Add(s + "." + s2);
+                        if (s != "")
+                        {
+                            combos.Add(s + "." + s2);
+                        }
                     }
                 }
-            }
-            
-            var lt = new List<(CSMarker, CSMarker)>();
 
-            foreach(var s in combos)
-            {
-                if (allfqn.TryGetValue(s, out var ns))
+                foreach (var s in combos)
                 {
-
-                    foreach (var item2 in ns)
+                    if (allfqn.TryGetValue(s, out var ns))
                     {
-                        if (item2 is CSMarker marker2)
+                        foreach (var item2 in ns)
                         {
-                            lt.Add((marker, marker2));
-                            
+                            if (item2 is CSMarker marker2)
+                            {
+                                lt.Add(new CSReference<CSMarker>(marker, marker2));
+
+                            }
                         }
                     }
                 }
             }
+
 
             foreach (var child in marker.Children)
             {
@@ -187,19 +260,7 @@ namespace CSRefactorCurio.Reporting
         {
             if (filter == null || filter.Length == 0)
             {
-                filter = new[]
-                {
-                    MarkerKind.Namespace,
-                    MarkerKind.Class,
-                    MarkerKind.Interface,
-                    MarkerKind.Struct,
-                    MarkerKind.Record,
-                    MarkerKind.Enum,
-                    MarkerKind.Method,
-                    MarkerKind.Property,
-                    MarkerKind.Delegate,
-                    MarkerKind.Const
-                };
+                filter = DefaultFQNFilter;
             }
 
             var dict = new Dictionary<string, List<INamespace>>();
@@ -217,7 +278,6 @@ namespace CSRefactorCurio.Reporting
                 
             });
         }
-
 
         private static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> items, Dictionary<string, List<INamespace>> currDict, ItemFilterFunc filter) where T : INamespace
         {
@@ -277,33 +337,47 @@ namespace CSRefactorCurio.Reporting
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
             var allref = ReportHelper.GetReferences(Solution.Projects, allFQN);
+            var so = (IList<MarkerKind>)ReportHelper.DefaultSortOrder;
 
             allref.Sort((a, b) =>
             {
-                var c = string.Compare(a.Item2.FullyQualifiedName, b.Item2.FullyQualifiedName);
+                if (a.Equals(b)) return 0;
+
+                var x = so.IndexOf(a.ReferencedObject.Kind);
+                var y = so.IndexOf(a.ReferencedObject.Kind);
+
+                if (x != -1 && y != -1)
+                {
+                    if (x < y) return -1;
+                    if (y < x) return 1;
+                }
+
+                x = so.IndexOf(a.CallingObject.Kind);
+                y = so.IndexOf(a.CallingObject.Kind);
+
+                if (x != -1 && y != -1)
+                {
+                    if (x < y) return -1;
+                    if (y < x) return 1;
+                }
+
+                var c = string.Compare(a.ReferencedObject.FullyQualifiedName, b.ReferencedObject.FullyQualifiedName);
+
                 if (c == 0)
                 {
-                    c = string.Compare(a.Item2.Generics, b.Item2.Generics);
+                    c = string.Compare(a.ReferencedObject.Generics, b.ReferencedObject.Generics);
 
                     if (c == 0)
                     {
-                        c = string.Compare(a.Item1.FullyQualifiedName, b.Item1.FullyQualifiedName);
+                        c = string.Compare(a.CallingObject.FullyQualifiedName, b.CallingObject.FullyQualifiedName);
 
                         if (c == 0)
                         {
-                            c = string.Compare(a.Item2.Generics, b.Item2.Generics);
+                            c = string.Compare(a.ReferencedObject.Generics, b.ReferencedObject.Generics);
                         }
 
                     }
 
-                }
-
-                if (c == 0)
-                {
-                    if (a != b)
-                    {
-                        return -1;
-                    }
                 }
 
                 return c;
@@ -317,7 +391,7 @@ namespace CSRefactorCurio.Reporting
 
             foreach (var item in allref)
             {
-                if (curr != item.Item2)
+                if (curr != item.ReferencedObject)
                 {
                     if (markers.Count > 0)
                     {
@@ -331,10 +405,10 @@ namespace CSRefactorCurio.Reporting
                         markers = new List<CSMarker>();
                     }
                     
-                    curr = item.Item2;
+                    curr = item.ReferencedObject;
                 }
 
-                if (!markers.Contains(item.Item1)) markers.Add(item.Item1);
+                if (!markers.Contains(item.CallingObject)) markers.Add(item.CallingObject);
             }
 
             if (curr != null)

@@ -52,15 +52,26 @@ namespace CSRefactorCurio.Converters
                         return KnownMonikers.Field;
 
                     case MarkerKind.Method:
-                    case MarkerKind.Constructor:
-                    case MarkerKind.Destructor:
                         return KnownMonikers.Method;
+
+                    case MarkerKind.Constructor:
+                        return KnownMonikers.NewClass;
+
+                    case MarkerKind.Destructor:
+                        return KnownMonikers.EndCall;
 
                     case MarkerKind.Const:
                         return KnownMonikers.Constant;
 
                     case MarkerKind.XMLDoc:
                         return KnownMonikers.XMLCommentTag;
+
+
+                    case MarkerKind.Get:
+                    case MarkerKind.Set:
+                    case MarkerKind.Add:
+                    case MarkerKind.Remove:
+                        return KnownMonikers.Part;
 
                     case MarkerKind.LineComment:
                     case MarkerKind.BlockComment:

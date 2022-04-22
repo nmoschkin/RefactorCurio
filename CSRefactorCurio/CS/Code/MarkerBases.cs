@@ -668,6 +668,20 @@ namespace DataTools.CSTools
             }
         }
 
+        public virtual string NameWithGenerics
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Generics))
+                {
+                    return $"{FullyQualifiedName}{Generics}";
+                }
+                else
+                {
+                    return FullyQualifiedName;
+                }
+            }
+        }
         public virtual string Namespace { get; set; }
 
         public virtual IMarker ParentElement

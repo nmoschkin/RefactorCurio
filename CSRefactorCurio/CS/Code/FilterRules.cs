@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CSRefactorCurio.Reporting;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,28 +50,12 @@ namespace DataTools.CSTools
             return base.ApplyFilter(rl);
         }
 
+        
         /// <summary>
         /// Gets or sets the sort kind order for this filter.  
         /// Items will be sorted according to kind, and being present in the list conveys an item kind's validity.
         /// </summary>
-        public MarkerKind[] SortKindOrder { get; set; } = new MarkerKind[] {                 
-            MarkerKind.Interface,
-            MarkerKind.Class,
-            MarkerKind.Record,
-            MarkerKind.Struct,
-            MarkerKind.Enum,
-            MarkerKind.Const,
-            MarkerKind.Delegate,
-            MarkerKind.Constructor,
-            MarkerKind.Destructor,
-            MarkerKind.Method,
-            MarkerKind.Property,
-            MarkerKind.Field,
-            MarkerKind.Operator,
-            MarkerKind.EnumValue,
-            MarkerKind.FieldValue,
-            MarkerKind.Event,
-        };
+        public MarkerKind[] SortKindOrder { get; set; } = ReportHelper.DefaultSortOrder;
 
         public override bool IsValid(IMarker item)
         {
