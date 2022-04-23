@@ -56,6 +56,7 @@
     </Compile>
     <Compile Include="Converters\BoolConverter.cs" />
     <Compile Include="Converters\ColorPropertyToBrushExtension.cs" />
+    <Compile Include="Converters\ItemCountConverter.cs" />
     <Compile Include="Converters\MarkerKindToMonikerConverter.cs" />
     <Compile Include="Converters\SelectionGroupConverter.cs" />
     <Compile Include="CS\Code\CodeParserBase.cs" />

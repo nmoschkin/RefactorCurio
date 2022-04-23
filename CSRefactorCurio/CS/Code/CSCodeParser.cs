@@ -376,7 +376,7 @@ namespace DataTools.CSTools
             "for", "while", "do", "if", "else", "switch", "case", "default", "break", "yield", "return", "add", "remove",
             "throw", "try", "catch", "finally", 
             "foreach", "in", "out", "ref", "null", "is", "not",
-            "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", 
+            "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "partial",
             "float", "double", "decimal", 
             "Guid", "DateTime", 
             "string", "char", "this", "base",
@@ -388,7 +388,7 @@ namespace DataTools.CSTools
         /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TMarker)"/> (in literally no particular order.)
         /// </summary>
         private static readonly string[] FilterType2 = new string[] { 
-            "global", "ref", "sealed", "class", "interface", "record", "struct", 
+            "global", "ref", "sealed", "class", "interface", "record", "struct", "partial",
             "namespace", "public", "private", "static", "async", "abstract", "const", 
             "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", 
             "extern", 
@@ -659,6 +659,11 @@ namespace DataTools.CSTools
                                 };
 
                                 TypeAndMethodParse(lookback, currMarker);
+                                if (currMarker.Kind == MarkerKind.Namespace)
+                                {
+                                    currNS = currMarker.Name;
+                                    currMarker.Namespace = currMarker.Name;
+                                }
                             }
 
                             markers.Add(currMarker);
