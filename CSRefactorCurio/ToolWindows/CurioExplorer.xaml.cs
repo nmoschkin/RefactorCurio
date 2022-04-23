@@ -39,6 +39,8 @@ namespace CSRefactorCurio
                 selMarker = marker; 
 
             }
+
+            vm.SelectedItem = e.NewValue;
         }
 
         private void ProjTree_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

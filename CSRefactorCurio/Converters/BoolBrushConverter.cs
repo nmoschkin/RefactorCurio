@@ -1,37 +1,31 @@
-﻿using CSRefactorCurio.Globalization.Resources;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using System.Windows.Media;
 
 namespace CSRefactorCurio.Converters
 {
-    internal class ItemCountConverter : IValueConverter
+    internal class BoolBrushConverter : IValueConverter
     {
+
+
+        public Brush TrueBrush { get; set; } = Brushes.Green;
+
+        public Brush FalseBrush { get; set; } = Brushes.Gray;
+
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int i)
+            if (value is bool b)
             {
-                if (i == 0)
-                {
-                    return string.Format(AppResources.NO_OBJECTS);
-
-                }
-                else if (i == 1)
-                {
-                    return string.Format(AppResources.ONE_OBJECT);
-                }
-                else
-                {
-                    return string.Format(AppResources.X_OBJECTS, i);
-                }
+                if (b) return TrueBrush;
+                else return FalseBrush;
             }
-
+            
             throw new NotImplementedException();
         }
 

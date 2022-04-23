@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,8 @@ namespace CSRefactorCurio.ViewModels
         private Dictionary<string, CSNamespace> namespacesMap = new Dictionary<string, CSNamespace>();
 
         private int classMode = 0;
+        
+        private object selectedItem;
 
         private bool[] isActive = new bool[3];
 
@@ -40,11 +43,14 @@ namespace CSRefactorCurio.ViewModels
         private IOwnedCommand clickClasses;
         private IOwnedCommand clickBuild;
         private IOwnedCommand reportCommand;
+        private IOwnedCommand splitFileCommand;
         public IOwnedCommand ClickNamespace => clickNamespace;
         public IOwnedCommand ClickClasses => clickClasses;
         public IOwnedCommand ClickBuild => clickBuild;
         public IOwnedCommand ReportCommand => reportCommand;
 
+        public IOwnedCommand SplitFileCommand => splitFileCommand;
+        
         public ObservableCollection<IProjectElement> CurrentItems => classModes[classMode];
 
 
@@ -84,6 +90,18 @@ namespace CSRefactorCurio.ViewModels
                 var dlg = new Report(this);
                 dlg.Show();
             }, nameof(ReportCommand));
+
+            splitFileCommand = new OwnedCommand(this, (o) =>
+            {
+                if (SelectedItem is CSCodeFile cf)
+                {
+                    
+                    var p = cf.Project.RootFolder.Find(Path.GetDirectoryName(cf.Filename));
+
+                    cf.OutputMarkers(Path.GetDirectoryName(cf.Filename));
+                }
+
+            }, nameof(SplitFileCommand));
 
             isActive[classMode] = true;
         }
@@ -234,6 +252,15 @@ namespace CSRefactorCurio.ViewModels
                     OnPropertyChanged(nameof(IsActive2));
                     OnPropertyChanged(nameof(IsActive3));
                 }
+            }
+        }
+
+        public object SelectedItem
+        {
+            get => selectedItem;    
+            set
+            {
+                SetProperty(ref selectedItem, value);
             }
         }
 
@@ -410,6 +437,11 @@ namespace CSRefactorCurio.ViewModels
 
         public bool RequestCanExecute(string commandId)
         {
+            if (commandId == nameof(splitFileCommand))
+            {
+                return (SelectedItem is CSCodeFile);
+            }
+            
             return true;
         }
     }

@@ -47,10 +47,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Build\MSBuildTool.cs" />
+    <Compile Include="Converters\BoolBrushConverter.cs" />
     <Compile Include="Commands\ICommandOwner.cs" />
     <Compile Include="Commands\OwnedCommand.cs" />
     <Compile Include="Commands\ShowClassFromJsonCommand.cs" />
     <Compile Include="Commands\ShowClassFromJsonFileCommand.cs" />
+    <Compile Include="Controls\SortOrderControl.xaml.cs">
+      <DependentUpon>SortOrderControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ToggleGroupBox.xaml.cs">
       <DependentUpon>ToggleGroupBox.xaml</DependentUpon>
     </Compile>
@@ -150,6 +154,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ToolWindows\CurioExplorerToolWindow.cs" />
+    <Page Include="Controls\SortOrderControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ToggleGroupBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

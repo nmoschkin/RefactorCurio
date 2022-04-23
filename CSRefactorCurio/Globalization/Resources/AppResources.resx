@@ -123,6 +123,9 @@
   <data name="APPLY" xml:space="preserve">
     <value>Apply</value>
   </data>
+  <data name="ASCENDING" xml:space="preserve">
+    <value>Ascending</value>
+  </data>
   <data name="BUILD" xml:space="preserve">
     <value>Build</value>
   </data>
@@ -141,8 +144,14 @@
   <data name="CLASSES" xml:space="preserve">
     <value>Classes</value>
   </data>
+  <data name="COMBINE_SELECTED_FILES" xml:space="preserve">
+    <value>Combine Selected Files</value>
+  </data>
   <data name="COUNT" xml:space="preserve">
     <value>Count</value>
+  </data>
+  <data name="DESCENDING" xml:space="preserve">
+    <value>Descending</value>
   </data>
   <data name="DETAILS" xml:space="preserve">
     <value>Details</value>
@@ -167,6 +176,9 @@
   </data>
   <data name="EXPAND_LIST" xml:space="preserve">
     <value>Expand List</value>
+  </data>
+  <data name="EXTRACT_SELECTED" xml:space="preserve">
+    <value>Extract Selected</value>
   </data>
   <data name="FALSE" xml:space="preserve">
     <value>False</value>
@@ -204,8 +216,23 @@
   <data name="NAMESPACES" xml:space="preserve">
     <value>Namespaces</value>
   </data>
+  <data name="NEW_FILES_HERE" xml:space="preserve">
+    <value>New Files Here</value>
+  </data>
+  <data name="NEW_FILES_IN_X" xml:space="preserve">
+    <value>New Files Into '{0}'</value>
+  </data>
+  <data name="NEW_FILE_HERE" xml:space="preserve">
+    <value>New Single FIle Here</value>
+  </data>
+  <data name="NEW_FILE_IN_X" xml:space="preserve">
+    <value>New Single File Into '{0}'</value>
+  </data>
   <data name="NO" xml:space="preserve">
     <value>No</value>
+  </data>
+  <data name="NO_OBJECTS" xml:space="preserve">
+    <value>(No Objects)</value>
   </data>
   <data name="OBJECT" xml:space="preserve">
     <value>Object</value>
@@ -215,6 +242,9 @@
   </data>
   <data name="OK" xml:space="preserve">
     <value>OK</value>
+  </data>
+  <data name="ONE_OBJECT" xml:space="preserve">
+    <value>(1 Object)</value>
   </data>
   <data name="OPEN_OBJECT_IN_CODE" xml:space="preserve">
     <value>Open Object In Code</value>
@@ -236,6 +266,18 @@
   </data>
   <data name="RELOAD" xml:space="preserve">
     <value>Reload</value>
+  </data>
+  <data name="REORDER_ITEMS" xml:space="preserve">
+    <value>Reorder Items</value>
+  </data>
+  <data name="REORGANIZE_FOLDER" xml:space="preserve">
+    <value>Reorganize Folder</value>
+  </data>
+  <data name="REORGANIZE_PROJECT" xml:space="preserve">
+    <value>Reorganize Project</value>
+  </data>
+  <data name="REORGANIZE_SOLUTION" xml:space="preserve">
+    <value>Reorganize Solution</value>
   </data>
   <data name="REPORTS" xml:space="preserve">
     <value>Reports</value>
@@ -272,6 +314,21 @@
   </data>
   <data name="SOLUTION" xml:space="preserve">
     <value>Solution</value>
+  </data>
+  <data name="SORT" xml:space="preserve">
+    <value>SORT</value>
+  </data>
+  <data name="SORT_ORDER" xml:space="preserve">
+    <value>Sort Order</value>
+  </data>
+  <data name="SPLIT_FILE_DEFAULT_OPTIONS" xml:space="preserve">
+    <value>Split File With Default Options</value>
+  </data>
+  <data name="SPLIT_FILE_FLAT" xml:space="preserve">
+    <value>Split File Here</value>
+  </data>
+  <data name="SPLIT_FILE_WITH_OPTIONS" xml:space="preserve">
+    <value>Split File ...</value>
   </data>
   <data name="STRUCT" xml:space="preserve">
     <value>Struct</value>

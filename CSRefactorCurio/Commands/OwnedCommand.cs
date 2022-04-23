@@ -13,19 +13,31 @@ namespace CSRefactorCurio
     public delegate void ExecOwnedCommandHandler(object parameter);
 
 
-    public class OwnedCommand : IOwnedCommand
+    public class OwnedCommand : ObservableBase, IOwnedCommand
     {
         public event EventHandler CanExecuteChanged;
 
         private string cmdId = Guid.NewGuid().ToString("d");
 
-        private bool canExecute = true;
+        private bool? canExecute = null;
 
         private ICommandOwner owner;
 
         private ExecOwnedCommandHandler handler;
 
         public string CommandId => cmdId;
+
+        public bool? IsEnabled
+        {
+            get => canExecute;
+            set
+            {
+                if (SetProperty(ref canExecute, value))
+                {
+                    CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
 
         public ICommandOwner Owner => owner;
         
@@ -47,17 +59,18 @@ namespace CSRefactorCurio
 
         public bool CanExecute(object parameter)
         {
-            return canExecute;
+            return canExecute ?? QueryCanExecute();
         }
 
         public bool QueryCanExecute()
         {
             var exec = owner?.RequestCanExecute(cmdId) ?? false;
 
-            if (exec != canExecute)
+            if (canExecute != null && exec != canExecute)
             {
                 canExecute = exec;
                 CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+                OnPropertyChanged(nameof(IsEnabled));
             }
 
             return exec;
@@ -72,6 +85,8 @@ namespace CSRefactorCurio
     public interface IOwnedCommand : ICommand
     {
         ICommandOwner Owner { get; }
+
+        bool? IsEnabled { get; set; }
 
         bool QueryCanExecute();
     }

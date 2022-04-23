@@ -79,6 +79,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ascending.
+        /// </summary>
+        internal static string ASCENDING {
+            get {
+                return ResourceManager.GetString("ASCENDING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Build.
         /// </summary>
         internal static string BUILD {
@@ -133,11 +142,29 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Combine Selected Files.
+        /// </summary>
+        internal static string COMBINE_SELECTED_FILES {
+            get {
+                return ResourceManager.GetString("COMBINE_SELECTED_FILES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Count.
         /// </summary>
         internal static string COUNT {
             get {
                 return ResourceManager.GetString("COUNT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Descending.
+        /// </summary>
+        internal static string DESCENDING {
+            get {
+                return ResourceManager.GetString("DESCENDING", resourceCulture);
             }
         }
         
@@ -210,6 +237,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string EXPAND_LIST {
             get {
                 return ResourceManager.GetString("EXPAND_LIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extract Selected.
+        /// </summary>
+        internal static string EXTRACT_SELECTED {
+            get {
+                return ResourceManager.GetString("EXTRACT_SELECTED", resourceCulture);
             }
         }
         
@@ -322,11 +358,56 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Single FIle Here.
+        /// </summary>
+        internal static string NEW_FILE_HERE {
+            get {
+                return ResourceManager.GetString("NEW_FILE_HERE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Single File Into &apos;{0}&apos;.
+        /// </summary>
+        internal static string NEW_FILE_IN_X {
+            get {
+                return ResourceManager.GetString("NEW_FILE_IN_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Files Here.
+        /// </summary>
+        internal static string NEW_FILES_HERE {
+            get {
+                return ResourceManager.GetString("NEW_FILES_HERE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Files Into &apos;{0}&apos;.
+        /// </summary>
+        internal static string NEW_FILES_IN_X {
+            get {
+                return ResourceManager.GetString("NEW_FILES_IN_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No.
         /// </summary>
         internal static string NO {
             get {
                 return ResourceManager.GetString("NO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (No Objects).
+        /// </summary>
+        internal static string NO_OBJECTS {
+            get {
+                return ResourceManager.GetString("NO_OBJECTS", resourceCulture);
             }
         }
         
@@ -354,6 +435,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string OK {
             get {
                 return ResourceManager.GetString("OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (1 Object).
+        /// </summary>
+        internal static string ONE_OBJECT {
+            get {
+                return ResourceManager.GetString("ONE_OBJECT", resourceCulture);
             }
         }
         
@@ -417,6 +507,42 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string RELOAD {
             get {
                 return ResourceManager.GetString("RELOAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reorder Items.
+        /// </summary>
+        internal static string REORDER_ITEMS {
+            get {
+                return ResourceManager.GetString("REORDER_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reorganize Folder.
+        /// </summary>
+        internal static string REORGANIZE_FOLDER {
+            get {
+                return ResourceManager.GetString("REORGANIZE_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reorganize Project.
+        /// </summary>
+        internal static string REORGANIZE_PROJECT {
+            get {
+                return ResourceManager.GetString("REORGANIZE_PROJECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reorganize Solution.
+        /// </summary>
+        internal static string REORGANIZE_SOLUTION {
+            get {
+                return ResourceManager.GetString("REORGANIZE_SOLUTION", resourceCulture);
             }
         }
         
@@ -525,6 +651,51 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string SOLUTION {
             get {
                 return ResourceManager.GetString("SOLUTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SORT.
+        /// </summary>
+        internal static string SORT {
+            get {
+                return ResourceManager.GetString("SORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort Order.
+        /// </summary>
+        internal static string SORT_ORDER {
+            get {
+                return ResourceManager.GetString("SORT_ORDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Split File With Default Options.
+        /// </summary>
+        internal static string SPLIT_FILE_DEFAULT_OPTIONS {
+            get {
+                return ResourceManager.GetString("SPLIT_FILE_DEFAULT_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Split File Here.
+        /// </summary>
+        internal static string SPLIT_FILE_FLAT {
+            get {
+                return ResourceManager.GetString("SPLIT_FILE_FLAT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Split File ....
+        /// </summary>
+        internal static string SPLIT_FILE_WITH_OPTIONS {
+            get {
+                return ResourceManager.GetString("SPLIT_FILE_WITH_OPTIONS", resourceCulture);
             }
         }
         

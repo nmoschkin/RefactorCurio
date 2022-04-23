@@ -53,5 +53,48 @@ namespace CSRefactorCurio.Options
         [Description("If the JSON text is commented, then the comments will be incorporated as documentation markup. Otherwise, markup will be generated using the name of the element.")]
         [DefaultValue(false)]
         public bool GenerateDocStrings { get; set; } = true;
+
+
+        [Category("Project Cleanup")]
+        [DisplayName("Use Separate Folders For Object Types")]
+        [Description("Create the folders based on default folder name options for the given objects.")]
+        [DefaultValue(false)]
+        public bool UseSeparateFolders { get; set; } = false;
+
+        [Category("Project Cleanup")]
+        [DisplayName("Class Folder Name")]
+        [Description("The name of the folder to put classes. Blank to leave in the same folder.")]
+        [DefaultValue("")]
+        public string ClassFolderName { get; set; } = "";
+
+
+
+        [Category("Project Cleanup")]
+        [DisplayName("Interface Folder Name")]
+        [Description("The name of the folder to put Interfaces. Blank to leave in the same folder.")]
+        [DefaultValue("Contracts")]
+        public string InterfaceFolderName { get; set; } = "Contracts";
+
+
+        [Category("Project Cleanup")]
+        [DisplayName("Struct Folder Name")]
+        [Description("The name of the folder to put Structs. Blank to leave in the same folder.")]
+        [DefaultValue("Structs")]
+        public string StructFolderName { get; set; } = "Structs";
+
+
+        [Category("Project Cleanup")]
+        [DisplayName("Enum Folder Name")]
+        [Description("The name of the folder to put Enums. Blank to leave in the same folder.")]
+        [DefaultValue("Enums")]
+        public string EnumFolderName { get; set; } = "Enums";
+
+        [Category("Project Cleanup")]
+        [DisplayName("Delegate Folder Name")]
+        [Description("The name of the folder to put Delegates. Blank to leave in the same folder.")]
+        [DefaultValue("")]
+        public string DelegateFolderName { get; set; } = "";
+
+
     }
 }

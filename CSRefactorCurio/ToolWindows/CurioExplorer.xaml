@@ -27,18 +27,22 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <ToolBar
+
+        <StackPanel
+            Margin="4"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
+            toolkit:Themes.UseVsTheme="True"
             Background="Transparent"
+            Orientation="Horizontal"
             ToolBar.OverflowMode="AsNeeded"
             >
-            <ToolBar.Resources>
+            <StackPanel.Resources>
                 <conv:SelectionGroupConverter x:Key="selConv" />
                 <!--<Style TargetType="ToggleButton">
                     <Setter Property="Background" Value="Transparent" />
                 </Style>-->
-            </ToolBar.Resources>
+            </StackPanel.Resources>
 
             <ToggleButton
                 x:Name="Button1"
@@ -74,7 +78,7 @@
                     />
             </ToggleButton>
 
-        </ToolBar>
+        </StackPanel>
 
         <TreeView
             Name="ProjTree"
@@ -483,6 +487,25 @@
                                 />
                         </MenuItem.Icon>
                     </MenuItem>
+
+                    <!--<Separator toolkit:Themes.UseVsTheme="True" />-->
+
+                    <MenuItem
+                        x:Name="SplitFileMenu"
+                        toolkit:Themes.UseVsTheme="True"
+                        Command="{Binding SplitFileCommand}"
+                        Header="{glob:Translate ResourceKey=SPLIT_FILE_DEFAULT_OPTIONS}"
+                        >
+                        <MenuItem.Icon>
+                            <imaging:CrispImage
+                                Width="16"
+                                Height="16"
+                                Margin="4"
+                                Moniker="{x:Static catalog:KnownMonikers.ElementSeparator}"
+                                />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
 
                 </ContextMenu>
             </TreeView.ContextMenu>
