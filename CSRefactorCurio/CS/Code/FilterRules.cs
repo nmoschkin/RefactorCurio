@@ -267,14 +267,11 @@ namespace DataTools.CSTools
                 {
                     switch(markers[i].Kind)
                     {
-                        case MarkerKind.Interface:
-                        case MarkerKind.Class:
-                        case MarkerKind.Struct:
-                        case MarkerKind.Enum:
-                        case MarkerKind.Record:
-                        case MarkerKind.Delegate:
-                        case MarkerKind.Consolidation:
+                        case MarkerKind.Namespace:
+                            foreach (var newItem in ApplyFilter(markers[i].Children)) lnew.Add(newItem);
+                            break;
 
+                        default:
                             var cmarker = markers[i].Clone<TMarker>(false);
                             if (cmarker.Children != null && cmarker.Children.Count > 0)
                             {
@@ -282,17 +279,9 @@ namespace DataTools.CSTools
                             }
 
                             lnew.Add(cmarker);
-
                             break;
 
-                        case MarkerKind.Namespace:
-                            foreach (var newItem in ApplyFilter(markers[i].Children)) lnew.Add(newItem);
-                            break;
-
-                        default:
-                            continue;
                     }
-
                 }
             }
 

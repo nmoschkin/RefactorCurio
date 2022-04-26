@@ -39,6 +39,9 @@ namespace DataTools.CSTools
         /// </summary>
         public virtual string[] OutputFiles => outputFiles;
 
+#if EXPERIMENTAL
+
+
         /// <summary>
         /// Gets or sets the 'Interfaces' directory name (default is 'Contracts')
         /// </summary>
@@ -64,6 +67,34 @@ namespace DataTools.CSTools
         /// </summary>
         public virtual bool SeparateDirs { get; set; } //= CSAppOptions.Instance.UseSeparateFolders;
 
+
+#else
+
+        /// <summary>
+        /// Gets or sets the 'Interfaces' directory name (default is 'Contracts')
+        /// </summary>
+        public virtual string InterfaceDirName { get; set; } = CSAppOptions.Instance.InterfaceFolderName;
+
+        /// <summary>
+        /// Gets or sets the 'Classes' directory name (default is none)
+        /// </summary>
+        public virtual string ClassDirName { get; set; } = CSAppOptions.Instance.ClassFolderName;
+
+        /// <summary>
+        /// Gets or stets the 'Enums' directory name (default is 'Enums')
+        /// </summary>
+        public virtual string EnumDirName { get; set; } = CSAppOptions.Instance.EnumFolderName;
+
+        /// <summary>
+        /// Gets or stets the 'Structs' directory name (default is 'Structs')
+        /// </summary>
+        public virtual string StructDirName { get; set; } = CSAppOptions.Instance.StructFolderName;
+
+        /// <summary>
+        /// Gets or sets a value indicating that files containing different types of objects will go in different subdirectories beneath the selected output directory.
+        /// </summary>
+        public virtual bool SeparateDirs { get; set; } = CSAppOptions.Instance.UseSeparateFolders;
+#endif
         /// <summary>
         /// Gets a value indicating if the last parse was successful.
         /// </summary>

@@ -380,6 +380,7 @@ namespace DataTools.CSTools
         }
 
         public IPropertiesContainer Properties => properties;
+
         /// <summary>
         /// Gets the root folder of the project.
         /// </summary>

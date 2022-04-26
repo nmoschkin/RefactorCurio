@@ -261,6 +261,12 @@ namespace DataTools.CSTools
         Attribute = 0x28,
 
         /// <summary>
+        /// Preprocessor Directive
+        /// </summary>
+        [Description("Preprocessor Directive")]
+        Directive = 0x29,
+
+        /// <summary>
         /// Explicit Interface Implementation
         /// </summary>
         [Description("Attribute or Decorator")]

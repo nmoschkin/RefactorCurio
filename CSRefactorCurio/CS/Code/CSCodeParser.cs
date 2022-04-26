@@ -468,6 +468,7 @@ namespace DataTools.CSTools
                 StringBuilder sb;
                 
                 forScan.Capacity = chars.Length;
+                int inif = 0;
 
                 int startPos = 0;
                 int scanStartPos = 0;
@@ -684,6 +685,8 @@ namespace DataTools.CSTools
                     }
                     else if (chars[i] == '{')
                     {
+                        if (inif > 0) continue;
+
                         forScan.Remove(forScan.Length - 1, 1);
                         clo = false;
                         ++currLevel;
@@ -799,6 +802,8 @@ namespace DataTools.CSTools
                     }
                     else if (chars[i] == '}')
                     {
+                        if (inif > 0) continue;
+
                         clo = false;
                         if (currPatt == MarkerKind.Enum)
                         {
@@ -856,7 +861,73 @@ namespace DataTools.CSTools
                         startLine = currLine;
 
                     }
-                    else if ((i < c - 1) && ((chars[i] == '/' && chars[i + 1] == '/') || (chars[i] == '#')))
+                    else if (chars[i] == '#')
+                    {
+                        // this is quick and dirty.
+                        // the logic is that if there's an #if block,
+                        // it either won't terminate a bracket set inside,
+                        // or the #else block will also terminate the bracket set.
+                        // well, we only want one termination of a hypothetical bracket set.
+                        // so we just want to be able to follow the flow of the document,
+                        // we're not concerned with what's inside.
+
+                        // TODO Follow compiler directives in real-time.
+
+                        forScan.Remove(forScan.Length - 1, 1);
+                        forScan.Append(' ');
+
+                        clo = false;
+
+                        currMarker = new TMarker()
+                        {
+                            StartColumn = ColumnFromHere(chars, i),
+                            StartLine = currLine,
+                            StartPos = i,
+                            Level = currLevel,
+                            ParentElementPath = currName,
+                            Namespace = currNS
+                        };
+
+                        sb = new StringBuilder();
+
+                        sb.Append(chars[i]);
+
+                        for (j = i + 1; j < c; j++)
+                        {
+                            if (chars[j] != '\r' && chars[j] != '\n') sb.Append(chars[j]);
+
+                            if (chars[j] == '\n')
+                            {
+                                forScan.Append('\n');
+                                currMarker.EndColumn = ColumnFromHere(chars, j - 1);
+                                currMarker.EndLine = currLine;
+                                currMarker.EndPos = j - 1;
+                                currMarker.Content = sb.ToString();
+                                currMarker.Kind = MarkerKind.Directive;
+
+                                markers.Add(currMarker);
+                                currMarker = default;
+                                currLine++;
+
+                                break;
+                            }
+                        }
+                        
+                        var dir = sb.ToString();
+
+                        if (dir.StartsWith("#if "))
+                        {
+                            inif++;
+                        }
+                        else if (dir == "#endif" || dir == "#else")
+                        {
+                            inif--;
+                        }
+
+                        if (j >= c) break;
+                        i = j;
+                    }
+                    else if ((i < c - 1) && ((chars[i] == '/' && chars[i + 1] == '/')))
                     {
                         forScan.Remove(forScan.Length - 1, 1);
                         forScan.Append(' ');
@@ -877,9 +948,10 @@ namespace DataTools.CSTools
                         sb.Append(chars[i + 1]);
 
                         bool docs = false;
+                    
                         for (j = i + 2; j < c; j++)
                         {
-                            if (j == i + 2 && chars[j] == '/')
+                            if ((j == i + 2) && chars[j] == '/')
                             {
                                 docs = true;
                             }
@@ -898,11 +970,6 @@ namespace DataTools.CSTools
                                 markers.Add(currMarker);
                                 currMarker = default;
                                 currLine++;
-
-                                //if (docs)
-                                //{
-                                //    startPos = scanStartPos = j + 1;
-                                //}
 
                                 break;
                             }
@@ -1767,7 +1834,7 @@ namespace DataTools.CSTools
             return pos;
         }
 
-        #endregion
+#endregion
 
     }
 

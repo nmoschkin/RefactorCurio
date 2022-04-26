@@ -101,7 +101,7 @@ namespace CSRefactorCurio
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
+            
             if (dte.Solution is object && dte.Solution.IsOpen)
             {
                 LoadProject();
@@ -115,7 +115,8 @@ namespace CSRefactorCurio
         {
             Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += SolutionEvents_OnAfterOpenSolution;
             Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnBeforeCloseSolution += SolutionEvents_OnBeforeCloseSolution;
-            VSColorTheme.ThemeChanged += VSColorTheme_ThemeChanged;            
+
+            VSColorTheme.ThemeChanged += VSColorTheme_ThemeChanged;
 
             await base.OnAfterPackageLoadedAsync(cancellationToken);
         }
