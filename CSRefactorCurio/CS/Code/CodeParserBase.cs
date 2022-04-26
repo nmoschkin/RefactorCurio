@@ -162,7 +162,7 @@ namespace DataTools.CSTools
         /// Gets the markers filtered for commit.
         /// </summary>
         /// <returns></returns>
-        protected abstract TList GetMarkersForCommit();
+        public abstract TList GetMarkersForCommit();
 
 
         /// <summary>

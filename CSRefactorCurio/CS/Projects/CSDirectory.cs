@@ -28,7 +28,7 @@ namespace DataTools.CSTools
     {
         #region Private Fields
 
-        CSFileChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSFileChain<CSMarker, ObservableMarkerList<CSMarker>>();
+        CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 
         private ObservableMarkerList<CSMarker> filteredChildren;
 
@@ -245,7 +245,7 @@ namespace DataTools.CSTools
 
         #region Protected Methods
 
-        protected override ObservableMarkerList<CSMarker> GetMarkersForCommit()
+        public override ObservableMarkerList<CSMarker> GetMarkersForCommit()
         {
             var db = new CSXMLIntegratorFilter<CSMarker, ObservableMarkerList<CSMarker>>();
             return db.ApplyFilter(markers);
@@ -264,7 +264,7 @@ namespace DataTools.CSTools
             {
                 SetHomeFile(markers);
                 RunFilters(markers);
-                
+
                 nocolnotify = false;
                 return true;
             }
@@ -890,6 +890,19 @@ namespace DataTools.CSTools
 
         #endregion Public Methods
 
+
+#if !EXPERIMENTAL
+        private void Shenanigans1(string text)
+        {
+            var str1 = "This is some shenanigans";
+#else
+        private void Shenanigans2(string text)
+        {
+            var str2 = "This is some other shenanigans";
+#endif
+
+        }
+
         #region Public Events
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -898,13 +911,14 @@ namespace DataTools.CSTools
 
         #region Public Properties
 
-        new public CSCodeFile HomeFile {
+        new public CSCodeFile HomeFile
+        {
             get => (CSCodeFile)base.HomeFile;
             set => base.HomeFile = value;
         }
 
-        public override ObservableMarkerList<CSMarker> Children 
-        { 
+        public override ObservableMarkerList<CSMarker> Children
+        {
             get => base.Children;
             set
             {
@@ -927,7 +941,7 @@ namespace DataTools.CSTools
                 usings.Add(Name);
             }
 
-            foreach(var c in Children)
+            foreach (var c in Children)
             {
                 usings.AddRange(c.ExtractAllUsings());
             }
@@ -958,11 +972,12 @@ namespace DataTools.CSTools
 
         #region Protected Methods
 
-        protected void OnPropertyChanged([CallerMemberName]string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion Protected Methods
+
     }
 }

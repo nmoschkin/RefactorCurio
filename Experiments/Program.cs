@@ -27,6 +27,7 @@ namespace Experiments
 
             file.OutputMarkers(outdir);
 
+            var markers = file.GetMarkersForCommit();
 
         }
     }

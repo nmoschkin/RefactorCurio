@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DataTools.CSTools
 {
@@ -183,11 +184,11 @@ namespace DataTools.CSTools
     }
 
     /// <summary>
-    /// The default filter chain for files consisting of the XML Eliminator and the File Sorter/Filter.
+    /// The default display filter chain for consisting of the XML Eliminator and the File Sorter/Filter.
     /// </summary>
     /// <typeparam name="TMarker"></typeparam>
     /// <typeparam name="TList"></typeparam>
-    public class CSFileChain<TMarker, TList> : FixedFilterRuleChain<TMarker, TList>
+    public class CSProjectDisplayChain<TMarker, TList> : FixedFilterRuleChain<TMarker, TList>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {
@@ -213,6 +214,45 @@ namespace DataTools.CSTools
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {
+
+        private TMarker FindEndIf(TList markers, int index, int cdepth, out int? relativeIndex)
+        {
+            int c = markers.Count;
+
+            for (int i = index; i < c; i++)
+            {
+                if (markers[i].Kind == MarkerKind.Directive && markers[i].Name.StartsWith("#if"))
+                {
+                    cdepth++;
+                }
+                else if (markers[i].Kind == MarkerKind.Directive && markers[i].Name == "#endif")
+                {
+                    cdepth--;
+                    if (cdepth == 0)
+                    {
+                        relativeIndex = i;
+                        return markers[i];
+                    }
+                }
+
+                if (markers[i].Children != null && markers[i].Children.Count > 0)
+                {
+                    int? re;
+                    var result = FindEndIf(markers[i].Children, 0, cdepth, out re);
+                    if (result != null)
+                    {
+                        relativeIndex = i;
+                        return result;
+                    }
+                }
+
+            }
+
+            relativeIndex = null;
+            return default;
+        }
+
+
         public override TList ApplyFilter(TList markers)
         {
             int i, c = markers.Count;
@@ -220,6 +260,52 @@ namespace DataTools.CSTools
 
             for (i = 0; i < c; i++)
             {
+                if (markers[i].Kind == MarkerKind.Directive && markers[i].Name.StartsWith("#if "))
+                {
+                    var xmarker = FindEndIf(markers, i, 0, out int? ri);
+                    
+                    if (xmarker != null && ri is int rix)
+                    {
+                        int j;
+
+                        for (j = i; j <= rix; j++)
+                        {
+                            if (ReportHelper.DefaultSortOrder.Contains(markers[j].Kind)) break;
+                        }
+
+                        if (j <= rix)
+                        {
+                            var mknew = markers[j].Clone<TMarker>(false);
+
+                            mknew.StartPos = markers[i].StartPos;
+                            mknew.StartLine = markers[i].StartLine;
+                            mknew.StartColumn = markers[i].StartColumn;
+
+                            mknew.Children = new TList();
+
+                            for (int z = i; z <= rix; z++)
+                            {
+                                if (markers[z].Children != null && markers[z].Children.Count > 0)
+                                {
+                                    markers[z].Children = ApplyFilter(markers[z].Children);
+                                }
+
+                                mknew.Children.Add(markers[z]);
+                            }
+
+                            mknew.EndPos = markers[rix].EndPos;
+                            mknew.EndLine = markers[rix].EndLine;
+                            mknew.EndColumn = markers[rix].EndColumn;
+
+                            //mknew.Kind = MarkerKind.Consolidation;
+                            lnew.Add(mknew);
+                            i = rix;
+
+                            continue;
+                        }
+                    }
+                }
+
                 if (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment)
                 {
                     int oi = i;
@@ -294,6 +380,28 @@ namespace DataTools.CSTools
             return true;
         }
     }
+
+    /// <summary>
+    /// The default file filter chain for consisting of the XML combiner and the File Sorter/Filter.
+    /// </summary>
+    /// <typeparam name="TMarker"></typeparam>
+    /// <typeparam name="TList"></typeparam>
+    public class CSFileChain<TMarker, TList> : FixedFilterRuleChain<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
+    {
+        public override FilterChainKind FilterChainKind => FilterChainKind.PassAll;
+
+        protected override IEnumerable<MarkerFilterRule<TMarker, TList>> ProvideFilterChain()
+        {
+            return new MarkerFilterRule<TMarker, TList>[]
+            {
+                new CSXMLIntegratorFilter<TMarker, TList>(),
+                new CSFileSortFilter<TMarker, TList>()
+            };
+        }
+    }
+
 
 
 }

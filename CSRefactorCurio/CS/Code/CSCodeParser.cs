@@ -236,7 +236,7 @@ namespace DataTools.CSTools
     public class CSCodeParser<TMarker, TList> : CodeParserBase<TMarker, TList> where TMarker : IMarker<TMarker, TList>, new() where TList : IMarkerList<TMarker>, new()
     {
 
-        protected override TList GetMarkersForCommit()
+        public override TList GetMarkersForCommit()
         {
             return markers;
         }
@@ -457,6 +457,7 @@ namespace DataTools.CSTools
                 int i, j, c = chars.Length;
 
                 TList markers = new TList();
+                var rootlist = markers;
                 TMarker currMarker = default;
                 string prevWord = "";
                 var strack = new Stack<MarkerKind>();
@@ -504,6 +505,8 @@ namespace DataTools.CSTools
                     }
                     else
                     {
+                        if (inif > 0 && chars[i] != '#') continue;
+
                         if (AllowedChar(chars[i], true))
                         {
                             currWord.Append(chars[i]);
@@ -685,8 +688,6 @@ namespace DataTools.CSTools
                     }
                     else if (chars[i] == '{')
                     {
-                        if (inif > 0) continue;
-
                         forScan.Remove(forScan.Length - 1, 1);
                         clo = false;
                         ++currLevel;
@@ -802,8 +803,6 @@ namespace DataTools.CSTools
                     }
                     else if (chars[i] == '}')
                     {
-                        if (inif > 0) continue;
-
                         clo = false;
                         if (currPatt == MarkerKind.Enum)
                         {
@@ -899,10 +898,12 @@ namespace DataTools.CSTools
                             if (chars[j] == '\n')
                             {
                                 forScan.Append('\n');
+
                                 currMarker.EndColumn = ColumnFromHere(chars, j - 1);
                                 currMarker.EndLine = currLine;
                                 currMarker.EndPos = j - 1;
                                 currMarker.Content = sb.ToString();
+                                currMarker.Name = sb.ToString();
                                 currMarker.Kind = MarkerKind.Directive;
 
                                 markers.Add(currMarker);
@@ -922,6 +923,7 @@ namespace DataTools.CSTools
                         else if (dir == "#endif" || dir == "#else")
                         {
                             inif--;
+                            if (inif < 0) inif = 0;
                         }
 
                         if (j >= c) break;
