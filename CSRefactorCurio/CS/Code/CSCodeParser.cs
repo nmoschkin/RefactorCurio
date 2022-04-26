@@ -169,7 +169,7 @@ namespace DataTools.CSTools
             {
                 t = "";
 
-                for (var i = marker.StartLine; i <= marker.EndLine; i++)
+                for (var i = marker.StartLine - 1; i < marker.EndLine; i++)
                 {
                     if (t != "") t += "\r\n";
                     t += lines[i];
@@ -213,15 +213,15 @@ namespace DataTools.CSTools
         /// <returns></returns>
         public static string GetPreamble(string[] lines, int preambleTo, int preambleFrom)
         {
-            string s = "";
+            var sb = new StringBuilder();
 
-            for (var i = preambleFrom; i <= preambleTo; i++)
+            for (var i = preambleFrom; i < preambleTo; i++)
             {
-                if (s != "") s += "\r\n";
-                s += lines[i];
+                if (sb.Length > 0) sb.Append("\r\n");
+                sb.Append(lines[i]);
             }
 
-            return s;
+            return sb.ToString();
         }
 
 
@@ -235,6 +235,11 @@ namespace DataTools.CSTools
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
     public class CSCodeParser<TMarker, TList> : CodeParserBase<TMarker, TList> where TMarker : IMarker<TMarker, TList>, new() where TList : IMarkerList<TMarker>, new()
     {
+
+        protected override TList GetMarkersForCommit()
+        {
+            return markers;
+        }
 
         /// <summary>
         /// Load and optionally parse a C# code file.
@@ -764,7 +769,7 @@ namespace DataTools.CSTools
                                         currMarker.Namespace = currNS;
                                         if (pre == -1)
                                         {
-                                            pre = startPos - 1;
+                                            pre = currLine - 2;
                                         }
                                     }
 

@@ -449,6 +449,7 @@ namespace DataTools.CSTools
         protected string scanHit;
         protected List<string> unknownWords;
         protected string parentElementString;
+        protected string content = null;
 
         #endregion Protected Fields
 
@@ -528,7 +529,26 @@ namespace DataTools.CSTools
 
         public virtual ElementType ChildType => ElementType.Marker;
 
-        public virtual string Content { get; set; }
+        public virtual string Content
+        {
+            get
+            {
+                if (content == null)
+                {
+                    var hf = HomeFile;
+                    if (hf is IProjectFile cf)
+                    {
+                        content = cf.Text.Substring(StartPos, EndPos - StartPos + 1);
+                    }
+                }
+
+                return content;
+            }
+            set
+            {
+                content = value;
+            }
+        }
 
         public virtual string DataType { get; set; }
 

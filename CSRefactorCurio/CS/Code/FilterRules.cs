@@ -203,4 +203,108 @@ namespace DataTools.CSTools
         }
     }
 
+
+    /// <summary>
+    /// Eliminates XML Document tags and comments and disintegrates merged compartments.
+    /// </summary>
+    /// <typeparam name="TMarker"></typeparam>
+    /// <typeparam name="TList"></typeparam>
+    public class CSXMLIntegratorFilter<TMarker, TList> : MarkerFilterRule<TMarker, TList>
+        where TList : IMarkerList<TMarker>, new()
+        where TMarker : IMarker<TMarker, TList>, new()
+    {
+        public override TList ApplyFilter(TList markers)
+        {
+            int i, c = markers.Count;
+            var lnew = new TList();
+
+            for (i = 0; i < c; i++)
+            {
+                if (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment)
+                {
+                    int oi = i;
+                    int x = i;
+
+                    while (i < c && (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment))
+                    {
+                        i++;
+                    }
+
+                    if (i < c)
+                    {
+                        var mknew = markers[i].Clone<TMarker>(false);
+
+                        mknew.StartPos = markers[x].StartPos;
+                        mknew.StartLine = markers[x].StartLine;
+                        mknew.StartColumn = markers[x].StartColumn;
+
+                        mknew.Children = new TList();
+
+                        for (int z = x; z <= i; z++)
+                        {
+                            if (markers[z].Children != null && markers[z].Children.Count > 0)
+                            {
+                                markers[z].Children = ApplyFilter(markers[z].Children);
+                            }
+
+                            mknew.Children.Add(markers[z]);
+                        }
+
+                        mknew.EndPos = markers[i].EndPos;
+                        mknew.EndLine = markers[i].EndLine;
+                        mknew.EndColumn = markers[i].EndColumn;
+
+                        //mknew.Kind = MarkerKind.Consolidation;
+                        lnew.Add(mknew);
+                    }
+                    else
+                    {
+                        i = oi;
+                        continue;
+                    }
+                }
+                else
+                {
+                    switch(markers[i].Kind)
+                    {
+                        case MarkerKind.Interface:
+                        case MarkerKind.Class:
+                        case MarkerKind.Struct:
+                        case MarkerKind.Enum:
+                        case MarkerKind.Record:
+                        case MarkerKind.Delegate:
+                        case MarkerKind.Consolidation:
+
+                            var cmarker = markers[i].Clone<TMarker>(false);
+                            if (cmarker.Children != null && cmarker.Children.Count > 0)
+                            {
+                                cmarker.Children = ApplyFilter(cmarker.Children);
+                            }
+
+                            lnew.Add(cmarker);
+
+                            break;
+
+                        case MarkerKind.Namespace:
+                            foreach (var newItem in ApplyFilter(markers[i].Children)) lnew.Add(newItem);
+                            break;
+
+                        default:
+                            continue;
+                    }
+
+                }
+            }
+
+            return lnew;
+
+        }
+
+        public override bool IsValid(IMarker item)
+        {
+            return true;
+        }
+    }
+
+
 }

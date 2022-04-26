@@ -24,7 +24,7 @@ namespace DataTools.CSTools
     /// <summary>
     /// CS Refactor Curio Solution Source Code File based on <see cref="CSCodeParser{TMarker, TList}"/>.
     /// </summary>
-    public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
+    public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectFile<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
     {
         #region Private Fields
 
@@ -142,7 +142,14 @@ namespace DataTools.CSTools
             }
             protected set
             {
-                project = new WeakReference<CurioProject>(value);
+                if (value == null)
+                {
+                    project = null;
+                }
+                else
+                {
+                    project = new WeakReference<CurioProject>(value);
+                }
             }
         }
 
@@ -237,6 +244,12 @@ namespace DataTools.CSTools
         #endregion Internal Methods
 
         #region Protected Methods
+
+        protected override ObservableMarkerList<CSMarker> GetMarkersForCommit()
+        {
+            var db = new CSXMLIntegratorFilter<CSMarker, ObservableMarkerList<CSMarker>>();
+            return db.ApplyFilter(markers);
+        }
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

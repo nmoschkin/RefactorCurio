@@ -170,6 +170,26 @@ namespace DataTools.CSTools
 
         #endregion Public Properties
     }
+
+    /// <summary>
+    /// Represents a project element with child elements based on a file.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IProjectFile : IProjectNode
+    {
+        string Filename { get; }
+
+        string Text { get; }
+
+    }
+
+    public interface IProjectFile<T> : IProjectFile, IProjectNode<T> where T : IList, INotifyCollectionChanged, INotifyPropertyChanged
+    {
+    }
+
+
+
+
     /// <summary>
     /// Represents a solution folder in a project.
     /// </summary>

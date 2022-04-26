@@ -42,27 +42,27 @@ namespace DataTools.CSTools
         /// <summary>
         /// Gets or sets the 'Interfaces' directory name (default is 'Contracts')
         /// </summary>
-        public virtual string InterfaceDirName { get; set; } = CSAppOptions.Instance.InterfaceFolderName;
+        public virtual string InterfaceDirName { get; set; } //= CSAppOptions.Instance.InterfaceFolderName;
 
         /// <summary>
         /// Gets or sets the 'Classes' directory name (default is none)
         /// </summary>
-        public virtual string ClassDirName { get; set; } = CSAppOptions.Instance.ClassFolderName;
+        public virtual string ClassDirName { get; set; } //= CSAppOptions.Instance.ClassFolderName;
 
         /// <summary>
         /// Gets or stets the 'Enums' directory name (default is 'Enums')
         /// </summary>
-        public virtual string EnumDirName { get; set; } = CSAppOptions.Instance.EnumFolderName;
+        public virtual string EnumDirName { get; set; } //= CSAppOptions.Instance.EnumFolderName;
 
         /// <summary>
         /// Gets or stets the 'Structs' directory name (default is 'Structs')
         /// </summary>
-        public virtual string StructDirName { get; set; } = CSAppOptions.Instance.StructFolderName;
+        public virtual string StructDirName { get; set; } //= CSAppOptions.Instance.StructFolderName;
 
         /// <summary>
         /// Gets or sets a value indicating that files containing different types of objects will go in different subdirectories beneath the selected output directory.
         /// </summary>
-        public virtual bool SeparateDirs { get; set; } = CSAppOptions.Instance.UseSeparateFolders;
+        public virtual bool SeparateDirs { get; set; } //= CSAppOptions.Instance.UseSeparateFolders;
 
         /// <summary>
         /// Gets a value indicating if the last parse was successful.
@@ -126,6 +126,14 @@ namespace DataTools.CSTools
         /// <exception cref="FileNotFoundException"></exception>
         public abstract void LoadFile(string filename, bool lazy = false);
 
+        
+        /// <summary>
+        /// Gets the markers filtered for commit.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract TList GetMarkersForCommit();
+
+
         /// <summary>
         /// Write the results of the refactor and reorganized file structure to disk.
         /// </summary>
@@ -156,54 +164,17 @@ namespace DataTools.CSTools
             if (mfile == null) return false;
             if (markers == null) return false;
 
-            foreach (var marker in mfile.Markers)
+            var mks = GetMarkersForCommit();
+
+            foreach (var marker in mks)
             {
                 if (seen.Contains(marker)) continue;
 
-                var mlist = new TList();
+                var mlist = new TList() { marker };
 
                 var name = marker.Name;
                 var ns = marker.Namespace;
                 var kind = marker.Kind;
-
-                foreach (var m in markers)
-                {
-                    if (seen.Contains(m) || mlist.Contains(m)) continue;
-
-                    if (m.Name == name && m.Namespace == ns && m.Kind == kind)
-                    {
-                        mlist.Add(m);
-                    }
-                }
-
-                QuickSort.Sort(mlist, (a, b) =>
-                {
-                    int x = string.Compare(a.Namespace, b.Namespace);
-
-                    if (x == 0)
-                    {
-                        x = string.Compare(a.Name, b.Name);
-                        if (x == 0)
-                        {
-                            x = string.Compare(a.Generics, b.Generics);
-                        }
-                    }
-
-                    return x;
-                });
-
-                if (((IList<TMarker>)mlist).Count == 0) continue;
-                if (seen is List<TMarker> l)
-                {
-                    l.AddRange(mlist);
-                }
-                else
-                {
-                    foreach (var m in mlist)
-                    {
-                        seen.Add(m);
-                    }
-                }
 
                 var mf = new AtomicGenerationInfo<TMarker, TList>()
                 {
