@@ -207,6 +207,9 @@
     <PackageReference Include="DataTools.Essentials">
       <Version>8.0.0.1011</Version>
     </PackageReference>
+    <PackageReference Include="DataTools.Graphics">
+      <Version>8.0.0.1010</Version>
+    </PackageReference>
     <PackageReference Include="DataTools.MathTools">
       <Version>8.0.0.1010</Version>
     </PackageReference>

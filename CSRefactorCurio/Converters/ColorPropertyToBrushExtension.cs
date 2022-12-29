@@ -1,5 +1,7 @@
-﻿using DataTools.Text;
+﻿using DataTools.Graphics;
+using DataTools.Text;
 
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 
 using System;
@@ -25,6 +27,7 @@ namespace CSRefactorCurio.Converters
         private SolidColorBrush defaultBrush = new SolidColorBrush(Colors.White);
 
         private ColorPropertyAspect aspect = ColorPropertyAspect.Foreground;
+        private bool isDark = false;
 
         public ColorPropertyToBrushExtension()
         {
@@ -36,6 +39,12 @@ namespace CSRefactorCurio.Converters
                 //get the COLORREF structure
                 uint win32Color;
                 uiShell2.GetVSSysColorEx((int)__VSSYSCOLOREX3.VSCOLOR_WINDOW, out win32Color);
+                var uc = new UniColor(win32Color);
+
+                if (uc.V < 0.5)
+                {
+                    isDark = true;
+                }
             }
         }
 
@@ -72,26 +81,42 @@ namespace CSRefactorCurio.Converters
 
                 if (CSRefactorCurioPackage._colors.TryGetValue(s, out IColorableProperty c))
                 {
+                    Color chk;
+
                     if (aspect == ColorPropertyAspect.Foreground)
                     {
-                        if (!cache.TryGetValue(c.Foreground, out retVal))
-                        {
-                            retVal = new SolidColorBrush(c.Foreground);
-                            cache.Add(c.Foreground, retVal);
-                        }
+                        var uc = new UniColor(c.Foreground.ToArgb());
 
-                        return retVal;
+                        if (uc.V < 0.5 && isDark)
+                        {
+                            chk = c.Background;
+                        }
+                        else
+                        {
+                            chk = c.Foreground;
+                        }
                     }
                     else
                     {
-                        if (!cache.TryGetValue(c.Background, out retVal))
-                        {
-                            retVal = new SolidColorBrush(c.Background);
-                            cache.Add(c.Background, retVal);
-                        }
+                        var uc = new UniColor(c.Background.ToArgb());
 
-                        return retVal;
+                        if (uc.V > 0.5 && isDark)
+                        {
+                            chk = c.Foreground;
+                        }
+                        else
+                        {
+                            chk = c.Background;
+                        }
                     }
+
+                    if (!cache.TryGetValue(chk, out retVal))
+                    {
+                        retVal = new SolidColorBrush(chk);
+                        cache.Add(chk, retVal);
+                    }
+
+                    return retVal;
                 }
             }
 

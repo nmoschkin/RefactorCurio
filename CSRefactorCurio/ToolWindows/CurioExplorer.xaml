@@ -17,6 +17,12 @@
     d:DesignWidth="300"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style
+            TargetType="TreeViewItem">
+            <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
+        </Style>
+    </UserControl.Resources>
     <Grid
         Cursor="{Binding Cursor}">
         <Grid.RowDefinitions>
