@@ -18,6 +18,7 @@ using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.TextFormatting;
 
 namespace DataTools.CSTools
 {
@@ -888,20 +889,63 @@ namespace DataTools.CSTools
             return null;
         }
 
-        #endregion Public Methods
-
-
-#if !EXPERIMENTAL
-        private void Shenanigans1(string text)
+        public override string FormatContents()
         {
-            var str1 = "This is some shenanigans";
-#else
-        private void Shenanigans2(string text)
-        {
-            var str2 = "This is some other shenanigans";
-#endif
+            if (Children != null && Children.Count > 0)
+            {
+                var sb = new StringBuilder();
 
+                var m = StartPos;
+                var n = Children[0].StartPos;
+
+                string s = "";
+
+                if (Level > 0)
+                {
+                    s = new string(' ', (Level - 1) * 4);
+                }
+
+                sb.Append(s);
+                sb.AppendLine(HomeFile.Text.Substring(m, n - m));
+
+                foreach (var marker in Children)
+                {
+                    switch (marker.Kind)
+                    {
+                        case MarkerKind.LineComment:
+                        case MarkerKind.BlockComment:
+                        case MarkerKind.XMLDoc:
+                            continue;
+
+                        case MarkerKind.Directive:
+                            if (marker.Content.StartsWith("#region") || marker.Content.StartsWith("#endregion"))
+                            {
+                                continue;
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    sb.Append(marker.FormatContents());
+                }
+
+                sb.AppendLine();
+                sb.Append(s);
+                sb.AppendLine("}");
+
+                return sb.ToString();
+            }
+            else
+            {
+                var fitext = HomeFile.Text.Substring(StartPos, EndPos - StartPos + 1);
+                return fitext;
+            
+            }
         }
+
+        #endregion Public Methods
 
         #region Public Events
 

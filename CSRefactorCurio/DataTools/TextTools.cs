@@ -1,25 +1,24 @@
-﻿// ************************************************* ''
-// DataTools C# Native Utility Library For Windows 
+﻿using System;
+
+// ************************************************* ''
+// DataTools C# Native Utility Library For Windows
 // Adapted for C#/Xamarin
 //
 // Module: TextTools
 //         Text processing and managling library.
-// 
+//
 // Copyright (C) 2011-2015, 2019 Nathan Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
+// Licensed Under the MIT License
 // ************************************************* ''
 
-using System;
-using System.Text;
-
-using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using Microsoft.VisualStudio.VCProjectEngine;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace DataTools.Text
 {
@@ -30,7 +29,6 @@ namespace DataTools.Text
     [Flags]
     public enum MatchCondition
     {
-
         /// <summary>
         /// The match must be exact
         /// </summary>
@@ -38,7 +36,7 @@ namespace DataTools.Text
         Exact = 0x0,
 
         /// <summary>
-        /// The match must be exact up until the length of the 
+        /// The match must be exact up until the length of the
         /// requested expression (if it is shorter than the matched index)
         /// </summary>
         /// <remarks></remarks>
@@ -122,7 +120,6 @@ namespace DataTools.Text
     /// </summary>
     public static class TextTools
     {
-
         /// <summary>
         /// All allowed mathematical characters.
         /// </summary>
@@ -153,7 +150,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public const string UrlAllowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
 
-
         /// <summary>
         /// Compares a string to many other strings.
         /// </summary>
@@ -162,7 +158,6 @@ namespace DataTools.Text
         /// <returns>True if found</returns>
         public static bool MultiComp(string v, string[] comp)
         {
-
             foreach (string x in comp)
             {
                 if (x == v) return true;
@@ -179,16 +174,13 @@ namespace DataTools.Text
         /// <returns>True if found</returns>
         public static bool MultiComp(char v, char[] comp)
         {
-
             foreach (char x in comp)
             {
                 if (x == v) return true;
             }
 
-
             return false;
         }
-
 
         /// <summary>
         /// Trim all public, writable, instance string properties in a class object.
@@ -197,9 +189,7 @@ namespace DataTools.Text
         /// <param name="trimChars">Optional trim characters</param>
         public static void ClassTrimTool(object obj, char[] trimChars = null)
         {
-
             if (obj == null || obj.GetType().IsClass == false) throw new ArgumentException();
-
 
             PropertyInfo[] props = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty);
 
@@ -246,7 +236,6 @@ namespace DataTools.Text
         /// </remarks>
         public static string[] Split(string scan, string separator, bool skipQuote = false, bool unescape = false, char quoteChar = '"', char escChar = '\\', bool unquote = false, bool withToken = false, bool withTokenIn = false, bool skipAllQuotes = true, bool trimResults = false, bool skipPairs = true)
         {
-
             int i;
             int line = 0;
 
@@ -348,7 +337,7 @@ namespace DataTools.Text
                     {
                         var x = 0;
                         var y = i;
-                        
+
                         while (y < c && x < e && chrs[y] == sep[x])
                         {
                             y++;
@@ -374,7 +363,7 @@ namespace DataTools.Text
             {
                 sOut.Add(sb.ToString());
             }
-            
+
             return sOut.ToArray();
         }
 
@@ -386,7 +375,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static bool IsAllNumbers(string value)
         {
-
             char[] ch = value.ToCharArray();
             int i, c = ch.Length - 1;
 
@@ -471,7 +459,6 @@ namespace DataTools.Text
 
             for (i = 0; i <= j; i++)
             {
-
                 if ((i == 0) && (modifiers & (NoSpaceModifiers.FirstToLower | NoSpaceModifiers.FirstToUpper)) != 0 && (exclusions.IndexOf(subject[i]) == -1))
                 {
                     switch (modifiers)
@@ -480,12 +467,12 @@ namespace DataTools.Text
                             ch[e] = char.ToUpper(subject[i]);
 
                             break;
+
                         case NoSpaceModifiers.FirstToLower:
                             ch[e] = char.ToLower(subject[i]);
 
                             break;
                     }
-
                 }
 
                 if (exclusions.IndexOf(subject[i]) != -1)
@@ -531,11 +518,9 @@ namespace DataTools.Text
                     ch[e] = subject[i];
                     e += 1;
                 }
-
             }
 
             return new string(ch);
-
         }
 
         /// <summary>
@@ -604,7 +589,7 @@ namespace DataTools.Text
         /// <param name="currStr">The current string that has been assembled so far.</param>
         /// <param name="currPos">The current position in the string that we have assembled so far.</param>
         /// <returns>An integer value indicating the state of the search:<br />
-        /// <br />0 - The string is not matched, and the string cannot be built from the combination of characters that have been passed. 
+        /// <br />0 - The string is not matched, and the string cannot be built from the combination of characters that have been passed.
         /// <br />1 - The string is matched, but not yet complete.
         /// <br />2 - The string is completely matched.
         /// </returns>
@@ -656,8 +641,8 @@ namespace DataTools.Text
                     return 1;
                 }
             }
-
         }
+
         /// <summary>
         /// Finds the text between two strings.
         /// </summary>
@@ -676,7 +661,7 @@ namespace DataTools.Text
         public static string TextBetween(string value, int startPos, string start, string stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false, bool noQuoteCheck = false)
         {
             int i = 0;
-            return TextBetween(value.ToCharArray(), startPos, ref i, start, stop, out idxStart, out idxStop, withDelimiters, escChar, throwException, noQuoteCheck);   
+            return TextBetween(value.ToCharArray(), startPos, ref i, start, stop, out idxStart, out idxStop, withDelimiters, escChar, throwException, noQuoteCheck);
         }
 
         /// <summary>
@@ -774,7 +759,6 @@ namespace DataTools.Text
                             level--;
                             if (level == 0)
                             {
-
                                 idxStop = i;
                                 //if (withDelimiters)
                                 //{
@@ -830,7 +814,7 @@ namespace DataTools.Text
         public static string TextBetween(string value, int startPos, char start, char stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false)
         {
             int i = 0;
-            return TextBetween(value.ToCharArray(), startPos, ref i, start, stop, out idxStart, out idxStop, withDelimiters, escChar, throwException);  
+            return TextBetween(value.ToCharArray(), startPos, ref i, start, stop, out idxStart, out idxStop, withDelimiters, escChar, throwException);
         }
 
         /// <summary>
@@ -1146,7 +1130,7 @@ namespace DataTools.Text
         /// </param>
         /// <param name="endPos">
         /// The returned end position of the quoted string.<br/><br />
-        /// If <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately before the quote character. 
+        /// If <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately before the quote character.
         /// </param>
         /// <param name="quoteChar">The quote character to use.</param>
         /// <param name="escChar">The escape character to use.</param>
@@ -1159,7 +1143,7 @@ namespace DataTools.Text
         /// If <paramref name="withQuotes"/> is true, then the escape characters are returned, verbatim. Otherwise, they are discarded.
         /// </remarks>
         /// <exception cref="SyntaxErrorException">If <paramref name="throwException"/> is true, then this error is thrown if the quoted string is unterminated.</exception>
-        /// 
+        ///
         public static string QuoteFromHere(string value, int index, out int? startPos, out int? endPos, char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
         {
             int l = 0;
@@ -1232,7 +1216,6 @@ namespace DataTools.Text
         {
             // ERROR: Not supported in C#: OnErrorStatement
 
-
             // as efficiently as possible
             char[] c = null;
             int a = 0;
@@ -1258,10 +1241,8 @@ namespace DataTools.Text
 
             d = new char[b + 1];
 
-
             for (a = 0; a <= b; a++)
             {
-
                 if ((RemoveComments == true))
                 {
                     j = cmt.Length - 1;
@@ -1326,12 +1307,10 @@ namespace DataTools.Text
                         }
                     }
                 }
-
             }
 
             Array.Resize(ref d, p);
             return new string(d);
-
         }
 
         public static string JustNumbers(string value, bool justDigits = false)
@@ -1402,7 +1381,6 @@ namespace DataTools.Text
                         }
                     }
                 }
-
 
                 if (t)
                 {
@@ -1534,9 +1512,7 @@ namespace DataTools.Text
                 return (double)o;
 
             return null;
-
         }
-
 
         /// <summary>
         /// Escape text for use in a CSV file.
@@ -1559,7 +1535,6 @@ namespace DataTools.Text
             {
                 switch (b[i])
                 {
-
                     case '\"':
                         sb.Append("\"\"");
                         break;
@@ -1567,14 +1542,11 @@ namespace DataTools.Text
                     default:
                         sb.Append(b[i]);
                         break;
-
                 }
             }
 
             return sb.ToString();
-
         }
-
 
         /// <summary>
         /// Escape text for use in a Json file.
@@ -1584,7 +1556,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string TextEscapeJson(string s)
         {
-
             char[] b;
             int i;
 
@@ -1596,8 +1567,6 @@ namespace DataTools.Text
 
             for (i = 0; i < b.Length; i++)
             {
-
-
                 if (i < b.Length - 1)
                 {
                     if ((b[i] == '\\') && (b[i + 1] == '\"'))
@@ -1617,7 +1586,6 @@ namespace DataTools.Text
             }
 
             return sOut.ToString();
-
         }
 
         /// <summary>
@@ -1635,7 +1603,6 @@ namespace DataTools.Text
             {
                 i = subj.IndexOf(search);
                 if (i != -1) subj = subj.Replace(search, replace);
-
             } while (i != -1);
 
             return subj;
@@ -1667,11 +1634,9 @@ namespace DataTools.Text
                         sOut.Append("\r\n");
                     sOut.Append(st[l]);
                 }
-
             }
 
             return sOut.ToString();
-
         }
 
         /// <summary>
@@ -1698,7 +1663,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string OneSpace(string input, string spaceChars = " ", bool PreserveQuotedText = true, char quoteChar = '\"', char escapeChar = '\\', bool Quick = true)
         {
-
             int a = 0;
             int b = 0;
 
@@ -1759,12 +1723,10 @@ namespace DataTools.Text
                             iQ = true;
                         }
                     }
-
                 }
             }
 
             return varOut.ToString();
-
         }
 
         public static string Bracket(string szText, ref int startIndex, ref int newIndex, ref string ErrorText)
@@ -1837,9 +1799,7 @@ namespace DataTools.Text
 
                     newIndex = ch.Length;
                     return szText.Substring(startIndex);
-
                 }
-
 
                 for (n = i; n <= c; n++)
                 {
@@ -1862,7 +1822,6 @@ namespace DataTools.Text
                             break; // TODO: might not be correct. Was : Exit For
                         }
                     }
-
                 }
 
                 if (bc != 0)
@@ -1877,14 +1836,12 @@ namespace DataTools.Text
                 startIndex = i;
 
                 return sOut;
-
             }
             catch (Exception ex)
             {
                 ErrorText = ex.Message;
                 return null;
             }
-
         }
 
         /// <summary>
@@ -1899,7 +1856,6 @@ namespace DataTools.Text
             string et = null;
             int i = 0, j = 0;
             return Bracket(szText, ref i, ref j, BracketPair, ref et);
-
         }
 
         /// <summary>
@@ -1952,7 +1908,6 @@ namespace DataTools.Text
             if (NoStickyChars == null)
                 NoStickyChars = "";
 
-
             for (i = 0; i <= c; i++)
             {
                 if ((sp[i] == '\"'))
@@ -1966,10 +1921,8 @@ namespace DataTools.Text
                         inqs = !inqs;
                 }
 
-
                 if (!inq && !inqs && Operators.IndexOf(sp[i]) != -1)
                 {
-
                     if ((i > 0) && (Operators.IndexOf(sp[i - 1]) != -1) && (NoStickyChars.IndexOf(sp[i]) == -1) && (NoStickyChars.IndexOf(sp[i - 1]) == -1))
                     {
                         if ((StickyCharsRight.IndexOf(sp[i - 1]) <= -1))
@@ -1993,19 +1946,15 @@ namespace DataTools.Text
                     {
                         s += " ";
                     }
-
                 }
                 else
                 {
                     s += sp[i];
                 }
-
             }
 
             return (OneSpace(s, SepChars)).Trim();
-
         }
-
 
         /// <summary>
         /// Strips out everything else from a string and returns only the numbers.
@@ -2052,7 +2001,7 @@ namespace DataTools.Text
 
             for (i = 0; i < cs; i++)
             {
-                if (scan.Contains(ch[i].ToString()))
+                if (scan.Contains(ch[i]))
                 {
                     sb.Append(ch[i]);
                 }
@@ -2060,8 +2009,6 @@ namespace DataTools.Text
 
             return sb.ToString();
         }
-
-
 
         /// <summary>
         /// Returns all words in a string as an array of strings.
@@ -2131,7 +2078,6 @@ namespace DataTools.Text
 
             SepChars = SepChars.Substring(1);
 
-
             for (i = 0; i <= c; i++)
             {
                 stwork = Words(stout[i], SepChars, null, SkipQuotes, Unescape, qc, ec);
@@ -2144,11 +2090,9 @@ namespace DataTools.Text
                 n = stwork2.Length;
                 Array.Resize(ref stwork2, n + stwork.Length);
                 Array.Copy(stwork, 0, stwork2, n, stwork.Length);
-
             }
 
             return stwork2;
-
         }
 
         /// <summary>
@@ -2204,7 +2148,6 @@ namespace DataTools.Text
                     xTot = 0;
 
                     continue;
-
                 }
                 else if ((xTot + st[i].Length) > Cols)
                 {
@@ -2223,7 +2166,6 @@ namespace DataTools.Text
                     xTot++;
                     sOut += " ";
                 }
-
             }
 
             return sOut;
@@ -2265,11 +2207,10 @@ namespace DataTools.Text
             {
                 return prefix + s;
             }
-
         }
 
         /// <summary>
-        /// Determines of a number can be parsed in hexadecimal 
+        /// Determines of a number can be parsed in hexadecimal
         /// (quick version, does not accept &amp;H or 0x, use IsHex() to parse those strings).
         /// </summary>
         /// <param name="input">Input string to scan.</param>
@@ -2278,7 +2219,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static bool IsHexQ(string input, ref int value)
         {
-
             string hx = "0123456789ABCDEFabcdef";
             int i = 0;
             int c = input.Length - 1;
@@ -2296,7 +2236,7 @@ namespace DataTools.Text
         }
 
         /// <summary>
-        /// Determines of a number can be parsed in hexadecimal 
+        /// Determines of a number can be parsed in hexadecimal
         /// (quick version, does not accept &amp;H or 0x, use IsHex() to parse those strings).
         /// </summary>
         /// <param name="input">Input string to scan.</param>
@@ -2317,7 +2257,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static bool IsHex(string hin, ref int value)
         {
-
             char[] b = null;
             int i = 0;
 
@@ -2333,39 +2272,8 @@ namespace DataTools.Text
 
             for (i = 0; i <= b.Length - 1; i++)
             {
-                switch (b[i])
-                {
-
-                    case 'a':
-                    case 'A':
-                    case 'b':
-                    case 'B':
-                    case 'c':
-                    case 'C':
-                    case 'd':
-                    case 'D':
-                    case 'e':
-                    case 'E':
-                    case 'f':
-                    case 'F':
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-
-                        break;
-
-                    default:
-
-                        c = false;
-                        break;
-                }
+                c = "ABCDEFabcdef0123456789".Contains(b[i]);
+                if (!c) break;
             }
 
             if (c)
@@ -2374,7 +2282,6 @@ namespace DataTools.Text
             }
 
             return c;
-
         }
 
         /// <summary>
@@ -2435,7 +2342,6 @@ namespace DataTools.Text
                     {
                         iQ = true;
                     }
-
                 }
             }
 
@@ -2631,7 +2537,6 @@ namespace DataTools.Text
                                 varOut.Append(char.ToLower(input[a]));
                             else
                                 varOut.Append(char.ToUpper(input[a]));
-
                         }
                         else
                         {
@@ -2646,7 +2551,6 @@ namespace DataTools.Text
                             iQ = true;
                         }
                     }
-
                 }
             }
 
@@ -2686,8 +2590,6 @@ namespace DataTools.Text
             {
                 return 0;
             }
-
-
         }
 
         /// <summary>
@@ -2708,7 +2610,6 @@ namespace DataTools.Text
 
             return output;
         }
-
 
         /// <summary>
         /// Concats all strings in a string array into one string.
@@ -2733,9 +2634,7 @@ namespace DataTools.Text
             }
 
             return sb.ToString();
-
         }
-
 
         /// <summary>
         /// Filters text using odd pairs of characters, when the beginning and end bounds have different constituents.
@@ -2759,7 +2658,6 @@ namespace DataTools.Text
             bool e = false;
 
             // ERROR: Not supported in C#: OnErrorStatement
-
 
             if ((FilterPair.Length == 0))
                 FilterPair = "\"";
@@ -2831,14 +2729,145 @@ namespace DataTools.Text
                     else
                     {
                         lnOut[m] += c[i];
-
                     }
-
                 }
             }
 
             return lnOut;
+        }
 
+        public static long ExaBiConst = 1024L * 1024 * 1024 * 1024 * 1024 * 1024;
+        public static long PetaBiConst = 1024L * 1024 * 1024 * 1024 * 1024;
+        public static long TeraBiConst = 1024L * 1024 * 1024 * 1024;
+        public static long GigaBiConst = 1024L * 1024 * 1024;
+        public static long MegaBiConst = 1024L * 1024;
+        public static long KiloBiConst = 1024L;
+
+        public static long ExaConst = 1000L * 1000 * 1000 * 1000 * 1000 * 1000;
+        public static long PetaConst = 1000L * 1000 * 1000 * 1000 * 1000;
+        public static long TeraConst = 1000L * 1000 * 1000 * 1000;
+        public static long GigaConst = 1000L * 1000 * 1000;
+        public static long MegaConst = 1000L * 1000;
+        public static long KiloConst = 1000L;
+
+        public static readonly string[] BinSpeedBytes = { "EiB/s", "PiB/s", "TiB/s", "GiB/s", "MiB/s", "KiB/s", "B/s" };
+        public static readonly string[] BinSpeedBits = { "Eib/s", "Pib/s", "Tib/s", "Gib/s", "Mib/s", "Kib/s", "b/s" };
+
+        public static readonly string[] BinSizeBytes = { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
+        public static readonly string[] BinSizeBits = { "Eib", "Pib", "Tib", "Gib", "Mib", "Kib", "b" };
+
+        public static readonly string[] DecSpeedBytes = { "EB/s", "PB/s", "TB/s", "GB/s", "MB/s", "KB/s", "B/s" };
+        public static readonly string[] DecSpeedBits = { "Eb/s", "Pb/s", "Tb/s", "Gb/s", "Mb/s", "Kb/s", "b/s" };
+
+        public static readonly string[] DecSizeBytes = { "EB", "PB", "TB", "GB", "MB", "KB", "B" };
+        public static readonly string[] DecSizeBits = { "Eb", "Pb", "Tb", "Gb", "Mb", "Kb", "b" };
+
+        public static readonly long[] BinValues = { ExaBiConst, PetaBiConst, TeraBiConst, GigaBiConst, MegaBiConst, KiloBiConst };
+        public static readonly long[] DecValues = { ExaConst, PetaConst, TeraConst, GigaConst, MegaConst, KiloConst };
+
+        /// <summary>
+        /// Prints a very large value for a size or transmission rate in a human-friendly format
+        /// </summary>
+        /// <param name="value">The value to print</param>
+        /// <param name="numFmt">The optional number format.</param>
+        /// <param name="speed">True for speed, false for size.</param>
+        /// <param name="binary">True to use the 1024 method, false to use the 1000 method.</param>
+        /// <param name="displayBinary">If <paramref name="binary"/> is true, then display the *bibits as opposed to the *gabits format.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Supports either bits or bytes, size or speed, binary or decimal.
+        /// </remarks>
+        public static string PrintFriendlyAmount(ulong value, string numFmt = null, bool speed = false, bool binary = true, bool displayBinary = false, bool bits = false, int rounding = 2)
+        {
+            double fs = value;
+            double spd = value;
+
+            int i;
+
+            string[] names;
+
+            if (binary && displayBinary)
+            {
+                if (speed)
+                {
+                    if (bits)
+                    {
+                        names = BinSpeedBits;
+                    }
+                    else
+                    {
+                        names = BinSpeedBytes;
+                    }
+                }
+                else
+                {
+                    if (bits)
+                    {
+                        names = BinSizeBits;
+                    }
+                    else
+                    {
+                        names = BinSizeBytes;
+                    }
+                }
+            }
+            else
+            {
+                if (speed)
+                {
+                    if (bits)
+                    {
+                        names = DecSpeedBits;
+                    }
+                    else
+                    {
+                        names = DecSpeedBytes;
+                    }
+                }
+                else
+                {
+                    if (bits)
+                    {
+                        names = DecSizeBits;
+                    }
+                    else
+                    {
+                        names = DecSizeBytes;
+                    }
+                }
+            }
+
+            if (binary)
+            {
+                for (i = 0; i < 6; i++)
+                {
+                    if (spd >= BinValues[i])
+                    {
+                        fs = spd / BinValues[i];
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (i = 0; i < 7; i++)
+                {
+                    if (spd >= DecValues[i])
+                    {
+                        fs = spd / DecValues[i];
+                        break;
+                    }
+                }
+            }
+
+            if (numFmt != null)
+            {
+                return Math.Round(fs, rounding).ToString(numFmt) + " " + names[i];
+            }
+            else
+            {
+                return Math.Round(fs, rounding) + " " + names[i];
+            }
         }
 
         /// <summary>
@@ -2850,115 +2879,7 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string PrintFriendlySize(double size, string format = null, bool binary = false, int round = 2)
         {
-            double fs;
-            string nom;
-
-            if (binary)
-            {
-                if ((size >= (1024D * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024)))
-                {
-                    fs = (size / (1024D * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024));
-                    nom = "YiB";
-                }
-                else if ((size >= (1024D * 1024 * 1024 * 1024 * 1024 * 1024 * 1024)))
-                {
-                    fs = (size / (1024D * 1024 * 1024 * 1024 * 1024 * 1024 * 1024));
-                    nom = "ZiB";
-                }
-                else if ((size >= (1024L * 1024 * 1024 * 1024 * 1024 * 1024)))
-                {
-                    fs = (size / (1024L * 1024 * 1024 * 1024 * 1024 * 1024));
-                    nom = "EiB";
-                }
-                else if ((size >= (1024L * 1024 * 1024 * 1024 * 1024)))
-                {
-                    fs = (size / (1024L * 1024 * 1024 * 1024 * 1024));
-                    nom = "PiB";
-                }
-                else if ((size >= (1024L * 1024 * 1024 * 1024)))
-                {
-                    fs = (size / (1024L * 1024 * 1024 * 1024));
-                    nom = "TiB";
-                }
-                else if ((size >= (1024 * 1024 * 1024)))
-                {
-                    fs = (size / (1024 * 1024 * 1024));
-                    nom = "GiB";
-                }
-                else if ((size >= (1024 * 1024)))
-                {
-                    fs = (size / (1024 * 1024));
-                    nom = "MiB";
-                }
-                else if ((size >= (1024)))
-                {
-                    fs = (size / (1024));
-                    nom = "KiB";
-                }
-                else
-                {
-                    fs = size;
-                    nom = "B";
-                }
-            }
-            else
-            {
-                if ((size >= (1000D * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000)))
-                {
-                    fs = (size / (1000D * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
-                    nom = "YB";
-                }
-                else if ((size >= (1000D * 1000 * 1000 * 1000 * 1000 * 1000 * 1000)))
-                {
-                    fs = (size / (1000D * 1000 * 1000 * 1000 * 1000 * 1000 * 1000));
-                    nom = "ZB";
-                }
-                else if ((size >= (1000L * 1000 * 1000 * 1000 * 1000 * 1000)))
-                {
-                    fs = (size / (1000L * 1000 * 1000 * 1000 * 1000 * 1000));
-                    nom = "EB";
-                }
-                else if ((size >= (1000L * 1000 * 1000 * 1000 * 1000)))
-                {
-                    fs = (size / (1000L * 1000 * 1000 * 1000 * 1000));
-                    nom = "PB";
-                }
-                else if ((size >= (1000L * 1000 * 1000 * 1000)))
-                {
-                    fs = (size / (1000L * 1000 * 1000 * 1000));
-                    nom = "TB";
-                }
-                else if ((size >= (1000 * 1000 * 1000)))
-                {
-                    fs = (size / (1000 * 1000 * 1000));
-                    nom = "GB";
-                }
-                else if ((size >= (1000 * 1000)))
-                {
-                    fs = (size / (1000 * 1000));
-                    nom = "MB";
-                }
-                else if ((size >= (1000)))
-                {
-                    fs = (size / (1000));
-                    nom = "KB";
-                }
-                else
-                {
-                    fs = size;
-                    nom = "B";
-                }
-            }
-
-            if (format != null)
-            {
-                return Math.Round(fs, round).ToString(format) + " " + nom;
-            }
-            else
-            {
-                return Math.Round(fs, round) + " " + nom;
-            }
-
+            return PrintFriendlyAmount((ulong)size, format, false, binary, binary, rounding: 2);
         }
 
         /// <summary>
@@ -2970,112 +2891,7 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string PrintFriendlySpeed(ulong speed, string format = null, bool binary = false)
         {
-            double fs;
-            double spd = speed;
-            string nom;
-
-            if (binary)
-            {
-                if ((spd >= (1024L * 1024 * 1024 * 1024 * 1024 * 1024)))
-                {
-                    fs = (spd / (1024L * 1024 * 1024 * 1024 * 1024 * 1024));
-                    nom = "Eb/s";
-                    //wow
-                }
-                else if ((spd >= (1024L * 1024 * 1024 * 1024 * 1024)))
-                {
-                    fs = (spd / (1024L * 1024 * 1024 * 1024 * 1024));
-                    nom = "Pb/s";
-                    //wow
-                }
-                else if ((spd >= (1024L * 1024 * 1024 * 1024)))
-                {
-                    fs = (spd / (1024L * 1024 * 1024 * 1024));
-                    nom = "Tb/s";
-                    //wow
-                }
-                else if ((spd >= (1024 * 1024 * 1024)))
-                {
-                    fs = (spd / (1024 * 1024 * 1024));
-                    nom = "Gb/s";
-                    // still wow
-                }
-                else if ((spd >= (1024 * 1024)))
-                {
-                    fs = (spd / (1024 * 1024));
-                    nom = "Mb/s";
-                    // okay
-                }
-                else if ((spd >= (1024)))
-                {
-                    fs = (spd / (1024));
-                    nom = "Kb/s";
-                    // fine.
-                }
-                else
-                {
-                    fs = spd;
-                    nom = "b/s";
-                    // wow.
-                }
-
-            }
-            else
-            {
-                if ((spd >= (1000L * 1000 * 1000 * 1000 * 1000 * 1000)))
-                {
-                    fs = (spd / (1000L * 1000 * 1000 * 1000 * 1000 * 1000));
-                    nom = "Eb/s";
-                    //wow
-                }
-                else if ((spd >= (1000L * 1000 * 1000 * 1000 * 1000)))
-                {
-                    fs = (spd / (1000L * 1000 * 1000 * 1000 * 1000));
-                    nom = "Pb/s";
-                    //wow
-                }
-                else if ((spd >= (1000L * 1000 * 1000 * 1000)))
-                {
-                    fs = (spd / (1000L * 1000 * 1000 * 1000));
-                    nom = "Tb/s";
-                    //wow
-                }
-                else if ((spd >= (1000 * 1000 * 1000)))
-                {
-                    fs = (spd / (1000 * 1000 * 1000));
-                    nom = "Gb/s";
-                    // still wow
-                }
-                else if ((spd >= (1000 * 1000)))
-                {
-                    fs = (spd / (1000 * 1000));
-                    nom = "Mb/s";
-                    // okay
-                }
-                else if ((spd >= (1000)))
-                {
-                    fs = (spd / (1000));
-                    nom = "Kb/s";
-                    // fine.
-                }
-                else
-                {
-                    fs = spd;
-                    nom = "b/s";
-                    // wow.
-                }
-
-            }
-
-            if (format != null)
-            {
-                return System.Math.Round(fs, 2).ToString(format) + " " + nom;
-            }
-            else
-            {
-                return System.Math.Round(fs, 2) + " " + nom;
-            }
-
+            return PrintFriendlyAmount(speed, format, true, binary);
         }
 
         /// <summary>
@@ -3086,7 +2902,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string UrlEncode(string input)
         {
-
             char[] chrs = input.ToCharArray();
             byte[] asc = null;
             string sOut = "";
@@ -3095,7 +2910,6 @@ namespace DataTools.Text
             int c = 0;
 
             c = chrs.Length - 1;
-
 
             for (i = 0; i <= c; i++)
             {
@@ -3115,7 +2929,6 @@ namespace DataTools.Text
             }
 
             return sOut;
-
         }
 
         /// <summary>
@@ -3126,7 +2939,6 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string UrlDecode(string input)
         {
-
             if (input.IndexOf("%") == -1)
                 return input;
 
@@ -3176,7 +2988,7 @@ namespace DataTools.Text
         /// <remarks>
         /// This function utilizes <see cref="System.ComponentModel.DescriptionAttribute"/>.
         /// </remarks>
-        public static string PrintEnumDesc(Type t, object val) 
+        public static string PrintEnumDesc(Type t, object val)
         {
             var fs = t.GetFields(BindingFlags.Static | BindingFlags.Public);
             var hfta = t.GetCustomAttribute(typeof(FlagsAttribute));
@@ -3211,12 +3023,10 @@ namespace DataTools.Text
                             {
                                 sb.Append(x.ToString());
                             }
-
                         }
                     }
 
                     return sb.ToString();
-
                 }
                 else
                 {
@@ -3245,7 +3055,6 @@ namespace DataTools.Text
             return val?.ToString();
         }
     }
-
 
     public static class StringExtensions
     {
@@ -3277,8 +3086,5 @@ namespace DataTools.Text
         {
             return TextTools.PrintEnumDesc(value);
         }
-
     }
-
-
 }

@@ -9,17 +9,13 @@ global using Task = System.Threading.Tasks.Task;
 
 using CSRefactorCurio.ViewModels;
 
-using DataTools.CSTools;
+using Microsoft.VisualStudio.PlatformUI;
 
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-
-using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Microsoft.VisualStudio.PlatformUI;
-//Then you get an event 
- 
+
+//Then you get an event
+
 namespace CSRefactorCurio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -42,11 +38,11 @@ namespace CSRefactorCurio
     termValues: new[] { "HierSingleSelectionName:^.+$" })]
     public sealed class CSRefactorCurioPackage : ToolkitPackage
     {
-        static object syncRoot = new object();
-        static CSRefactorCurioPackage _package;
+        private static object syncRoot = new object();
+        private static CSRefactorCurioPackage _package;
 
-        EnvDTE.Solution currSln = null;
-        CurioExplorerSolution _curio;
+        private EnvDTE.Solution currSln = null;
+        private CurioExplorerSolution _curio;
         internal static ColorItems _colors;
         public static object SyncRoot => syncRoot;
 
@@ -67,7 +63,7 @@ namespace CSRefactorCurio
                 }
             }
         }
-        
+
         internal CurioExplorerSolution CurioSolution
         {
             get
@@ -79,7 +75,7 @@ namespace CSRefactorCurio
             }
             private set
             {
-                lock(syncRoot)
+                lock (syncRoot)
                 {
                     _curio = value;
                 }
@@ -88,10 +84,9 @@ namespace CSRefactorCurio
 
         public const string AddItemContextGuid = "17D7439F-90F8-4396-9B51-8309208381A5";
         public const string JsonItemContextGuid = "CD497BC9-978B-4C88-A214-0E22886A9601";
-       
+
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-
             CurioSolution = new CurioExplorerSolution();
             Instance = this;
 
@@ -100,14 +95,14 @@ namespace CSRefactorCurio
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-            
-            if (dte.Solution is object && dte.Solution.IsOpen)
+            EnvDTE.DTE dte = (EnvDTE.DTE)await GetServiceAsync(typeof(EnvDTE.DTE));
+
+            if (dte != null && dte.Solution is object && dte.Solution.IsOpen)
             {
                 LoadProject();
             }
 
-            _colors = await ColorItems.CreateAsync();
+            _colors = await ColorItems.CreateAsync(false);
             await base.InitializeAsync(cancellationToken, progress);
         }
 
@@ -121,9 +116,9 @@ namespace CSRefactorCurio
             await base.OnAfterPackageLoadedAsync(cancellationToken);
         }
 
-        private void VSColorTheme_ThemeChanged(ThemeChangedEventArgs e)
-        {            
-            _colors = ColorItems.Create();
+        private async void VSColorTheme_ThemeChanged(ThemeChangedEventArgs e)
+        {
+            _colors = await ColorItems.CreateAsync(false);
         }
 
         private void SolutionEvents_OnAfterOpenSolution(object sender, OpenSolutionEventArgs e)
@@ -141,21 +136,21 @@ namespace CSRefactorCurio
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            EnvDTE.DTE dte = (EnvDTE.DTE)await GetServiceAsync(typeof(EnvDTE.DTE));
+            if (dte == null) return;
+
             lock (syncRoot)
             {
-                EnvDTE.DTE dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
                 if (!reload && dte.Solution == currSln) return;
                 currSln = (EnvDTE.Solution)dte.Solution;
-               
+
                 CurioSolution.LoadFromDTE(dte);
             }
         }
 
         private void LoadProject()
-        {            
+        {
             _ = RefreshSolutionAsync(false);
-           
         }
     }
 }

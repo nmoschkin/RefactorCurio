@@ -267,6 +267,13 @@ namespace DataTools.CSTools
         /// <remarks>Implementations should make note of when and where they cannot fulfill the <paramref name="deep"/> contract.</remarks>
         T Clone<T>(bool deep) where T : IMarker, new();
 
+        
+        /// <summary>
+        /// Formats the contents of this marker for output to file.
+        /// </summary>
+        /// <returns></returns>
+        string FormatContents();
+
         #endregion Public Methods
 
     }
@@ -902,6 +909,12 @@ namespace DataTools.CSTools
         {
             return $"{Kind} {Name}{Generics}, Line: {StartLine} to {EndLine}";
         }
+
+        /// <summary>
+        /// Gets the formatted contents of the entire marker.
+        /// </summary>
+        /// <returns></returns>
+        public abstract string FormatContents();
 
         #endregion Public Methods
 

@@ -306,12 +306,12 @@ namespace DataTools.CSTools
                     }
                 }
 
-                if (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment)
+                if (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment || markers[i].Kind == MarkerKind.BlockComment)
                 {
                     int oi = i;
                     int x = i;
 
-                    while (i < c && (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment))
+                    while (i < c && (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment || markers[i].Kind == MarkerKind.BlockComment))
                     {
                         i++;
                     }
@@ -355,6 +355,9 @@ namespace DataTools.CSTools
                     {
                         case MarkerKind.Namespace:
                             foreach (var newItem in ApplyFilter(markers[i].Children)) lnew.Add(newItem);
+                            break;
+
+                        case MarkerKind.Using:
                             break;
 
                         default:

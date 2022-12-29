@@ -169,11 +169,13 @@ namespace DataTools.CSTools
             {
                 t = "";
 
-                for (var i = marker.StartLine - 1; i < marker.EndLine; i++)
-                {
-                    if (t != "") t += "\r\n";
-                    t += lines[i];
-                }
+                t += marker.FormatContents();
+
+                //for (var i = marker.StartLine - 1; i < marker.EndLine; i++)
+                //{
+                //    if (t != "") t += "\r\n";
+                //    t += lines[i];
+                //}
 
                 if (marker.Namespace != null)
                 {
