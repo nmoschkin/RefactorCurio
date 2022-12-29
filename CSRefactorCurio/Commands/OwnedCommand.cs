@@ -1,17 +1,13 @@
-﻿using DataTools.Observable;
+﻿using DataTools.Essentials.Observable;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-
 
 namespace CSRefactorCurio
 {
     public delegate void ExecOwnedCommandHandler(object parameter);
-
 
     public class OwnedCommand : ObservableBase, IOwnedCommand
     {
@@ -40,7 +36,7 @@ namespace CSRefactorCurio
         }
 
         public ICommandOwner Owner => owner;
-        
+
         public OwnedCommand(ICommandOwner owner, ExecOwnedCommandHandler handler, string cmdId = null)
         {
             this.owner = owner;
@@ -53,7 +49,7 @@ namespace CSRefactorCurio
         {
             //if (e.PropertyName == cmdId)
             //{
-                QueryCanExecute();
+            QueryCanExecute();
             //}
         }
 
@@ -90,5 +86,4 @@ namespace CSRefactorCurio
 
         bool QueryCanExecute();
     }
-
 }

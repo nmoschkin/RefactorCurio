@@ -1,28 +1,22 @@
-﻿
-using CSRefactorCurio.Dialogs;
+﻿using CSRefactorCurio.Dialogs;
 using CSRefactorCurio.Reporting;
 
 using DataTools.CSTools;
-using DataTools.Observable;
+using DataTools.Essentials.Observable;
 
 using EnvDTE80;
-
-using Microsoft.VisualStudio.Shell.Interop;
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CSRefactorCurio.ViewModels
 {
-
     /// <summary>
     /// The heart of the Curio Refactor Studio Solution
     /// </summary>
@@ -53,7 +47,6 @@ namespace CSRefactorCurio.ViewModels
         /// </summary>
         public CurioExplorerSolution()
         {
-
             classModes = new List<ObservableCollection<IProjectElement>>()
             {
                 new ObservableCollection<IProjectElement>(),
@@ -90,12 +83,10 @@ namespace CSRefactorCurio.ViewModels
             {
                 if (SelectedItem is CSCodeFile cf)
                 {
-
                     var p = cf.Project.RootFolder.Find(Path.GetDirectoryName(cf.Filename));
 
                     cf.OutputMarkers(Path.GetDirectoryName(cf.Filename));
                 }
-
             }, nameof(SplitFileCommand));
 
             clickProject = new OwnedCommand(this, (o) =>
@@ -108,7 +99,6 @@ namespace CSRefactorCurio.ViewModels
                     {
                         l.Add(p.Name);
                     }
-
                 }
             }, nameof(ClickProject));
 
@@ -171,10 +161,9 @@ namespace CSRefactorCurio.ViewModels
         /// Click a namespace
         /// </summary>
         public IOwnedCommand ClickNamespace => clickNamespace;
-        
-        
+
         public IOwnedCommand ClickProject => clickProject;
-        
+
         /// <summary>
         /// Gets the current view items.
         /// </summary>
@@ -333,7 +322,6 @@ namespace CSRefactorCurio.ViewModels
             LoadingFlag = false;
         }
 
-
         /// <summary>
         /// Find the specified project element by path.
         /// </summary>
@@ -341,7 +329,6 @@ namespace CSRefactorCurio.ViewModels
         /// <returns></returns>
         public IProjectElement FindByPath(string path)
         {
-
             foreach (IProjectNode project in Projects)
             {
                 var s = FindByPath(path, project);
@@ -360,7 +347,6 @@ namespace CSRefactorCurio.ViewModels
         {
             if (elem is CSMarker marker)
             {
-
                 var hf = marker.HomeFile as CSCodeFile;
 
                 if (hf != null)
@@ -373,14 +359,10 @@ namespace CSRefactorCurio.ViewModels
                         var test = FindProjectItem(fp, item);
                         if (test != null) return test;
                     }
-
-
                 }
-
             }
 
             return null;
-
         }
 
         /// <summary>
@@ -424,17 +406,14 @@ namespace CSRefactorCurio.ViewModels
         /// </remarks>
         public void RefreshNamespaces()
         {
-
             //var project = GetAllProjects(Projects).FirstOrDefault();
 
             //project.ReadTheFile();
-
 
             Cursor = Cursors.Wait;
             namespacesMap.Clear();
 
             var rpt = new MostSpreadOutNamespacesReport(this);
-
 
             classModes[1] = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
 
@@ -476,7 +455,6 @@ namespace CSRefactorCurio.ViewModels
         /// <param name="source">The source of native items is this list.</param>
         protected void PopulateFrom(IList<IProjectElement> addto, IEnumerable source)
         {
-
             DataTools.CSTools.CSSolutionFolder current = null;
 
             foreach (object obj in source)
@@ -487,7 +465,7 @@ namespace CSRefactorCurio.ViewModels
                     {
                         current = new DataTools.CSTools.CSSolutionFolder(item.Name);
                         addto.Add(current);
-                        
+
                         PopulateFrom(current.Children, item.ProjectItems);
                     }
                     else if (item.FullName.ToLower().EndsWith(".csproj"))
@@ -519,7 +497,6 @@ namespace CSRefactorCurio.ViewModels
                     {
                         var s = FindByPath(path, projectNode);
                         if (s != null) return s;
-
                     }
                 }
             }

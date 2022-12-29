@@ -1,11 +1,6 @@
-﻿
-using DataTools.CSTools;
-using DataTools.Desktop;
-using DataTools.MathTools;
-using DataTools.Observable;
-using DataTools.SortedLists;
-
-using Microsoft.Build.Framework.XamlTypes;
+﻿using DataTools.Desktop;
+using DataTools.Essentials.Observable;
+using DataTools.Essentials.SortedLists;
 
 using System;
 using System.Collections;
@@ -14,11 +9,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.TextFormatting;
 
 namespace DataTools.CSTools
 {
@@ -29,11 +21,11 @@ namespace DataTools.CSTools
     {
         #region Private Fields
 
-        CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
+        private CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 
         private ObservableMarkerList<CSMarker> filteredChildren;
 
-        bool nocolnotify = false;
+        private bool nocolnotify = false;
 
         private string title;
 
@@ -63,6 +55,7 @@ namespace DataTools.CSTools
         #region Public Properties
 
         IList IProjectNode.Children => markers;
+
         public virtual ObservableMarkerList<CSMarker> Children
         {
             get
@@ -93,6 +86,7 @@ namespace DataTools.CSTools
 
         public ElementType ChildType => ElementType.Marker;
         public ElementType ElementType => ElementType.File;
+
         public override string Filename
         {
             get => base.Filename;
@@ -127,7 +121,6 @@ namespace DataTools.CSTools
                     filteredChildren = value;
                     OnPropertyChanged();
                 }
-
             }
         }
 
@@ -154,7 +147,6 @@ namespace DataTools.CSTools
             }
         }
 
-
         public string Title
         {
             get => title;
@@ -172,7 +164,7 @@ namespace DataTools.CSTools
 
         #region Public Methods
 
-        new public static CSCodeFile LoadFromFile(string path, CurioProject project, bool lazy)
+        public new static CSCodeFile LoadFromFile(string path, CurioProject project, bool lazy)
         {
             var cf = new CSCodeFile(project);
             cf.LoadFile(path, lazy);
@@ -256,6 +248,7 @@ namespace DataTools.CSTools
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
         protected override bool Parse(string text)
         {
             markers.Clear();
@@ -273,7 +266,6 @@ namespace DataTools.CSTools
             nocolnotify = false;
             return false;
         }
-
 
         #endregion Protected Methods
 
@@ -301,7 +293,6 @@ namespace DataTools.CSTools
     /// </summary>
     public class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
-
         #region Private Fields
 
         private ObservableCollection<IProjectElement> children;
@@ -347,6 +338,7 @@ namespace DataTools.CSTools
         #region Public Properties
 
         IList IProjectNode.Children => children;
+
         public ObservableCollection<IProjectElement> Children
         {
             get => children;
@@ -357,6 +349,7 @@ namespace DataTools.CSTools
         }
 
         public ElementType ChildType => ElementType.File;
+
         /// <summary>
         /// Gets the observable list of subdirectories.
         /// </summary>
@@ -370,6 +363,7 @@ namespace DataTools.CSTools
         }
 
         public ElementType ElementType => ElementType.Directory;
+
         /// <summary>
         /// Gets the observable list of source code files.
         /// </summary>
@@ -521,7 +515,6 @@ namespace DataTools.CSTools
                         return newdir;
                     }
                 }
-
             }
 
             return null;
@@ -606,6 +599,7 @@ namespace DataTools.CSTools
 
             return count;
         }
+
         /// <summary>
         /// Process a <see cref="FileNotifyInfo"/> change event from the filesystem watcher.
         /// </summary>
@@ -632,7 +626,6 @@ namespace DataTools.CSTools
                     var obj = Find(this.Project.ProjectRootPath + "\\" + info.OldName);
                     if (obj != null)
                     {
-
                         if (obj is CSCodeFile file)
                         {
                             if (File.Exists(file.Filename)) file.Refresh();
@@ -656,7 +649,6 @@ namespace DataTools.CSTools
                         fobj.Refresh();
                     }
                     break;
-
             }
         }
 
@@ -742,7 +734,6 @@ namespace DataTools.CSTools
             {
                 Children.Add(item1);
             }
-
         }
 
         /// <summary>
@@ -807,6 +798,7 @@ namespace DataTools.CSTools
 
             return false;
         }
+
         /// <summary>
         /// Sort child elements.
         /// </summary>
@@ -831,7 +823,6 @@ namespace DataTools.CSTools
             {
                 return string.Compare(a.Title, b.Title);
             });
-
         }
 
         public override string ToString()
@@ -848,7 +839,6 @@ namespace DataTools.CSTools
         /// </summary>
         protected void CheckNamespaces()
         {
-
             List<string> p = new List<string>();
 
             foreach (var item in Files)
@@ -941,7 +931,6 @@ namespace DataTools.CSTools
             {
                 var fitext = HomeFile.Text.Substring(StartPos, EndPos - StartPos + 1);
                 return fitext;
-            
             }
         }
 
@@ -955,7 +944,7 @@ namespace DataTools.CSTools
 
         #region Public Properties
 
-        new public CSCodeFile HomeFile
+        public new CSCodeFile HomeFile
         {
             get => (CSCodeFile)base.HomeFile;
             set => base.HomeFile = value;
@@ -972,12 +961,10 @@ namespace DataTools.CSTools
                     OnPropertyChanged();
                 }
             }
-
         }
 
         public string[] ExtractAllUsings()
         {
-
             List<string> usings = new List<string>();
 
             if (kind == MarkerKind.Using)
@@ -993,10 +980,8 @@ namespace DataTools.CSTools
             return usings.ToArray();
         }
 
-
         public string[] ExtractAllGlobalUsings()
         {
-
             List<string> usings = new List<string>();
 
             if (kind == MarkerKind.Using && AccessModifiers == AccessModifiers.Global)
@@ -1022,6 +1007,5 @@ namespace DataTools.CSTools
         }
 
         #endregion Protected Methods
-
     }
 }

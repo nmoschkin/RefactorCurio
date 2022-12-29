@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DataTools.Essentials.Helpers;
+using DataTools.Essentials.SortedLists;
+
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using DataTools.MathTools;
-using System.Diagnostics.Contracts;
-using DataTools.SortedLists;
-using DataTools.Observable;
-using Microsoft.Build.Framework.XamlTypes;
-using System.Text.RegularExpressions;
-using MessagePack;
 
 namespace DataTools.CSTools
 {
-
-
     /// <summary>
     /// Detected access modifiers
     /// </summary>
@@ -116,7 +109,7 @@ namespace DataTools.CSTools
         /// </summary>
         int EndPos { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// If applicable, the generic type parameters of this element.
         /// </summary>
         string Generics { get; set; }
@@ -230,6 +223,7 @@ namespace DataTools.CSTools
         /// The scanned text that was used to determine the nature of the current element.
         /// </summary>
         string ScanHit { get; set; }
+
         /// <summary>
         /// The start column in the original document.
         /// </summary>
@@ -244,6 +238,7 @@ namespace DataTools.CSTools
         /// The first character position in the original document.
         /// </summary>
         int StartPos { get; set; }
+
         /// <summary>
         /// A list of words we did not understand. We'll examine these for type references.
         /// </summary>
@@ -267,7 +262,6 @@ namespace DataTools.CSTools
         /// <remarks>Implementations should make note of when and where they cannot fulfill the <paramref name="deep"/> contract.</remarks>
         T Clone<T>(bool deep) where T : IMarker, new();
 
-        
         /// <summary>
         /// Formats the contents of this marker for output to file.
         /// </summary>
@@ -275,7 +269,6 @@ namespace DataTools.CSTools
         string FormatContents();
 
         #endregion Public Methods
-
     }
 
     /// <summary>
@@ -311,7 +304,6 @@ namespace DataTools.CSTools
         where TMarker : IMarker<TMarker, TList>, new()
         where TFilter : MarkerFilter<TMarker, TList>, new()
     {
-
         #region Public Properties
 
         /// <summary>
@@ -343,7 +335,6 @@ namespace DataTools.CSTools
         TList RunFilters(TList items);
 
         #endregion Public Methods
-
     }
 
     /// <summary>
@@ -366,7 +357,7 @@ namespace DataTools.CSTools
     {
         #region Private Fields
 
-        MarkerFilterRuleChain<TMarker, TList> filterChain;
+        private MarkerFilterRuleChain<TMarker, TList> filterChain;
 
         #endregion Private Fields
 
@@ -709,6 +700,7 @@ namespace DataTools.CSTools
                 }
             }
         }
+
         public virtual string Namespace { get; set; }
 
         public virtual IMarker ParentElement
@@ -785,7 +777,6 @@ namespace DataTools.CSTools
 
         T IMarker.Clone<T>(bool deep)
         {
-
             var pis = typeof(T).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
             var r = new T();
@@ -809,7 +800,7 @@ namespace DataTools.CSTools
 
             // the less ideal situation...
 
-            // This is a pretty open interface with many setters, and since we can't copy the object as a descendant 
+            // This is a pretty open interface with many setters, and since we can't copy the object as a descendant
             // because we don't know from whence the object comes, we can invoke its interface members, instead.
             foreach (var pi in pis)
             {
@@ -824,7 +815,7 @@ namespace DataTools.CSTools
                 }
                 else
                 {
-                    // we can try to see if this works.  
+                    // we can try to see if this works.
 
                     // the only reason to exhaustively check for common ancestry
                     // is to throw an argument exception, and that will happen, regardless.
@@ -917,7 +908,6 @@ namespace DataTools.CSTools
         public abstract string FormatContents();
 
         #endregion Public Methods
-
     }
 
     /// <summary>
@@ -996,7 +986,6 @@ namespace DataTools.CSTools
         public abstract bool IsValid(IMarker item);
 
         #endregion Public Methods
-
     }
 
     /// <summary>
@@ -1304,12 +1293,13 @@ namespace DataTools.CSTools
 
         #endregion Public Properties
     }
+
     /// <summary>
     /// Base class for a strongly-typed, self-applying sort filter.
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/> element type.</typeparam>
     /// <typeparam name="TList">The <see cref="IMarkerList{TMarker}"/> type.</typeparam>
-    public abstract class SortFilterRule<TMarker, TList> : MarkerFilterRule<TMarker, TList>, IComparer<TMarker> where TMarker: IMarker, new() where TList: IMarkerList<TMarker>, new()
+    public abstract class SortFilterRule<TMarker, TList> : MarkerFilterRule<TMarker, TList>, IComparer<TMarker> where TMarker : IMarker, new() where TList : IMarkerList<TMarker>, new()
     {
         #region Public Methods
 

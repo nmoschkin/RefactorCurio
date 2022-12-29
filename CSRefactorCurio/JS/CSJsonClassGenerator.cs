@@ -1,17 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using CSRefactorCurio.Globalization.Resources;
+
+using DataTools.Essentials.Observable;
+using DataTools.MathTools;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using DataTools.MathTools;
-
-using CSRefactorCurio;
-using DataTools.Observable;
-using System.Collections.ObjectModel;
-using CSRefactorCurio.Globalization.Resources;
 
 namespace DataTools.CSTools
 {
@@ -55,23 +54,23 @@ namespace DataTools.CSTools
     public class CSJsonClassGenerator : ObservableBase, IJsonCSSettings
     {
         private ObservableCollection<string> jsonComments = new ObservableCollection<string>();
-        int ipidx = 0;
+        private int ipidx = 0;
 
-        string text;
-        string code;
-        string className;
-        string nameSpace;
+        private string text;
+        private string code;
+        private string className;
+        private string nameSpace;
 
-        FPType floatType = FPType.Decimal;
-        IntType intType = IntType.Long;
-        IndeterminateType indType = IndeterminateType.Float;
+        private FPType floatType = FPType.Decimal;
+        private IntType intType = IntType.Long;
+        private IndeterminateType indType = IndeterminateType.Float;
 
-        bool isInvalid = true;
-        bool genTC = true;
-        bool mvvm = false;
-        bool generateDocStrings = true;
+        private bool isInvalid = true;
+        private bool genTC = true;
+        private bool mvvm = false;
+        private bool generateDocStrings = true;
 
-        bool hastime = false;
+        private bool hastime = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether to generate time conversion classes if UNIX-like time conversions are detected.
@@ -89,7 +88,6 @@ namespace DataTools.CSTools
             }
         }
 
-
         /// <summary>
         /// Generate XML Document Markup
         /// </summary>
@@ -98,7 +96,7 @@ namespace DataTools.CSTools
             get => generateDocStrings;
             set
             {
-                SetProperty(ref generateDocStrings, value); 
+                SetProperty(ref generateDocStrings, value);
             }
         }
 
@@ -351,7 +349,6 @@ namespace DataTools.CSTools
                 foreach (JToken jt in jarr)
                 {
                     classes.AddRange(ParseObject(jt, clsName + (++z).ToString(), MVVMSetProperty));
-
                 }
             }
             else
@@ -408,7 +405,6 @@ namespace DataTools.CSTools
 
                 sb.Append(PrintClass(cls));
                 sb.AppendLine("");
-
             }
             else
             {
@@ -566,13 +562,11 @@ namespace DataTools.CSTools
                         return IntNumberType == IntType.Int ? "int" : "long";
                     }
                 }
-
             }
             else
             {
                 return "object";
             }
-
         }
 
         private string FirstToUL(string text, bool toUpper)
@@ -598,7 +592,6 @@ namespace DataTools.CSTools
 
             public List<ParsedProperty> Properties { get; set; } = new List<ParsedProperty>();
 
-
             public ParsedClass(string name)
             {
                 Name = name;
@@ -606,7 +599,6 @@ namespace DataTools.CSTools
 
             public ParsedClass()
             {
-
             }
         }
 
@@ -644,7 +636,7 @@ namespace DataTools.CSTools
 
             public override int GetHashCode()
             {
-                return (int)DataTools.Streams.Crc32.Calculate(Encoding.UTF8.GetBytes(PropertyName + Type));
+                return (int)DataTools.Streams.Crc32.Hash(Encoding.UTF8.GetBytes(PropertyName + Type));
             }
 
             public override string ToString()
@@ -683,7 +675,6 @@ namespace DataTools.CSTools
                     return false;
                 }
             }
-
         }
 
         private ParsedProperty ParseProperty(JProperty jp, bool propChange)
@@ -729,7 +720,6 @@ namespace DataTools.CSTools
             }
             else
             {
-
                 type = PrintType(val);
 
                 if (type.StartsWith("dt") && varName != "sequence")
@@ -767,7 +757,6 @@ namespace DataTools.CSTools
                     type = "long";
                     dprop = null;
                 }
-
             }
 
             if (arrdepth > 0)
@@ -790,18 +779,14 @@ namespace DataTools.CSTools
                 VariableName = varName,
                 PropertyClasses = classes
             };
-
         }
-
 
         private string PrintProperty(ParsedProperty prop, string ns = "")
         {
-
             var sb = new StringBuilder();
 
             if (prop.PropertyChanged)
             {
-
                 sb.AppendLine(ns + $"");
                 sb.AppendLine(ns + $"    private {prop.Type} {prop.VariableName};");
             }
@@ -855,7 +840,6 @@ namespace DataTools.CSTools
                 sb.AppendLine("{");
                 sb.AppendLine();
                 ns = "    ";
-
             }
 
             sb.AppendLine(ns + "public class " + cls.Name);
@@ -915,6 +899,5 @@ namespace DataTools.CSTools
 
             return classes;
         }
-
     }
 }

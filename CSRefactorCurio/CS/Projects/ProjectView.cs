@@ -1,12 +1,10 @@
-﻿using DataTools.Observable;
+﻿using DataTools.Essentials.Observable;
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.CSTools
 {
@@ -39,7 +37,7 @@ namespace DataTools.CSTools
                     {
                         view.CollectionChanged -= OnViewCollectionModified;
                     }
-                    
+
                     view = value;
 
                     if (view != null)
@@ -61,6 +59,5 @@ namespace DataTools.CSTools
         }
 
         protected abstract void SetupView();
-
     }
 }

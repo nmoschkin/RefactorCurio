@@ -3,20 +3,16 @@
 using CSRefactorCurio.Reporting;
 
 using DataTools.CSTools;
-using DataTools.Observable;
+using DataTools.Essentials.Observable;
 
-
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace CSRefactorCurio.ViewModels
 {
-
-
     internal class ReportViewModel : ObservableBase, ICommandOwner
     {
-        ISolution solution;
+        private ISolution solution;
 
         public string[] ReportTypes { get; }
 
@@ -39,7 +35,7 @@ namespace CSRefactorCurio.ViewModels
             }
         }
 
-        public ReportViewModel(ISolution solution) 
+        public ReportViewModel(ISolution solution)
         {
             ReportTypes = new string[] { AppResources.REPORT_MOST_INTERDEPENDENT, AppResources.REPORT_MOST_REFERENCED_OBJECTS, AppResources.REPORT_MOST_SPREAD_OUT };
             this.solution = solution;

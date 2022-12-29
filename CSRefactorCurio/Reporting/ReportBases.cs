@@ -1,14 +1,12 @@
-﻿using System;
+﻿using DataTools.CSTools;
+using DataTools.Essentials.Observable;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
-using DataTools.CSTools;
-using DataTools.Observable;
 
 namespace CSRefactorCurio.Reporting
 {
@@ -19,13 +17,11 @@ namespace CSRefactorCurio.Reporting
         IList AssociatedList { get; }
     }
 
-
-    public interface IReportNode<T> : IReportNode, INotifyPropertyChanged 
+    public interface IReportNode<T> : IReportNode, INotifyPropertyChanged
     {
         new T Element { get; }
 
         new IList<T> AssociatedList { get; }
-
     }
 
     public interface IReport : INotifyPropertyChanged
@@ -71,7 +67,7 @@ namespace CSRefactorCurio.Reporting
         }
 
         [Browsable(true)]
-        public object Element 
+        public object Element
         {
             get => element;
             protected internal set
@@ -92,11 +88,10 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-
     public class ReportNode<T> : ReportNode, IReportNode<T> where T : IProjectElement
     {
-        new private T element;
-        new private IList<T> associatedList;
+        private new T element;
+        private new IList<T> associatedList;
 
         public override string Title
         {
@@ -108,7 +103,7 @@ namespace CSRefactorCurio.Reporting
         }
 
         [Browsable(true)]
-        new public virtual T Element
+        public virtual new T Element
         {
             get => element;
             protected internal set
@@ -119,7 +114,7 @@ namespace CSRefactorCurio.Reporting
 
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        new public virtual IList<T> AssociatedList
+        public virtual new IList<T> AssociatedList
         {
             get => associatedList;
             set
@@ -127,10 +122,9 @@ namespace CSRefactorCurio.Reporting
                 if (SetProperty(ref associatedList, value)) base.associatedList = (IList)value;
             }
         }
-
     }
 
-    public abstract class ReportBase : ObservableBase, IReport 
+    public abstract class ReportBase : ObservableBase, IReport
     {
         protected IList reports;
 
@@ -141,7 +135,7 @@ namespace CSRefactorCurio.Reporting
         public abstract int Count { get; }
 
         [Browsable(true)]
-        public abstract string ReportName { get;  }
+        public abstract string ReportName { get; }
 
         [Browsable(true)]
         public abstract string AssociatedReason { get; }
@@ -150,7 +144,7 @@ namespace CSRefactorCurio.Reporting
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public IList Reports
         {
-            get => reports; 
+            get => reports;
             set
             {
                 SetProperty(ref reports, value);
@@ -160,10 +154,9 @@ namespace CSRefactorCurio.Reporting
         [Browsable(true)]
         public abstract int ReportId { get; }
 
-        public abstract void CompileReport<T>(IList<T> context) where T: INamespace;
+        public abstract void CompileReport<T>(IList<T> context) where T : INamespace;
 
         public abstract void Sort();
-
 
         public ReportBase(ISolution solution)
         {
@@ -174,18 +167,17 @@ namespace CSRefactorCurio.Reporting
         {
             return this.ReportName;
         }
-
     }
 
     public abstract class ReportBase<T> : ReportBase, IReport<T> where T : IReportNode, new()
     {
-        new private IList<T> reports;
+        private new IList<T> reports;
 
         public override int Count => reports?.Count ?? 0;
 
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        new public virtual IList<T> Reports 
+        public virtual new IList<T> Reports
         {
             get => reports;
             set
@@ -201,6 +193,5 @@ namespace CSRefactorCurio.Reporting
         public ReportBase(ISolution solution) : base(solution)
         {
         }
-
     }
 }

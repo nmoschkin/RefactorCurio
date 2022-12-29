@@ -1,19 +1,13 @@
-﻿using CSRefactorCurio.Options;
-
-using DataTools.SortedLists;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace DataTools.CSTools
 {
-    public abstract class CodeParserBase<TMarker, TList> 
-        where TMarker : IMarker<TMarker, TList>, new() 
+    public abstract class CodeParserBase<TMarker, TList>
+        where TMarker : IMarker<TMarker, TList>, new()
         where TList : IMarkerList<TMarker>, new()
     {
-
-
         protected string[] lines = null;
         protected string text = null;
 
@@ -41,7 +35,6 @@ namespace DataTools.CSTools
 
 #if EXPERIMENTAL
 
-
         /// <summary>
         /// Gets or sets the 'Interfaces' directory name (default is 'Contracts')
         /// </summary>
@@ -66,7 +59,6 @@ namespace DataTools.CSTools
         /// Gets or sets a value indicating that files containing different types of objects will go in different subdirectories beneath the selected output directory.
         /// </summary>
         public virtual bool SeparateDirs { get; set; } //= CSAppOptions.Instance.UseSeparateFolders;
-
 
 #else
 
@@ -95,6 +87,7 @@ namespace DataTools.CSTools
         /// </summary>
         public virtual bool SeparateDirs { get; set; } = CSAppOptions.Instance.UseSeparateFolders;
 #endif
+
         /// <summary>
         /// Gets a value indicating if the last parse was successful.
         /// </summary>
@@ -157,13 +150,11 @@ namespace DataTools.CSTools
         /// <exception cref="FileNotFoundException"></exception>
         public abstract void LoadFile(string filename, bool lazy = false);
 
-        
         /// <summary>
         /// Gets the markers filtered for commit.
         /// </summary>
         /// <returns></returns>
         public abstract TList GetMarkersForCommit();
-
 
         /// <summary>
         /// Write the results of the refactor and reorganized file structure to disk.

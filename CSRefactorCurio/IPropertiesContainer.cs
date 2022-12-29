@@ -1,17 +1,14 @@
 ﻿using CSRefactorCurio.Helpers;
 
-using DataTools.Observable;
+using DataTools.Essentials.Observable;
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace CSRefactorCurio
@@ -98,13 +95,11 @@ namespace CSRefactorCurio
             }
         }
 
-
         public Property(IPropertiesContainer parent, EnvDTE.Property native)
         {
             _native = native;
             Container = parent;
         }
-
     }
 
     /// <summary>
@@ -123,7 +118,7 @@ namespace CSRefactorCurio
 
         public Color Background
         {
-            get => BrushHelper.MakeColorFromNumber(_native.Background | 0xff000000); 
+            get => BrushHelper.MakeColorFromNumber(_native.Background | 0xff000000);
         }
 
         public bool Bold
@@ -144,7 +139,6 @@ namespace CSRefactorCurio
 
             Container = parent;
         }
-
     }
 
     public class PropertiesContainer : PropertiesContainer<EnvDTE.Properties, IProperty>
@@ -172,12 +166,11 @@ namespace CSRefactorCurio
                 OnPropertyChanged(prop.Name);
             }
         }
-
     }
 
     public class ColorItems : PropertiesContainer<EnvDTE.FontsAndColorsItems, IColorableProperty>
     {
-        EnvDTE.DTE dte;
+        private EnvDTE.DTE dte;
 
         public static async Task<ColorItems> CreateAsync(bool lazy = true)
         {
@@ -226,7 +219,6 @@ namespace CSRefactorCurio
                     newprop.PropertyChanged += OnChildPropertyChanged;
                     OnPropertyChanged(prop.Name);
                 }
-
             }
         }
 
@@ -274,17 +266,14 @@ namespace CSRefactorCurio
             }
 
             return null;
-
         }
-
     }
 
     /// <summary>
     /// Wraps <see cref="EnvDTE.Properties"/>
     /// </summary>
-    public abstract class PropertiesContainer<TNative, TWrap> : ObservableBase, IPropertiesContainer<TWrap>, IReadOnlyDictionary<string, TWrap> where TNative : IEnumerable where TWrap: IProperty
+    public abstract class PropertiesContainer<TNative, TWrap> : ObservableBase, IPropertiesContainer<TWrap>, IReadOnlyDictionary<string, TWrap> where TNative : IEnumerable where TWrap : IProperty
     {
-
         protected bool _lazy;
 
         protected TNative _native;
@@ -393,8 +382,4 @@ namespace CSRefactorCurio
             return ((IEnumerable<KeyValuePair<string, TWrap>>)_properties).GetEnumerator();
         }
     }
-
-
-
-
 }

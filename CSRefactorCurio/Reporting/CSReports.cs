@@ -2,31 +2,23 @@
 using CSRefactorCurio.ViewModels;
 
 using DataTools.CSTools;
-using DataTools.SortedLists;
-
-using Microsoft.Build.Framework.XamlTypes;
-using Microsoft.VisualStudio.OLE.Interop;
+using DataTools.Essentials.SortedLists;
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CSRefactorCurio.Reporting
 {
-
     public delegate bool ItemFilterFunc(INamespace item);
 
     public class CSReference<T> where T : IMarker
     {
-
         public T ReferencedObject { get; set; }
 
         public T CallingObject { get; set; }
-
 
         public CSReference(T calling, T referenced)
         {
@@ -42,12 +34,10 @@ namespace CSRefactorCurio.Reporting
         {
             return $"{CallingObject.Title} => {ReferencedObject.Title}";
         }
-
     }
 
     public static class ReportHelper
     {
-        
         /// <summary>
         /// Gets the default sort order for filters, lists, and rules.
         /// </summary>
@@ -122,7 +112,7 @@ namespace CSRefactorCurio.Reporting
                     }
                 }
             }
-            
+
             var keys = outDict.Keys.ToArray();
 
             foreach (var key in keys)
@@ -133,9 +123,8 @@ namespace CSRefactorCurio.Reporting
                 }
             }
 
-            return outDict; 
+            return outDict;
         }
-
 
         internal static List<CSReference<CSMarker>> GetReferences(CurioExplorerSolution sln, Dictionary<string, List<INamespace>> allfqn)
         {
@@ -150,7 +139,7 @@ namespace CSRefactorCurio.Reporting
             {
                 if (elem is CurioProject proj)
                 {
-                    lt.AddRange(GetReferences(proj, allfqn));   
+                    lt.AddRange(GetReferences(proj, allfqn));
                 }
                 else if (elem is CSSolutionFolder fld)
                 {
@@ -234,13 +223,11 @@ namespace CSRefactorCurio.Reporting
                             if (item2 is CSMarker marker2)
                             {
                                 lt.Add(new CSReference<CSMarker>(marker, marker2));
-
                             }
                         }
                     }
                 }
             }
-
 
             foreach (var child in marker.Children)
             {
@@ -264,9 +251,9 @@ namespace CSRefactorCurio.Reporting
             }
 
             var dict = new Dictionary<string, List<INamespace>>();
-            
-            return AllFullyQualifiedNames(namespaces, dict, (t) => {
-                
+
+            return AllFullyQualifiedNames(namespaces, dict, (t) =>
+            {
                 if (t is IMarker marker)
                 {
                     return filter.Contains(marker.Kind);
@@ -275,13 +262,11 @@ namespace CSRefactorCurio.Reporting
                 {
                     return true;
                 }
-                
             });
         }
 
         private static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> items, Dictionary<string, List<INamespace>> currDict, ItemFilterFunc filter) where T : INamespace
         {
-
             foreach (var nsobj in items)
             {
                 if (filter(nsobj))
@@ -328,6 +313,7 @@ namespace CSRefactorCurio.Reporting
         {
             AssociatedReason = associated;
         }
+
         public HeaviestReferencesReport(ISolution solution) : this(solution, "DEFAULT")
         {
         }
@@ -375,9 +361,7 @@ namespace CSRefactorCurio.Reporting
                         {
                             c = string.Compare(a.ReferencedObject.Generics, b.ReferencedObject.Generics);
                         }
-
                     }
-
                 }
 
                 return c;
@@ -404,7 +388,7 @@ namespace CSRefactorCurio.Reporting
                         rpts.Add(rpt);
                         markers = new List<CSMarker>();
                     }
-                    
+
                     curr = item.ReferencedObject;
                 }
 
@@ -441,18 +425,14 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-
-
-
     public class MostSpreadOutNamespacesReport : ReportBase<ReportNode<IProjectNode>>
     {
-
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_SPREAD_OUT;
 
         [Browsable(true)]
         public override string AssociatedReason { get; }
-                
+
         [Browsable(true)]
         public override int ReportId { get; } = 1;
 
@@ -460,11 +440,12 @@ namespace CSRefactorCurio.Reporting
         {
             AssociatedReason = associated;
         }
+
         public MostSpreadOutNamespacesReport(ISolution solution) : this(solution, "DEFAULT")
         {
         }
 
-        public override void CompileReport<T>(IList<T> context) 
+        public override void CompileReport<T>(IList<T> context)
         {
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
@@ -516,6 +497,4 @@ namespace CSRefactorCurio.Reporting
             });
         }
     }
-
-
 }

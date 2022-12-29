@@ -1,27 +1,23 @@
-﻿// ************************************************* ''
+﻿using System;
+
+// ************************************************* ''
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: FileApi
 //         Native File Services.
-// 
+//
 // Copyright (C) 2011-2020 Nathan Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
+// Licensed Under the MIT License
 // ************************************************* ''
-
-using System;
-using System.Runtime.InteropServices;
-
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32
 {
     internal static class IO
     {
-
         public static readonly IntPtr INVALID_HANDLE_VALUE = (IntPtr)(-1);
-        
+
         public const int METHOD_BUFFERED = 0;
         public const int METHOD_IN_DIRECT = 1;
         public const int METHOD_OUT_DIRECT = 2;
@@ -99,6 +95,7 @@ namespace DataTools.Win32
 
         //  (_WIN32_WINNT >= &H0600)
         public const int COPY_FILE_COPY_SYMLINK = 0x800;
+
         public const int COPY_FILE_NO_BUFFERING = 0x1000;
         //
 
@@ -126,6 +123,7 @@ namespace DataTools.Win32
 
         //  (_WIN32_WINNT >= &H0600)
         public const int REPLACEFILE_IGNORE_ACL_ERRORS = 0x4;
+
         //
 
         //  '' ''  (_WIN32_WINNT >= &H0500)
@@ -134,8 +132,6 @@ namespace DataTools.Win32
         // Define the NamedPipe definitions
         //
 
-        
-        
         //
         // Define the dwOpenMode values for CreateNamedPipe
         //
@@ -175,7 +171,6 @@ namespace DataTools.Win32
         // into CreateFile
         //
 
-        
         public const int FILE_BEGIN = 0;
         public const int FILE_CURRENT = 1;
         public const int FILE_END = 2;
@@ -245,11 +240,10 @@ namespace DataTools.Win32
         //  These are the generic rights.
         //
 
-        public const int GENERIC_READ = unchecked((int) 0x80000000);
+        public const int GENERIC_READ = unchecked((int)0x80000000);
         public const int GENERIC_WRITE = 0x40000000;
         public const int GENERIC_EXECUTE = 0x20000000;
         public const int GENERIC_ALL = 0x10000000;
-
 
         public const int FILE_READ_DATA = 0x1;    // file & pipe
         public const int FILE_LIST_DIRECTORY = 0x1;    // directory
@@ -348,7 +342,6 @@ namespace DataTools.Win32
         public const int FILE_SUPPORTS_INTEGRITY_STREAMS = 0x4000000;
         public const long FILE_INVALID_FILE_ID = -1L;
 
-        
         // begin_1_0
         // begin_2_0
         // begin_2_1
@@ -396,8 +389,5 @@ namespace DataTools.Win32
             FindExSearchLimitToDirectories,
             FindExSearchLimitToDevices
         }
-
     }
-
-
 }

@@ -1,21 +1,19 @@
 ﻿using DataTools.CSTools;
-using DataTools.Observable;
+using DataTools.Essentials.Observable;
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Input;
 
 namespace CSRefactorCurio.ViewModels
 {
     internal class JSConvertViewModel : ObservableBase, ICommandOwner
     {
-
         public event EventHandler<RequestCloseEventArgs> RequestClose;
+
         private string lastcn = "";
 
         private CSJsonClassGenerator generator;
@@ -34,8 +32,8 @@ namespace CSRefactorCurio.ViewModels
 
         public IOwnedCommand OKCommand => okCommand;
 
-        public IOwnedCommand CancelCommand => cancelCommand; 
-                
+        public IOwnedCommand CancelCommand => cancelCommand;
+
         public IOwnedCommand ResetCommand => resetCommand;
 
         public IOwnedCommand BrowseCommand => browseCommand;
@@ -82,7 +80,7 @@ namespace CSRefactorCurio.ViewModels
                     SetProperty(ref project, null);
                     return;
                 }
-                else if (!projects.Contains(value)) 
+                else if (!projects.Contains(value))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -116,7 +114,6 @@ namespace CSRefactorCurio.ViewModels
 
             resetCommand = new OwnedCommand(this, (o) =>
             {
-
             }, nameof(ResetCommand));
 
             browseCommand = new OwnedCommand(this, (o) =>
@@ -130,7 +127,7 @@ namespace CSRefactorCurio.ViewModels
                 {
                     Directory = dlg.SelectedPath;
                 }
-            }, nameof (BrowseCommand));
+            }, nameof(BrowseCommand));
         }
 
         public JSConvertViewModel(CurioProject project) : this()
@@ -139,7 +136,7 @@ namespace CSRefactorCurio.ViewModels
 
             this.generator = new CSJsonClassGenerator();
             this.generator.PropertyChanged += Generator_PropertyChanged;
-            
+
             SelectedProject = project;
             SelectedNamespace = project.DefaultNamespace ?? project.AssemblyName ?? project.Namespaces.FirstOrDefault();
         }
@@ -180,7 +177,7 @@ namespace CSRefactorCurio.ViewModels
             {
                 if (string.IsNullOrEmpty(FileName) || string.IsNullOrEmpty(lastcn) || FileName == (lastcn + ".cs"))
                 {
-                    FileName = Generator.ClassName + ".cs";                    
+                    FileName = Generator.ClassName + ".cs";
                 }
 
                 lastcn = Generator.ClassName;

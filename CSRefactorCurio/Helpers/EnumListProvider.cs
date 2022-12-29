@@ -1,4 +1,4 @@
-﻿using DataTools.Observable;
+﻿using DataTools.Essentials.Observable;
 
 using Microsoft.Build.Framework;
 
@@ -7,13 +7,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace CSRefactorCurio.Helpers
 {
-
     internal struct EnumListElement
     {
         public string Name { get; }
@@ -25,7 +23,7 @@ namespace CSRefactorCurio.Helpers
         public EnumListElement(Type enumType, string name, object value)
         {
             if (!enumType.IsEnum) throw new ArgumentException(nameof(enumType));
-            
+
             EnumType = enumType;
             Value = value;
             Name = name;
@@ -51,7 +49,6 @@ namespace CSRefactorCurio.Helpers
                         break;
                     }
                 }
-
             }
         }
 
@@ -60,7 +57,6 @@ namespace CSRefactorCurio.Helpers
             return Name;
         }
     }
-
 
     internal class EnumListElement<T> where T : Enum
     {
@@ -73,6 +69,7 @@ namespace CSRefactorCurio.Helpers
             Name = name;
             Value = value;
         }
+
         public override string ToString()
         {
             return Name;
@@ -144,10 +141,9 @@ namespace CSRefactorCurio.Helpers
 
             throw new InvalidOperationException();
         }
-
     }
 
-    internal class EnumListProvider : ObservableBase 
+    internal class EnumListProvider : ObservableBase
     {
         private List<EnumListElement> items;
         private EnumListElement selItem;
@@ -196,10 +192,8 @@ namespace CSRefactorCurio.Helpers
                 {
                     items.Add(new EnumListElement(enumType, field.Name, field.GetValue(null)));
                 }
-
             }
         }
-
     }
 
     internal class EnumListProvider<T> : ObservableBase where T : Enum
@@ -230,11 +224,7 @@ namespace CSRefactorCurio.Helpers
                 {
                     items.Add(new EnumListElement<T>(field.Name, (T)field.GetValue(null)));
                 }
-
             }
-
         }
-
     }
-
 }

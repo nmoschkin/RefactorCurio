@@ -4,12 +4,15 @@
 // Module: Real-time FileSystemMonitor implementation
 //         With multi-threading and synchronized
 //         with the app thread.
-// 
+//
 // Copyright (C) 2011-2020 Nathan Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
+// Licensed Under the MIT License
 // ************************************************* ''
+
+using DataTools.Memory;
+using DataTools.Win32;
 
 using System;
 using System.Collections.Generic;
@@ -17,14 +20,10 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-using DataTools.Win32;
-using DataTools.Win32.Memory;
-
 namespace DataTools.Desktop
 {
-    static class FileSystemMonitor
+    internal static class FileSystemMonitor
     {
-
         /// <summary>
         /// Defines the base for all custom messages in this module.
         /// </summary>
@@ -92,14 +91,15 @@ namespace DataTools.Desktop
         public const int ERROR_DESTFILEFAIL = ERROR_MIN + 5;
 
         [DllImport("kernel32", EntryPoint = "CreateEventW", CharSet = CharSet.Unicode)]
-
         public static extern IntPtr CreateEvent(IntPtr lpEventAttributes, bool bManualREset, bool bInitialState, string lpName);
+
         [DllImport("kernel32")]
         public static extern bool SetEvent(IntPtr hEvent);
+
         [DllImport("kernel32")]
         public static extern bool ResetEvent(IntPtr hEvent);
-        [DllImport("kernel32", EntryPoint = "FindFirstChangeNotificationW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32", EntryPoint = "FindFirstChangeNotificationW", CharSet = CharSet.Unicode)]
         public static extern IntPtr FindFirstChangeNotification(string lpPathName, bool bWatchSubtree, NotifyFilter dwNotifyFilter);
 
         public delegate void FileIoCompletionDelegate(int dwErrorCode, int dwNumberOfBytesTransfered, System.Threading.NativeOverlapped lpOverlapped);
@@ -115,7 +115,6 @@ namespace DataTools.Desktop
     [Flags]
     public enum NotifyFilter
     {
-
         /// <summary>
         /// Any file name change in the watched directory or subtree causes a change notification wait operation to return. Changes include renaming, creating, or deleting a file.
         /// </summary>
@@ -171,7 +170,6 @@ namespace DataTools.Desktop
     /// <remarks></remarks>
     public enum FileActions
     {
-
         /// <summary>
         /// The file was added to the directory.
         /// </summary>
@@ -544,7 +542,6 @@ namespace DataTools.Desktop
             _Storage = stor;
         }
 
-        
         private bool disposedValue; // To detect redundant calls
 
         // IDisposable
@@ -570,7 +567,6 @@ namespace DataTools.Desktop
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
     }
 
     /// <summary>
@@ -579,7 +575,6 @@ namespace DataTools.Desktop
     /// <remarks></remarks>
     public enum MonitorClosedState
     {
-
         /// <summary>
         /// The monitor was closed by a user action or a normal program event.
         /// </summary>
@@ -699,34 +694,32 @@ namespace DataTools.Desktop
         protected IntPtr _hFile;
         protected bool _isWatching;
         protected System.Threading.Thread _thread;
-        protected MemPtr _Buff;
+        protected SafePtr _Buff = new SafePtr();
 
         // the default filter will be write, and rename (which includes delete, create and move).
         protected NotifyFilter _Filter = NotifyFilter.NotifyWrite | NotifyFilter.NotifyFileRename | NotifyFilter.NotifyDirectoryRename;
 
         // this is the action buffer that gets handled by the message pump.
         protected List<FSMonitorEventArgs> _WaitList = new List<FSMonitorEventArgs>();
+
         protected FSMonitorEventArgs _SigAdd;
         protected int _WaitLock = 0;
         protected int _lastIndex = 0;
         protected IntPtr _owner;
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        static extern bool CloseHandle(IntPtr hObject);
+        private static extern bool CloseHandle(IntPtr hObject);
 
         [DllImport("user32", EntryPoint = "PostMessageW", CharSet = CharSet.Unicode)]
-        static extern bool PostMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
-        
+        private static extern bool PostMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
+
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        static extern int GetLastError();
+        private static extern int GetLastError();
 
         [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
-        static extern IntPtr CreateFile([MarshalAs(UnmanagedType.LPWStr)] string lpFileName, int dwDesiredAccess, int dwShareMode, IntPtr lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, IntPtr hTemplateFile);
+        private static extern IntPtr CreateFile([MarshalAs(UnmanagedType.LPWStr)] string lpFileName, int dwDesiredAccess, int dwShareMode, IntPtr lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, IntPtr hTemplateFile);
 
-
-
-        const int WS_CHILDWINDOW = 0x40000000;
-
+        private const int WS_CHILDWINDOW = 0x40000000;
 
         /// <summary>
         /// The event that get fired when a change is detected in the monitored path.
@@ -758,8 +751,6 @@ namespace DataTools.Desktop
 
         public delegate void MonitorClosedEventHandler(object sender, MonitorClosedEventArgs e);
 
-        
-        
         /// <summary>
         /// Gets or sets the NotifyFilter criteria for this monitor object.
         /// </summary>
@@ -842,8 +833,6 @@ namespace DataTools.Desktop
             }
         }
 
-        
-        
         /// <summary>
         /// Create and activate the file system monitor thread.
         /// </summary>
@@ -872,8 +861,6 @@ namespace DataTools.Desktop
             return _hFile == IntPtr.Zero;
         }
 
-        
-        
         /// <summary>
         /// Initialize a new instance of the FSMonitor class with the specified String object.
         /// </summary>
@@ -924,8 +911,6 @@ namespace DataTools.Desktop
             internalCreate(buffLen);
         }
 
-        
-        
         /// <summary>
         /// Creates the window.
         /// </summary>
@@ -956,7 +941,7 @@ namespace DataTools.Desktop
 
             // 128k is definitely enough when the thread is running continuously.
             // barring something funky blocking us ...
-            return _Buff.AllocZero(buffLen, true);
+            return _Buff.Alloc(buffLen);
         }
 
         /// <summary>
@@ -998,14 +983,14 @@ namespace DataTools.Desktop
         protected bool internalWatch()
         {
             int blen = 0;
-            int bufflen = (int)_Buff.Size;
-            var tbuff = _Buff.Handle;
+            int bufflen = (int)_Buff.Length;
+            var tbuff = _Buff.DangerousGetHandle();
             if (_thread is object)
                 return false;
             if (!internalOpenFile())
                 return false;
             FILE_NOTIFY_INFORMATION fn;
-            fn.ptr = _Buff;
+            fn.ptr = (IntPtr)_Buff;
             _thread = new System.Threading.Thread(() =>
             {
                 var notice = IntPtr.Zero;
@@ -1060,8 +1045,6 @@ namespace DataTools.Desktop
             return true;
         }
 
-        
-        
         /// <summary>
         /// Internal message pump handler and event dispatcher.
         /// </summary>
@@ -1088,7 +1071,6 @@ namespace DataTools.Desktop
                             {
                                 if (_WaitList[i] is object)
                                 {
-
                                     // post the events so that whatever is watching this folder can do its thing.
 
                                     _WaitList[i]._Info = (FileNotifyInfo)_WaitList[i]._Info.Clone();
@@ -1114,11 +1096,9 @@ namespace DataTools.Desktop
 
                 case FileSystemMonitor.WM_SIGNAL_CLEAN:
                     {
-
                         // don't block on the main thread, block on the watching thread, instead.
                         if (System.Threading.Monitor.TryEnter(_WaitList))
                         {
-
                             // we have a lock, let's clean up the queue
                             int i;
                             int c = _WaitList.Count - 1;
@@ -1178,8 +1158,6 @@ namespace DataTools.Desktop
             }
         }
 
-        
-        
         /// <summary>
         /// Returns true if the monitor has been disposed.
         /// If it has been disposed, it may not be reused.
@@ -1218,7 +1196,7 @@ namespace DataTools.Desktop
                 DestroyHandle();
 
                 // free the buffer
-                _Buff.Free(true);
+                _Buff.Free();
 
                 // release the String handle
                 _stor = null;
@@ -1243,6 +1221,5 @@ namespace DataTools.Desktop
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
     }
 }

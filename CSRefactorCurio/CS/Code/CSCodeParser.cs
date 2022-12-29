@@ -1,31 +1,21 @@
-﻿using System;
-using System.Collections;
+﻿using DataTools.Text;
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-using DataTools.SortedLists;
-using DataTools.Text;
-
-using Microsoft.VisualStudio.Debugger.Interop;
-using Microsoft.VisualStudio.LocalLogger;
-using Microsoft.VisualStudio.RemoteSettings;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace DataTools.CSTools
 {
-
     /// <summary>
     /// Code Parser Output File
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/></typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
-    public class OutputFile<TMarker, TList> where TMarker: IMarker, new() where TList : IMarkerList<TMarker>, new()
+    public class OutputFile<TMarker, TList> where TMarker : IMarker, new() where TList : IMarkerList<TMarker>, new()
     {
         /// <summary>
         /// The text of the new file.
@@ -68,7 +58,7 @@ namespace DataTools.CSTools
         /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
         /// <param name="parser">The code parser instance.</param>
         /// <returns>A new output file.</returns>
-        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, AtomicGenerationInfo<TI, TL> file, string[] lines, bool sepDirs, CodeParserBase<TI, TL> parser = null) where TI: IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
+        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, AtomicGenerationInfo<TI, TL> file, string[] lines, bool sepDirs, CodeParserBase<TI, TL> parser = null) where TI : IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
         {
             return NewFile<TI, TL>(path, file.Markers[0].Kind, file.Markers[0].Name, FormatOutputText<TI, TL>(file.Markers, lines, file.PreambleEnd, file.PreambleBegin), sepDirs, parser);
         }
@@ -106,7 +96,6 @@ namespace DataTools.CSTools
                 case MarkerKind.Enum:
                     kind = cs?.EnumDirName ?? "Enums";
                     break;
-
             }
             if (sepDirs && !string.IsNullOrEmpty(kind))
             {
@@ -123,7 +112,6 @@ namespace DataTools.CSTools
                     Text = text,
                     Filename = $"{path}\\{name}.cs"
                 };
-
             }
         }
 
@@ -154,7 +142,6 @@ namespace DataTools.CSTools
         /// <returns>Formatted Code</returns>
         public static string FormatOutputText<TI, TL>(TL markers, string[] lines, int preambleTo = -1, int preambleFrom = 0) where TI : IMarker, new() where TL : IList<TI>, new()
         {
-
             string t = "";
             string lastns = null;
             string textOut = "";
@@ -202,7 +189,6 @@ namespace DataTools.CSTools
                 x++;
             }
 
-
             return textOut;
         }
 
@@ -225,9 +211,6 @@ namespace DataTools.CSTools
 
             return sb.ToString();
         }
-
-
-
     }
 
     /// <summary>
@@ -237,7 +220,6 @@ namespace DataTools.CSTools
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
     public class CSCodeParser<TMarker, TList> : CodeParserBase<TMarker, TList> where TMarker : IMarker<TMarker, TList>, new() where TList : IMarkerList<TMarker>, new()
     {
-
         public override TList GetMarkersForCommit()
         {
             return markers;
@@ -264,7 +246,6 @@ namespace DataTools.CSTools
             }
         }
 
-       
         /// <summary>
         /// Create a new empty code parser.
         /// </summary>
@@ -326,7 +307,6 @@ namespace DataTools.CSTools
                     foreach (var marker in markers)
                     {
                         SetAtomicFile(marker, cf);
-
                     }
 
                     SetParent(markers, default);
@@ -342,12 +322,10 @@ namespace DataTools.CSTools
 
                 return ParseSuccess;
             }
-            
         }
-        
+
         private void SetParent(TList markers, TMarker parent, string parentPath = null)
         {
-
             string pp = parentPath ?? "";
 
             if (parent != null && !string.IsNullOrEmpty(parent.Name) && parent.Kind != MarkerKind.Namespace)
@@ -376,29 +354,29 @@ namespace DataTools.CSTools
         /// <summary>
         /// The big list of all C# keywords and intrinsic types
         /// </summary>
-        private static readonly string[] FilterType1 = new string[] { 
+        private static readonly string[] FilterType1 = new string[] {
             "public", "private", "protected", "internal", "global",
             "class", "const", "struct", "record", "interface", "namespace", "delegate", "event", "enum", "readonly",
             "async", "extern", "override", "abstract", "sealed", "new", "unsafe", "fixed", "static", "using", "get", "set",
             "for", "while", "do", "if", "else", "switch", "case", "default", "break", "yield", "return", "add", "remove",
-            "throw", "try", "catch", "finally", 
+            "throw", "try", "catch", "finally",
             "foreach", "in", "out", "ref", "null", "is", "not",
             "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "partial",
-            "float", "double", "decimal", 
-            "Guid", "DateTime", 
+            "float", "double", "decimal",
+            "Guid", "DateTime",
             "string", "char", "this", "base",
-            "void", "var", "dynamic", "object", 
+            "void", "var", "dynamic", "object",
             "Enum", "Tuple", "bool", "true", "false", "IntPtr", "UIntPtr"
         };
 
         /// <summary>
         /// A list of keywords to process for the <see cref="TypeAndMethodParse(string, TMarker)"/> (in literally no particular order.)
         /// </summary>
-        private static readonly string[] FilterType2 = new string[] { 
+        private static readonly string[] FilterType2 = new string[] {
             "global", "ref", "sealed", "class", "interface", "record", "struct", "partial",
-            "namespace", "public", "private", "static", "async", "abstract", "const", 
-            "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected", 
-            "extern", 
+            "namespace", "public", "private", "static", "async", "abstract", "const",
+            "readonly", "unsafe", "fixed", "delegate", "event", "virtual", "protected",
+            "extern",
             "internal", "override", "new", "using", "get", "set", "add", "remove", "enum" };
 
         static CSCodeParser()
@@ -442,7 +420,6 @@ namespace DataTools.CSTools
             genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
         }
 
-
         /// <summary>
         /// The actual C# parser engine.
         /// </summary>
@@ -453,7 +430,6 @@ namespace DataTools.CSTools
         /// </remarks>
         protected virtual TList InternalParseCSCode(char[] chars)
         {
-
             lock (SyncRoot)
             {
                 int i, j, c = chars.Length;
@@ -469,7 +445,7 @@ namespace DataTools.CSTools
                 StringBuilder currWord = new StringBuilder();
                 StringBuilder forScan = new StringBuilder();
                 StringBuilder sb;
-                
+
                 forScan.Capacity = chars.Length;
                 int inif = 0;
 
@@ -500,10 +476,9 @@ namespace DataTools.CSTools
 
                 for (i = 0; i < c; i++)
                 {
-                    
                     if (chars[i] == '\r' || chars[i] == '\n')
                     {
-                        forScan.Append(chars[i]); 
+                        forScan.Append(chars[i]);
                     }
                     else
                     {
@@ -537,9 +512,7 @@ namespace DataTools.CSTools
                                             currMarker.UnknownWords.Add(cw);
                                         }
                                     }
-                                    
                                 }
-
                             }
 
                             prevWord = cw;
@@ -576,9 +549,9 @@ namespace DataTools.CSTools
 
                         var sl = currLine;
                         var lookahead = TextTools.TextBetween(chars, i, ref currLine, '[', ']', out int? spt, out int? ept, withDelimiters: true);
-                        
+
                         if (lookahead == null) continue;
-                        
+
                         if (!Regex.IsMatch(lookahead, @"\[\s*\w|_|@[\w\d._@]+\s*\(?.*?\)?\]"))
                         {
                             continue;
@@ -594,7 +567,7 @@ namespace DataTools.CSTools
                             if (!FilterType1.Contains(attr) && !unrecognizedWords.Contains(attr))
                             {
                                 unrecognizedWords.Add(attr);
-                                
+
                                 if (currMarker != null)
                                 {
                                     if (currMarker.UnknownWords == null)
@@ -627,13 +600,12 @@ namespace DataTools.CSTools
                             var lookback = TextTools.OneSpace(fs).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
 
                             Match testEnum = null;
-                            
+
                             if (currPatt == MarkerKind.Enum)
                             {
                                 testEnum = patterns[MarkerKind.EnumValue].Match(lookback);
-
                             }
-                            
+
                             if (testEnum != null && testEnum.Success)
                             {
                                 currMarker = new TMarker
@@ -682,7 +654,7 @@ namespace DataTools.CSTools
 
                         scanStartPos = startPos = i + 1;
                         forScan.Clear();
-                        
+
                         prevWord = "";
 
                         startLine = currLine;
@@ -705,7 +677,7 @@ namespace DataTools.CSTools
                             var lookback = TextTools.OneSpace(fs).Trim(); // TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
                             Match cons = currCons?.Match(lookback) ?? null;
                             Match ops = patterns[MarkerKind.Operator].Match(lookback);
-                            
+
                             if (cons != null && cons.Success && !ops.Success)
                             {
                                 currMarker = new TMarker
@@ -752,7 +724,6 @@ namespace DataTools.CSTools
                                 }
                                 else
                                 {
-
                                     currMarker = new TMarker
                                     {
                                         Namespace = currNS,
@@ -833,11 +804,10 @@ namespace DataTools.CSTools
                                     Level = currLevel,
                                     ScanHit = lookback,
                                 };
-                                
+
                                 markers.Add(currMarker);
                             }
                         }
-
 
                         --currLevel;
                         currPatt = strack.Pop();
@@ -860,7 +830,6 @@ namespace DataTools.CSTools
                         prevWord = "";
 
                         startLine = currLine;
-
                     }
                     else if (chars[i] == '#')
                     {
@@ -915,7 +884,7 @@ namespace DataTools.CSTools
                                 break;
                             }
                         }
-                        
+
                         var dir = sb.ToString();
 
                         if (dir.StartsWith("#if "))
@@ -952,7 +921,7 @@ namespace DataTools.CSTools
                         sb.Append(chars[i + 1]);
 
                         bool docs = false;
-                    
+
                         for (j = i + 2; j < c; j++)
                         {
                             if ((j == i + 2) && chars[j] == '/')
@@ -977,7 +946,6 @@ namespace DataTools.CSTools
 
                                 break;
                             }
-
                         }
 
                         if (j >= c) break;
@@ -997,7 +965,6 @@ namespace DataTools.CSTools
                             Level = currLevel,
                             ParentElementPath = currName,
                             Namespace = currNS
-
                         };
 
                         sb = new StringBuilder();
@@ -1031,7 +998,6 @@ namespace DataTools.CSTools
                                 currLine++;
                                 continue;
                             }
-
                         }
 
                         if (j >= c) break;
@@ -1043,10 +1009,9 @@ namespace DataTools.CSTools
                 PostScanTasks(markers);
 
                 return markers;
-
             }
-
         }
+
         private string FirstNameFromHere(string val, bool alsoDot)
         {
             val = val.Trim();
@@ -1086,11 +1051,11 @@ namespace DataTools.CSTools
             if (marker.Kind == MarkerKind.EnumValue) return 0;
 
             IList<string> filter2 = FilterType2;
-            
+
             str = str.Trim();
             var w = str.ToCharArray();
             int c = w.Length;
-            
+
             var tsb = new StringBuilder();
             var nsb = new StringBuilder();
             bool fl = false;
@@ -1116,7 +1081,7 @@ namespace DataTools.CSTools
                 }
                 else if (ch == '<')
                 {
-                    try 
+                    try
                     {
                         var t = TextTools.TextBetween(w, i, ref l, '<', '>', out int? ax, out int? bx, withDelimiters: true);
                         if (t != null && bx != null)
@@ -1175,7 +1140,7 @@ namespace DataTools.CSTools
                         }
                         lww = false;
                     }
-                    catch (Exception ex) 
+                    catch (Exception ex)
                     {
                         Console.WriteLine(ex.ToString());
                     }
@@ -1189,7 +1154,7 @@ namespace DataTools.CSTools
                         {
                             tsb.Clear();
                             lww = false;
-                            switch(del)
+                            switch (del)
                             {
                                 case "public":
                                 case "private":
@@ -1214,7 +1179,7 @@ namespace DataTools.CSTools
                                 case "namespace":
                                 case "using":
                                 case "operator":
-                                    marker.Kind = (MarkerKind)Enum.Parse(typeof (MarkerKind), TextTools.TitleCase(del));
+                                    marker.Kind = (MarkerKind)Enum.Parse(typeof(MarkerKind), TextTools.TitleCase(del));
                                     break;
 
                                 case "async":
@@ -1256,7 +1221,6 @@ namespace DataTools.CSTools
                                 default:
                                     break;
                             }
-
                         }
                         else
                         {
@@ -1270,7 +1234,6 @@ namespace DataTools.CSTools
                         break;
                     }
                 }
-
             }
 
             if (tsb.Length > 0)
@@ -1282,7 +1245,7 @@ namespace DataTools.CSTools
                 }
                 else
                 {
-                    switch(marker.Kind)
+                    switch (marker.Kind)
                     {
                         case MarkerKind.Class:
                         case MarkerKind.Struct:
@@ -1301,9 +1264,7 @@ namespace DataTools.CSTools
                             tsb.Append(generics1);
                             marker.DataType = tsb.ToString();
                             break;
-
                     }
-
                 }
             }
             else
@@ -1353,9 +1314,9 @@ namespace DataTools.CSTools
 
             if (nsb.Length > 0)
             {
-                marker.Name = nsb.ToString();   
+                marker.Name = nsb.ToString();
             }
-            
+
             if (marker.DataType == null && marker.Kind == MarkerKind.Operator)
             {
                 marker.DataType = marker.Name;
@@ -1377,12 +1338,11 @@ namespace DataTools.CSTools
             bool inh = false;
 
             var retVal = 1;
-            
+
             tsb.Clear();
             int x = -1;
             if (i < c)
             {
-                
                 for (; i < c; i++)
                 {
                     ch = w[i];
@@ -1519,7 +1479,7 @@ namespace DataTools.CSTools
                                 tsb.Clear();
                                 break;
                             }
-                            else 
+                            else
                             {
                                 x = -1;
                                 inh = false;
@@ -1544,19 +1504,18 @@ namespace DataTools.CSTools
                     var sp = str.Substring(x);
                     marker.WhereClause = " " + sp;
                 }
-                
+
                 if (ihits.Count > 0)
                 {
                     tsb.Clear();
-                    foreach(var s in ihits)
+                    foreach (var s in ihits)
                     {
                         if (tsb.Length > 0) tsb.Append(", ");
                         tsb.Append(s);
                     }
-                    marker.Inheritances = ihits;                    
+                    marker.Inheritances = ihits;
                     marker.InheritanceString = " : " + tsb.ToString();
                 }
-              
             }
 
             if (marker.Inheritances != null)
@@ -1565,7 +1524,7 @@ namespace DataTools.CSTools
                 {
                     marker.UnknownWords = new List<string>();
                 }
-                foreach(var s in marker.Inheritances)
+                foreach (var s in marker.Inheritances)
                 {
                     if (!string.IsNullOrEmpty(s) && !marker.UnknownWords.Contains(s))
                     {
@@ -1612,7 +1571,7 @@ namespace DataTools.CSTools
                 }
                 else
                 {
-                    foreach(var ch in g)
+                    foreach (var ch in g)
                     {
                         if (AllowedChar(ch, true))
                         {
@@ -1722,7 +1681,6 @@ namespace DataTools.CSTools
                     //        mknew.Children = new TList();
                     //        mknew.Content = "";
 
-
                     //        for (int z = x; z <= i; z++)
                     //        {
                     //            if (markers[z].Children != null) PostScanTasks(markers[z].Children);
@@ -1765,9 +1723,7 @@ namespace DataTools.CSTools
                     //        i = x;
                     //    }
                     //}
-
                 }
-
             }
         }
 
@@ -1789,7 +1745,6 @@ namespace DataTools.CSTools
                     if (sb.Length > 0) sb.Append(",");
                     sb.Append(TextTools.TitleCase(t));
                 }
-
             }
 
             if (Enum.TryParse<AccessModifiers>(sb.ToString(), out AccessModifiers result))
@@ -1798,13 +1753,12 @@ namespace DataTools.CSTools
             }
 
             return AccessModifiers.None;
-
         }
 
         private int CountLines(string text)
         {
             int count = 0;
-            foreach(var ch in text)
+            foreach (var ch in text)
             {
                 if (ch == '\n') count++;
                 else if (ch == '\r') continue;
@@ -1822,13 +1776,11 @@ namespace DataTools.CSTools
         /// <returns></returns>
         private int ColumnFromHere(char[] chars, int pos)
         {
-
             int c = 0;
             int i;
 
             for (i = pos - 1; i >= 0; i--)
             {
-
                 var ch = chars[i];
                 if (ch == '\n') return c;
 
@@ -1838,8 +1790,6 @@ namespace DataTools.CSTools
             return pos;
         }
 
-#endregion
-
+        #endregion CSharp Code Parsing Internals
     }
-
 }

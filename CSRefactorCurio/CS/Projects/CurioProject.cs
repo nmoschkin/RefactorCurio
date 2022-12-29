@@ -1,9 +1,7 @@
-﻿
-using CSRefactorCurio;
+﻿using CSRefactorCurio;
 
 using DataTools.Desktop;
-using DataTools.Observable;
-using DataTools.Text;
+using DataTools.Essentials.Observable;
 
 using System.Collections;
 using System.Collections.Generic;
@@ -16,14 +14,12 @@ using System.Xml;
 
 namespace DataTools.CSTools
 {
-
     /// <summary>
     /// Project element types.
     /// </summary>
     [Flags]
     public enum ElementType
     {
-        
         /// <summary>
         /// Unknown/generic element type.
         /// </summary>
@@ -64,12 +60,10 @@ namespace DataTools.CSTools
         /// </summary>
         ReportNode = 0x40,
 
-
         /// <summary>
         /// This is a project view layout.
         /// </summary>
         ProjectView = 0x80,
-
 
         Any = 0xff
     }
@@ -85,13 +79,12 @@ namespace DataTools.CSTools
         /// Gets the fully-qualified name calculated from the <see cref="Namespace"/> and <see cref="Name"/> properties.
         /// </summary>
         string FullyQualifiedName { get; }
-
     }
 
     /// <summary>
     /// Represents a basic project element.
     /// </summary>
-    public interface IProjectElement 
+    public interface IProjectElement
     {
         #region Public Properties
 
@@ -180,15 +173,11 @@ namespace DataTools.CSTools
         string Filename { get; }
 
         string Text { get; }
-
     }
 
     public interface IProjectFile<T> : IProjectFile, IProjectNode<T> where T : IList, INotifyCollectionChanged, INotifyPropertyChanged
     {
     }
-
-
-
 
     /// <summary>
     /// Represents a solution folder in a project.
@@ -214,6 +203,7 @@ namespace DataTools.CSTools
         #region Public Properties
 
         IList IProjectNode.Children => Children;
+
         /// <summary>
         /// Gets the child project elements.
         /// </summary>
@@ -284,7 +274,7 @@ namespace DataTools.CSTools
         {
             _project = nativeProject;
             PopulateProjectProperties();
-            
+
             if (filename == null || !File.Exists(filename)) throw new FileNotFoundException();
 
             ProjectRootPath = Path.GetFullPath(Path.GetDirectoryName(filename) ?? "");
@@ -337,6 +327,7 @@ namespace DataTools.CSTools
         /// Gets a value indicating if the project is a .NET Framework project (as opposed to .NET Core/5/6/etc.)
         /// </summary>
         public bool IsFrameworkProject => isFrameworkProject;
+
         /// <summary>
         /// Gets a list of all namespace that are currently detected in the project.
         /// </summary>
@@ -411,6 +402,7 @@ namespace DataTools.CSTools
                 SetProperty(ref selectedItem, value);
             }
         }
+
         public string Title
         {
             get => title;
@@ -488,7 +480,6 @@ namespace DataTools.CSTools
             OnPropertyChanged(nameof(Namespaces));
         }
 
-
         public override string ToString()
         {
             if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
@@ -520,10 +511,6 @@ namespace DataTools.CSTools
             }
 
             var file = files.FirstOrDefault();
-
-            
-
-
         }
 
         /// <summary>
@@ -567,6 +554,4 @@ namespace DataTools.CSTools
 
         #endregion Protected Methods
     }
-
-
 }

@@ -1,6 +1,5 @@
-﻿using DataTools.CSTools;
-using DataTools.Observable;
-using DataTools.SortedLists;
+﻿using DataTools.Essentials.Observable;
+using DataTools.Essentials.SortedLists;
 
 using System;
 using System.Collections;
@@ -8,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.CSTools
 {
@@ -104,7 +102,7 @@ namespace DataTools.CSTools
             get => markers;
             protected set
             {
-                SetProperty(ref markers, value);    
+                SetProperty(ref markers, value);
             }
         }
 
@@ -154,7 +152,6 @@ namespace DataTools.CSTools
             return NamespacesFromProjects(new[] { project }, namespaces);
         }
 
-
         /// <summary>
         /// Generate a namespace map from the specified projects.
         /// </summary>
@@ -174,7 +171,7 @@ namespace DataTools.CSTools
             }
 
             int proc = 0;
-            
+
             foreach (var project in projects)
             {
                 var root = project.RootFolder;
@@ -213,7 +210,6 @@ namespace DataTools.CSTools
             {
                 return string.Compare(a.Title, b.Title, StringComparison.OrdinalIgnoreCase);
             });
-
         }
 
         public override string ToString()
@@ -259,12 +255,13 @@ namespace DataTools.CSTools
 
                     namespaces.Add(sb.ToString(), vns);
                 }
-        
+
                 lvn = vns;
             }
 
             return lvn;
         }
+
         /// <summary>
         /// Get the namespaces for the specified node.
         /// </summary>
@@ -272,7 +269,7 @@ namespace DataTools.CSTools
         /// <param name="namespaces">The current namespace map.</param>
         protected static int NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace, EnvDTE.StatusBar statusBar = null, int totalFiles = 0, int processed = 0)
         {
-            foreach (var file in node.Files) 
+            foreach (var file in node.Files)
             {
                 processed++;
                 if (statusBar != null)
