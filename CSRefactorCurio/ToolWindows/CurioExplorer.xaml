@@ -7,8 +7,6 @@
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
     xmlns:glob="clr-namespace:CSRefactorCurio.Globalization"
-    xmlns:rpt="clr-namespace:CSRefactorCurio.Reporting"
-    xmlns:mod="clr-namespace:DataTools.CSTools"
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
     xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
@@ -18,10 +16,14 @@
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <Style
-            TargetType="TreeViewItem">
-            <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
+                <ResourceDictionary
+                    Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid
         Cursor="{Binding Cursor}">
@@ -30,404 +32,68 @@
                 Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-
-        <StackPanel
+        <ToolBarTray
             Margin="4"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
             toolkit:Themes.UseVsTheme="True"
-            Background="Transparent"
-            Orientation="Horizontal"
-            ToolBar.OverflowMode="AsNeeded">
-            <StackPanel.Resources>
-                <conv:SelectionGroupConverter
-                    x:Key="selConv" />
-                <!--<Style TargetType="ToggleButton">
+            Background="Transparent">
+
+            <ToolBar
+                x:Name="TopBar"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                toolkit:Themes.UseVsTheme="True"
+                Background="Transparent"
+                ToolBar.OverflowMode="AsNeeded"
+                ToolBarTray.IsLocked="True">
+                <ToolBar.Resources>
+                    <conv:SelectionGroupConverter
+                        x:Key="selConv" />
+                    <!--<Style TargetType="ToggleButton">
                     <Setter Property="Background" Value="Transparent" />
                 </Style>-->
-            </StackPanel.Resources>
+                </ToolBar.Resources>
 
-            <ToggleButton
-                x:Name="Button1"
-                toolkit:Themes.UseVsTheme="True"
-                IsChecked="{Binding IsActive1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <imaging:CrispImage
-                    Width="16"
-                    Height="16"
-                    Moniker="{x:Static catalog:KnownMonikers.FolderClosed}" />
-            </ToggleButton>
-            <ToggleButton
-                x:Name="Button2"
-                toolkit:Themes.UseVsTheme="True"
-                IsChecked="{Binding IsActive2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <imaging:CrispImage
-                    Width="16"
-                    Height="16"
-                    Moniker="{x:Static catalog:KnownMonikers.Namespace}" />
-            </ToggleButton>
-            <ToggleButton
-                x:Name="Button3"
-                toolkit:Themes.UseVsTheme="True"
-                IsChecked="{Binding IsActive3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <imaging:CrispImage
-                    Width="16"
-                    Height="16"
-                    Moniker="{x:Static catalog:KnownMonikers.TreeMap}" />
-            </ToggleButton>
-        </StackPanel>
+                <ToggleButton
+                    x:Name="Button1"
+                    toolkit:Themes.UseVsTheme="True"
+                    IsChecked="{Binding IsActive1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <imaging:CrispImage
+                        Width="16"
+                        Height="16"
+                        Moniker="{x:Static catalog:KnownMonikers.FolderClosed}" />
+                </ToggleButton>
+                <ToggleButton
+                    x:Name="Button2"
+                    toolkit:Themes.UseVsTheme="True"
+                    IsChecked="{Binding IsActive2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <imaging:CrispImage
+                        Width="16"
+                        Height="16"
+                        Moniker="{x:Static catalog:KnownMonikers.Namespace}" />
+                </ToggleButton>
+                <ToggleButton
+                    x:Name="Button3"
+                    toolkit:Themes.UseVsTheme="True"
+                    IsChecked="{Binding IsActive3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <imaging:CrispImage
+                        Width="16"
+                        Height="16"
+                        Moniker="{x:Static catalog:KnownMonikers.TreeMap}" />
+                </ToggleButton>
+            </ToolBar>
+        </ToolBarTray>
 
         <TreeView
-            Name="ProjTree"
+            x:Name="ProjTree"
             Grid.Row="1"
-            toolkit:Themes.UseVsTheme="True"
             Background="Transparent"
+            ItemContainerStyle="{StaticResource BeautifulStyle}"
             ItemsSource="{Binding CurrentItems}"
             MouseDoubleClick="ProjTree_MouseDoubleClick"
             SelectedItemChanged="ProjTree_SelectedItemChanged">
 
-            <TreeView.Resources>
-
-                <Style
-                    TargetType="ToolTip">
-                    <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ToolWindowBackgroundKey}}" />
-                </Style>
-                <conv:ItemCountConverter
-                    x:Key="intConv" />
-
-                <conv:MarkerKindToMonikerConverter
-                    x:Key="convMon" />
-
-                <Style
-                    x:Key="ExpandingImageStyle"
-                    TargetType="{x:Type imaging:CrispImage}">
-                    <Setter Property="Moniker" Value="{x:Static catalog:KnownMonikers.FolderClosed}" />
-                    <Style.Triggers>
-                        <DataTrigger
-                            Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsExpanded}"
-                            Value="True">
-                            <Setter Property="Moniker" Value="{x:Static catalog:KnownMonikers.FolderOpened}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-                <HierarchicalDataTemplate
-                    DataType="{x:Type mod:CurioProject}"
-                    ItemsSource="{Binding RootFolder.Children}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage
-                            Width="16"
-                            Margin="2"
-                            Moniker="{x:Static catalog:KnownMonikers.CSProjectNode}" />
-
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="2"
-                            Text="{Binding Title}" />
-                    </Grid>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate
-                    DataType="{x:Type mod:CSNamespace}"
-                    ItemsSource="{Binding Children}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage
-                            Width="16"
-                            Margin="2"
-                            Moniker="{x:Static catalog:KnownMonikers.Namespace}" />
-
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="2"
-                            Text="{Binding Title}" />
-                    </Grid>
-                </HierarchicalDataTemplate>
-
-                <HierarchicalDataTemplate
-                    DataType="{x:Type mod:CSDirectory}"
-                    ItemsSource="{Binding Children}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage
-                            x:Name="ciFolder"
-                            Width="16"
-                            Height="16"
-                            Margin="2"
-                            Style="{StaticResource ExpandingImageStyle}" />
-
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="2"
-                            Text="{Binding Title}" />
-                    </Grid>
-                </HierarchicalDataTemplate>
-
-                <HierarchicalDataTemplate
-                    DataType="{x:Type mod:CSSolutionFolder}"
-                    ItemsSource="{Binding Children}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage
-                            x:Name="ciFolder"
-                            Width="16"
-                            Height="16"
-                            Margin="2"
-                            Style="{StaticResource ExpandingImageStyle}" />
-
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="2"
-                            Text="{Binding Title}" />
-                    </Grid>
-                </HierarchicalDataTemplate>
-
-                <HierarchicalDataTemplate
-                    DataType="{x:Type mod:CSCodeFile}"
-                    ItemsSource="{Binding FilteredItems}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition
-                                Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage
-                            Width="16"
-                            Height="16"
-                            Margin="2"
-                            Moniker="{x:Static catalog:KnownMonikers.CSFile}" />
-
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="2"
-                            Text="{Binding Title}" />
-
-                        <TextBlock
-                            Grid.Column="2"
-                            Margin="6,2,2,2"
-                            Text="{Binding FilteredItems.Count, Converter={StaticResource intConv}}" />
-                    </Grid>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate
-                    DataType="{x:Type rpt:ReportNode}"
-                    ItemsSource="{Binding AssociatedList}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage
-                            Width="16"
-                            Height="16"
-                            Margin="2"
-                            Moniker="{x:Static catalog:KnownMonikers.SubReport}" />
-
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="2"
-                            Text="{Binding Title}" />
-                    </Grid>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate
-                    DataType="{x:Type mod:CSMarker}"
-                    ItemsSource="{Binding Children}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <imaging:CrispImage
-                            Width="16"
-                            Height="16"
-                            Margin="2"
-                            Moniker="{Binding Kind, Converter={StaticResource convMon}}" />
-
-                        <StackPanel
-                            Grid.Column="1"
-                            Margin="2"
-                            HorizontalAlignment="Stretch"
-                            Orientation="Horizontal">
-
-                            <TextBlock
-                                Margin="0"
-                                Padding="0"
-                                Foreground="{conv:ColorPropertyToBrush Key=Keyword}"
-                                Text="{Binding AccessModifierString}">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel
-                                            Orientation="Vertical">
-                                            <Label
-                                                Content="{Binding Title}" />
-                                            <Label
-                                                Content="{Binding}" />
-                                            <Label
-                                                Content="{Binding HomeFile}" />
-                                            <Label
-                                                Content="{Binding HomeFile.Project}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-
-                            <TextBlock
-                                Margin="0"
-                                Padding="0"
-                                Foreground="{conv:ColorPropertyToBrush Key=Type}"
-                                Text="{Binding DataTypeString}">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel
-                                            Orientation="Vertical">
-                                            <Label
-                                                Content="{Binding Title}" />
-                                            <Label
-                                                Content="{Binding}" />
-                                            <Label
-                                                Content="{Binding HomeFile}" />
-                                            <Label
-                                                Content="{Binding HomeFile.Project}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-
-                            <TextBlock
-                                Margin="0"
-                                Padding="0"
-                                Foreground="{conv:ColorPropertyToBrush Key=Identifier}"
-                                Text="{Binding Name}">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel
-                                            Orientation="Vertical">
-                                            <Label
-                                                Content="{Binding Title}" />
-                                            <Label
-                                                Content="{Binding}" />
-                                            <Label
-                                                Content="{Binding HomeFile}" />
-                                            <Label
-                                                Content="{Binding HomeFile.Project}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-
-                            <TextBlock
-                                Margin="0"
-                                Padding="0"
-                                Text="{Binding Generics}">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel
-                                            Orientation="Vertical">
-                                            <Label
-                                                Content="{Binding Title}" />
-                                            <Label
-                                                Content="{Binding}" />
-                                            <Label
-                                                Content="{Binding HomeFile}" />
-                                            <Label
-                                                Content="{Binding HomeFile.Project}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-
-                            <TextBlock
-                                Margin="0"
-                                Padding="0"
-                                Foreground="{conv:ColorPropertyToBrush Key=Punctuation}"
-                                Text="{Binding MethodParamsString}">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel
-                                            Orientation="Vertical">
-                                            <Label
-                                                Content="{Binding Title}" />
-                                            <Label
-                                                Content="{Binding}" />
-                                            <Label
-                                                Content="{Binding HomeFile}" />
-                                            <Label
-                                                Content="{Binding HomeFile.Project}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-
-                            <TextBlock
-                                Margin="0"
-                                Padding="0"
-                                Foreground="{conv:ColorPropertyToBrush Key=Type}"
-                                Text="{Binding Inheritance}">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel
-                                            Orientation="Vertical">
-                                            <Label
-                                                Content="{Binding Title}" />
-                                            <Label
-                                                Content="{Binding}" />
-                                            <Label
-                                                Content="{Binding HomeFile}" />
-                                            <Label
-                                                Content="{Binding HomeFile.Project}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-                            <TextBlock
-                                Margin="0"
-                                Padding="0"
-                                Foreground="{conv:ColorPropertyToBrush Key=Operator}"
-                                Text="{Binding WhereClause}">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel
-                                            Orientation="Vertical">
-                                            <Label
-                                                Content="{Binding Title}" />
-                                            <Label
-                                                Content="{Binding}" />
-                                            <Label
-                                                Content="{Binding HomeFile}" />
-                                            <Label
-                                                Content="{Binding HomeFile.Project}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-                        </StackPanel>
-                    </Grid>
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>
             <TreeView.ContextMenu>
 
                 <ContextMenu
@@ -477,7 +143,6 @@
                     </MenuItem>
 
                     <MenuItem
-                        x:Name="TreeCtx"
                         toolkit:Themes.UseVsTheme="True"
                         Command="{Binding ReportCommand}"
                         Header="{glob:Translate ResourceKey=REPORTS}">
@@ -493,7 +158,6 @@
                     <!--<Separator toolkit:Themes.UseVsTheme="True" />-->
 
                     <MenuItem
-                        x:Name="SplitFileMenu"
                         toolkit:Themes.UseVsTheme="True"
                         Command="{Binding SplitFileCommand}"
                         Header="{glob:Translate ResourceKey=SPLIT_FILE_DEFAULT_OPTIONS}">

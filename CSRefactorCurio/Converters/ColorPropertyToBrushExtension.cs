@@ -1,12 +1,10 @@
 ﻿using DataTools.Graphics;
-using DataTools.Text;
 
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -32,8 +30,7 @@ namespace CSRefactorCurio.Converters
         public ColorPropertyToBrushExtension()
         {
             IVsUIShell2 uiShell2 = CSRefactorCurioPackage.GetGlobalService(typeof(SVsUIShell)) as IVsUIShell2;
-            Debug.Assert(uiShell2 != null, "failed to get IVsUIShell2");
-            var s = TextTools.PrintFriendlySpeed(1209345843);
+
             if (uiShell2 != null)
             {
                 //get the COLORREF structure

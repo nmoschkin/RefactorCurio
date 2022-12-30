@@ -1,5 +1,4 @@
 ﻿using CSRefactorCurio.ViewModels;
-using CSRefactorCurio.Helpers;
 
 using DataTools.CSTools;
 
@@ -11,33 +10,47 @@ namespace CSRefactorCurio
 {
     public partial class CurioExplorer : UserControl
     {
-        CurioExplorerSolution vm;
-        EnvDTE.ProjectItem selItem;
-        CSMarker selMarker;
+        private CurioExplorerSolution vm;
+        private EnvDTE.ProjectItem selItem;
+        private CSMarker selMarker;
 
         public CurioExplorer()
         {
             InitializeComponent();
             Loaded += CurioExplorer_Loaded;
+            TopBar.Loaded += ToolBar_Loaded;
             lock (CSRefactorCurioPackage.SyncRoot)
             {
                 DataContext = vm = CSRefactorCurioPackage.Instance.CurioSolution;
             }
         }
 
+        private void ToolBar_Loaded(object sender, RoutedEventArgs e)
+        {
+            ToolBar toolBar = sender as ToolBar;
+            var overflowGrid = toolBar.Template.FindName("OverflowGrid", toolBar) as FrameworkElement;
+            if (overflowGrid != null)
+            {
+                overflowGrid.Visibility = Visibility.Collapsed;
+            }
+
+            var mainPanelBorder = toolBar.Template.FindName("MainPanelBorder", toolBar) as FrameworkElement;
+            if (mainPanelBorder != null)
+            {
+                mainPanelBorder.Margin = new Thickness(0);
+            }
+        }
+
         private void CurioExplorer_Loaded(object sender, RoutedEventArgs e)
         {
         }
-    
 
         private void ProjTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            
             if (e.NewValue is CSMarker marker)
             {
                 selItem = vm.FindProjectItem(e.NewValue as IProjectNode);
-                selMarker = marker; 
-
+                selMarker = marker;
             }
 
             vm.SelectedItem = e.NewValue;
@@ -59,7 +72,6 @@ namespace CSRefactorCurio
                 }
                 catch
                 {
-
                 }
             }
         }
