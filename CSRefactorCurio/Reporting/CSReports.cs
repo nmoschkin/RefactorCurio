@@ -12,9 +12,9 @@ using System.Text;
 
 namespace CSRefactorCurio.Reporting
 {
-    public delegate bool ItemFilterFunc(INamespace item);
+    internal delegate bool ItemFilterFunc(INamespace item);
 
-    public class CSReference<T> where T : IMarker
+    internal class CSReference<T> where T : IMarker
     {
         public T ReferencedObject { get; set; }
 
@@ -36,7 +36,7 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    public static class ReportHelper
+    internal static class ReportHelper
     {
         /// <summary>
         /// Gets the default sort order for filters, lists, and rules.
@@ -82,7 +82,7 @@ namespace CSRefactorCurio.Reporting
             MarkerKind.Remove,
         };
 
-        internal static Dictionary<string, List<CSCodeFile>> CountFilesForNamespaces(Dictionary<string, List<INamespace>> allfqn)
+        public static Dictionary<string, List<CSCodeFile>> CountFilesForNamespaces(Dictionary<string, List<INamespace>> allfqn)
         {
             var outDict = new Dictionary<string, List<CSCodeFile>>();
 
@@ -126,7 +126,7 @@ namespace CSRefactorCurio.Reporting
             return outDict;
         }
 
-        internal static List<CSReference<CSMarker>> GetReferences(CurioExplorerSolution sln, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CurioExplorerSolution sln, Dictionary<string, List<INamespace>> allfqn)
         {
             return GetReferences(sln.Projects, allfqn);
         }
@@ -298,7 +298,7 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    public class HeaviestReferencesReport : ReportBase<ReportNode<INamespace>>
+    internal class HeaviestReferencesReport : ReportBase<ReportNode<INamespace>>
     {
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_REFERENCED_OBJECTS;
@@ -425,7 +425,7 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    public class MostSpreadOutNamespacesReport : ReportBase<ReportNode<IProjectNode>>
+    internal class MostSpreadOutNamespacesReport : ReportBase<ReportNode<IProjectNode>>
     {
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_SPREAD_OUT;

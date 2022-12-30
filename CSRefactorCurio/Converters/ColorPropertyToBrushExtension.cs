@@ -13,7 +13,7 @@ using System.Windows.Media;
 
 namespace CSRefactorCurio.Converters
 {
-    public enum ColorPropertyAspect
+    internal enum ColorPropertyAspect
     {
         Foreground,
         Background

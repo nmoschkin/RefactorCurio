@@ -6,295 +6,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace DataTools.CSTools
 {
     /// <summary>
-    /// CS Refactor Curio Solution Source Code File based on <see cref="CSCodeParser{TMarker, TList}"/>.
-    /// </summary>
-    public class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectFile<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
-    {
-        #region Private Fields
-
-        private CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
-
-        private ObservableMarkerList<CSMarker> filteredChildren;
-
-        private bool nocolnotify = false;
-
-        private string title;
-
-        private WeakReference<CurioProject> project;
-
-        #endregion Private Fields
-
-        #region Public Constructors
-
-        /// <summary>
-        /// Instantiate a blank, unloaded code file reader.
-        /// </summary>
-        public CSCodeFile(CurioProject project)
-        {
-            Project = project;
-            markers.CollectionChanged += OnChildrenChanged;
-        }
-
-        #endregion Public Constructors
-
-        #region Public Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Public Events
-
-        #region Public Properties
-
-        IList IProjectNode.Children => markers;
-
-        public virtual ObservableMarkerList<CSMarker> Children
-        {
-            get
-            {
-                if ((markers == null || markers.Count == 0) && IsLazyLoad) Refresh();
-                return markers;
-            }
-            protected set
-            {
-                if (markers != value)
-                {
-                    if (markers != null)
-                    {
-                        markers.CollectionChanged -= OnChildrenChanged;
-                    }
-                    markers = value;
-                    if (markers != null)
-                    {
-                        markers.CollectionChanged += OnChildrenChanged;
-                    }
-
-                    RunFilters(markers);
-
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public ElementType ChildType => ElementType.Marker;
-        public ElementType ElementType => ElementType.File;
-
-        public override string Filename
-        {
-            get => base.Filename;
-            protected set
-            {
-                if (base.Filename != value)
-                {
-                    base.Filename = value;
-                    if (value != null)
-                    {
-                        Title = System.IO.Path.GetFileName(value);
-                    }
-
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>>();
-
-        public virtual ObservableMarkerList<CSMarker> FilteredItems
-        {
-            get
-            {
-                if ((markers == null || markers.Count == 0) && IsLazyLoad) Refresh();
-                return filteredChildren;
-            }
-            protected set
-            {
-                if (filteredChildren != value)
-                {
-                    filteredChildren = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public CurioProject Project
-        {
-            get
-            {
-                if (project == null || !project.TryGetTarget(out var proj))
-                {
-                    return null;
-                }
-                return proj;
-            }
-            protected set
-            {
-                if (value == null)
-                {
-                    project = null;
-                }
-                else
-                {
-                    project = new WeakReference<CurioProject>(value);
-                }
-            }
-        }
-
-        public string Title
-        {
-            get => title;
-            set
-            {
-                if (title != value)
-                {
-                    title = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        #endregion Public Properties
-
-        #region Public Methods
-
-        public new static CSCodeFile LoadFromFile(string path, CurioProject project, bool lazy)
-        {
-            var cf = new CSCodeFile(project);
-            cf.LoadFile(path, lazy);
-            return cf;
-        }
-
-        /// <summary>
-        /// Add the specified marker to the children collection if not there already.
-        /// </summary>
-        /// <param name="marker">The marker to add.</param>
-        public void AddMarker(CSMarker marker)
-        {
-            if (!markers.Contains(marker)) markers.Add(marker);
-        }
-
-        public MarkerFilterRule ProvideFilterRule(ObservableMarkerList<CSMarker> items)
-        {
-            return fileChain;
-        }
-
-        /// <summary>
-        /// Remove the specified marker.
-        /// </summary>
-        /// <param name="marker"></param>
-        /// <returns>True if the marker was located and removed successfully.</returns>
-        public bool RemoveMarker(CSMarker marker)
-        {
-            return markers.Remove(marker);
-        }
-
-        public string Rename(string newName)
-        {
-            var oldname = Filename;
-
-            if (File.Exists(Filename))
-            {
-                try
-                {
-                    File.Move(Filename, newName);
-                    Filename = System.IO.Path.GetFullPath(newName);
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            return oldname;
-        }
-
-        public ObservableMarkerList<CSMarker> RunFilters(ObservableMarkerList<CSMarker> items)
-        {
-            FilteredItems = Filter.ApplyFilter(items, ProvideFilterRule(items));
-            return FilteredItems;
-        }
-
-        #endregion Public Methods
-
-        #region Internal Methods
-
-        /// <summary>
-        /// Fired when the file is renamed from outside the solution.
-        /// </summary>
-        /// <param name="newName"></param>
-        internal void RenameEvent(string newName)
-        {
-            Filename = newName;
-        }
-
-        #endregion Internal Methods
-
-        #region Protected Methods
-
-        public override ObservableMarkerList<CSMarker> GetMarkersForCommit()
-        {
-            var db = new CSXMLIntegratorFilter<CSMarker, ObservableMarkerList<CSMarker>>();
-            return db.ApplyFilter(markers);
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected override bool Parse(string text)
-        {
-            markers.Clear();
-            nocolnotify = true;
-
-            if (base.Parse(text) && markers != null)
-            {
-                SetHomeFile(markers);
-                RunFilters(markers);
-
-                nocolnotify = false;
-                return true;
-            }
-
-            nocolnotify = false;
-            return false;
-        }
-
-        #endregion Protected Methods
-
-        #region Private Methods
-
-        private void OnChildrenChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (!nocolnotify) RunFilters(markers);
-        }
-
-        private void SetHomeFile(IMarkerList markers)
-        {
-            foreach (IMarker item in markers)
-            {
-                item.HomeFile = this;
-                SetHomeFile(item.Children);
-            }
-        }
-
-        #endregion Private Methods
-    }
-
-    /// <summary>
     /// CS Refactor Curio Solution Source Code Directory object.
     /// </summary>
-    public class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
+    internal class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
-        #region Private Fields
-
         private ObservableCollection<IProjectElement> children;
         private ObservableCollection<CSDirectory> directories;
         private ObservableCollection<CSCodeFile> files;
@@ -303,10 +24,6 @@ namespace DataTools.CSTools
         private string path = null;
         private WeakReference<CurioProject> project = null;
         private string title = null;
-
-        #endregion Private Fields
-
-        #region Public Constructors
 
         /// <summary>
         /// Create a new directory element for the specified project.
@@ -332,10 +49,6 @@ namespace DataTools.CSTools
 
             ReadDirectory();
         }
-
-        #endregion Public Constructors
-
-        #region Public Properties
 
         IList IProjectNode.Children => children;
 
@@ -446,10 +159,6 @@ namespace DataTools.CSTools
                 SetProperty(ref title, value);
             }
         }
-
-        #endregion Public Properties
-
-        #region Public Methods
 
         /// <summary>
         /// Find the project element at the location specified by <paramref name="path"/>, optionally creating it, if it does not exist.
@@ -830,10 +539,6 @@ namespace DataTools.CSTools
             return Title;
         }
 
-        #endregion Public Methods
-
-        #region Protected Methods
-
         /// <summary>
         /// Performs a check to ensure the local list of namespaces is up to date with the structure of the directory.
         /// </summary>
@@ -855,157 +560,5 @@ namespace DataTools.CSTools
             namespaces = p;
             OnPropertyChanged(nameof(Namespaces));
         }
-
-        #endregion Protected Methods
-    }
-
-    /// <summary>
-    /// CS Refactor Curio Solution Marker
-    /// </summary>
-    public class CSMarker : MarkerBase<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>
-    {
-        #region Public Methods
-
-        public override CSMarker FindParent(MarkerKind parentKind)
-        {
-            var p = this.ParentElement as CSMarker;
-
-            while (p != null)
-            {
-                if (p.Kind == parentKind) return p;
-                p = p.ParentElement as CSMarker;
-            }
-
-            return null;
-        }
-
-        public override string FormatContents()
-        {
-            if (Children != null && Children.Count > 0)
-            {
-                var sb = new StringBuilder();
-
-                var m = StartPos;
-                var n = Children[0].StartPos;
-
-                string s = "";
-
-                if (Level > 0)
-                {
-                    s = new string(' ', (Level - 1) * 4);
-                }
-
-                sb.Append(s);
-                sb.AppendLine(HomeFile.Text.Substring(m, n - m));
-
-                foreach (var marker in Children)
-                {
-                    switch (marker.Kind)
-                    {
-                        case MarkerKind.LineComment:
-                        case MarkerKind.BlockComment:
-                        case MarkerKind.XMLDoc:
-                            continue;
-
-                        case MarkerKind.Directive:
-                            if (marker.Content.StartsWith("#region") || marker.Content.StartsWith("#endregion"))
-                            {
-                                continue;
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    sb.Append(marker.FormatContents());
-                }
-
-                sb.AppendLine();
-                sb.Append(s);
-                sb.AppendLine("}");
-
-                return sb.ToString();
-            }
-            else
-            {
-                var fitext = HomeFile.Text.Substring(StartPos, EndPos - StartPos + 1);
-                return fitext;
-            }
-        }
-
-        #endregion Public Methods
-
-        #region Public Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Public Events
-
-        #region Public Properties
-
-        public new CSCodeFile HomeFile
-        {
-            get => (CSCodeFile)base.HomeFile;
-            set => base.HomeFile = value;
-        }
-
-        public override ObservableMarkerList<CSMarker> Children
-        {
-            get => base.Children;
-            set
-            {
-                if (base.Children != value)
-                {
-                    base.Children = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string[] ExtractAllUsings()
-        {
-            List<string> usings = new List<string>();
-
-            if (kind == MarkerKind.Using)
-            {
-                usings.Add(Name);
-            }
-
-            foreach (var c in Children)
-            {
-                usings.AddRange(c.ExtractAllUsings());
-            }
-
-            return usings.ToArray();
-        }
-
-        public string[] ExtractAllGlobalUsings()
-        {
-            List<string> usings = new List<string>();
-
-            if (kind == MarkerKind.Using && AccessModifiers == AccessModifiers.Global)
-            {
-                usings.Add(Name);
-            }
-
-            foreach (var c in Children)
-            {
-                usings.AddRange(c.ExtractAllUsings());
-            }
-
-            return usings.ToArray();
-        }
-
-        #endregion Public Properties
-
-        #region Protected Methods
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion Protected Methods
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DataTools.CSTools
 {
-    public abstract class CodeParserBase<TMarker, TList>
+    internal abstract class CodeParserBase<TMarker, TList>
         where TMarker : IMarker<TMarker, TList>, new()
         where TList : IMarkerList<TMarker>, new()
     {

@@ -18,37 +18,28 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
-                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
-                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
+                <ResourceDictionary
+                    Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
+                <ResourceDictionary
+                    Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
+                <ResourceDictionary
+                    Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
                 <ResourceDictionary>
 
-                    <ContextMenu x:Key="TreeContext" toolkit:Themes.UseVsTheme="True">
+                    <ContextMenu
+                        x:Key="TreeContext"
+                        toolkit:Themes.UseVsTheme="True">
                         <ContextMenu.Resources>
-                            <Style TargetType="MenuItem">
-                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.MenuTextKey}}" />
-                                <Setter Property="Height" Value="24" />
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                <Setter Property="HorizontalContentAlignment" Value="Left" />
-                                <Setter Property="Margin" Value="0" />
-                                <Setter Property="Padding" Value="4,2" />
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                                <Setter Property="VerticalContentAlignment" Value="Center" />
-                                <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
-                            </Style>
-                        </ContextMenu.Resources>
-
-                        <ContextMenu.ItemContainerStyle>
-                            <Style TargetType="ItemsControl">
-                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
-                                <Setter Property="BorderThickness" Value="0" />
+                            <Style
+                                TargetType="ItemsControl">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ButtonFaceKey}}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsBrushes.ActiveBorderKey}}" />
                                 <Setter Property="Margin" Value="0" />
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
                             </Style>
-                        </ContextMenu.ItemContainerStyle>
+                        </ContextMenu.Resources>
                         <MenuItem
                             toolkit:Themes.UseVsTheme="True"
                             Command="{Binding ClickBuild}"
@@ -92,15 +83,16 @@
                             </MenuItem.Icon>
                         </MenuItem>
                     </ContextMenu>
-
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Cursor="{Binding Cursor}">
+    <Grid
+        Cursor="{Binding Cursor}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <ToolBarTray
@@ -119,7 +111,8 @@
                 ToolBar.OverflowMode="AsNeeded"
                 ToolBarTray.IsLocked="True">
                 <ToolBar.Resources>
-                    <conv:SelectionGroupConverter x:Key="selConv" />
+                    <conv:SelectionGroupConverter
+                        x:Key="selConv" />
                     <!--<Style TargetType="ToggleButton">
                     <Setter Property="Background" Value="Transparent" />
                 </Style>-->
@@ -154,7 +147,7 @@
                 </ToggleButton>
             </ToolBar>
         </ToolBarTray>
-
+        <MenuItem />
         <TreeView
             x:Name="ProjTree"
             Grid.Row="1"
@@ -164,6 +157,5 @@
             ItemsSource="{Binding CurrentItems}"
             MouseDoubleClick="ProjTree_MouseDoubleClick"
             SelectedItemChanged="ProjTree_SelectedItemChanged" />
-
     </Grid>
 </UserControl>

@@ -5,7 +5,7 @@ namespace DataTools.CSTools
     /// <summary>
     /// Identify known and unknown logical elements.
     /// </summary>
-    public enum MarkerKind
+    internal enum MarkerKind
     {
 
         /// <summary>

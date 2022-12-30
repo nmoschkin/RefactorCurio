@@ -63,6 +63,38 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Build\MSBuildTool.cs" />
+    <Compile Include="CS\Code\AccessModifiers.cs" />
+    <Compile Include="CS\Code\AtomicGenerationInfo.cs" />
+    <Compile Include="CS\Code\IMarkerList.cs" />
+    <Compile Include="CS\Code\IObservarbleMarkerList.cs" />
+    <Compile Include="CS\Filtering\CSFileSortFilter.cs" />
+    <Compile Include="CS\Filtering\CSProjectDisplayChain.cs" />
+    <Compile Include="CS\Filtering\CSXMLEliminatorFilter.cs" />
+    <Compile Include="CS\Filtering\CSXMLIntegratorFilter.cs" />
+    <Compile Include="CS\Filtering\FilterChainKind.cs" />
+    <Compile Include="CS\Filtering\FixedFilterRuleChain.cs" />
+    <Compile Include="CS\Code\IMarker.cs" />
+    <Compile Include="CS\Filtering\IMarkerFilterProvider.cs" />
+    <Compile Include="CS\Code\MarkerBase.cs" />
+    <Compile Include="CS\Filtering\MarkerFilter.cs" />
+    <Compile Include="CS\Filtering\MarkerFilterRule.cs" />
+    <Compile Include="CS\Filtering\MarkerFilterRuleChain.cs" />
+    <Compile Include="CS\Filtering\MarkerKindFilterRule.cs" />
+    <Compile Include="CS\Filtering\MarkerLevelFilterRule.cs" />
+    <Compile Include="CS\Code\OutputFile.cs" />
+    <Compile Include="CS\Projects\CSCodeFile.cs" />
+    <Compile Include="CS\Projects\CSMarker.cs" />
+    <Compile Include="CS\Projects\CSSolutionFolder.cs" />
+    <Compile Include="CS\Projects\ElementType.cs" />
+    <Compile Include="CS\Projects\INamespace.cs" />
+    <Compile Include="CS\Projects\IProjectElement.cs" />
+    <Compile Include="CS\Projects\IProjectFile.cs" />
+    <Compile Include="CS\Projects\IProjectHost.cs" />
+    <Compile Include="CS\Projects\IProjectNode.cs" />
+    <Compile Include="CS\Projects\ISolution.cs" />
+    <Compile Include="JS\FPType.cs" />
+    <Compile Include="JS\IndeterminateType.cs" />
+    <Compile Include="JS\IntType.cs" />
     <Compile Include="Styles\ExplorerTemplates.xaml.cs">
       <DependentUpon>ExplorerTemplates.xaml</DependentUpon>
     </Compile>
@@ -90,10 +122,10 @@
     <Compile Include="Converters\SelectionGroupConverter.cs" />
     <Compile Include="CS\Code\CodeParserBase.cs" />
     <Compile Include="CS\Code\CSCodeParser.cs" />
-    <Compile Include="CS\Code\FilterRules.cs" />
+    <Compile Include="CS\Filtering\CSFileChain.cs" />
     <Compile Include="CS\Code\MarkerKind.cs" />
     <Compile Include="CS\Code\MarkerList.cs" />
-    <Compile Include="CS\Code\MarkerBases.cs" />
+    <Compile Include="CS\Filtering\SortFilterRule.cs" />
     <Compile Include="CS\Projects\CSDirectory.cs" />
     <Compile Include="CS\Projects\CSNamespace.cs" />
     <Compile Include="CS\Projects\CurioProject.cs" />

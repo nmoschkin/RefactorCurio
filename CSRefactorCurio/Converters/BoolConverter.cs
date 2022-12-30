@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
 namespace CSRefactorCurio.Converters
 {
-
-    public enum BoolConverterModes
+    internal enum BoolConverterModes
     {
         Detect,
         InverseDetect,
@@ -21,7 +18,7 @@ namespace CSRefactorCurio.Converters
         InverseVisibility
     }
 
-    public class BoolConverter : IValueConverter
+    internal class BoolConverter : IValueConverter
     {
         public BoolConverterModes Mode { get; set; } = BoolConverterModes.InverseBool;
 
@@ -33,7 +30,6 @@ namespace CSRefactorCurio.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-
             switch (Mode)
             {
                 case BoolConverterModes.InverseBool:
@@ -47,7 +43,7 @@ namespace CSRefactorCurio.Converters
                     return value == null;
 
                 case BoolConverterModes.Number:
-                    
+
                     if (value is int i)
                     {
                         return (i == NumberValue);
@@ -94,14 +90,11 @@ namespace CSRefactorCurio.Converters
 
                 default:
                     return false;
-
             }
 
             return false;
-
         }
 
-        
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             switch (Mode)
@@ -150,7 +143,6 @@ namespace CSRefactorCurio.Converters
 
                 default:
                     return false;
-
             }
 
             return false;

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace DataTools.CSTools
 {
-    public abstract class ProjectView : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
+    internal abstract class ProjectView : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
     {
         private ObservableCollection<IProjectElement> view;
 

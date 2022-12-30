@@ -16,7 +16,7 @@ namespace CSRefactorCurio
     /// <summary>
     /// Simple interface for the EnvDTE properties.
     /// </summary>
-    public interface IProperty : INotifyPropertyChanged
+    internal interface IProperty : INotifyPropertyChanged
     {
         IPropertiesContainer Container { get; }
 
@@ -28,7 +28,7 @@ namespace CSRefactorCurio
     /// <summary>
     /// Simple interface for the colorable property.
     /// </summary>
-    public interface IColorableProperty : IProperty
+    internal interface IColorableProperty : IProperty
     {
         Color Background { get; }
 
@@ -40,7 +40,7 @@ namespace CSRefactorCurio
     /// <summary>
     /// Simple interface for a property container.
     /// </summary>
-    public interface IPropertiesContainer
+    internal interface IPropertiesContainer
     {
         object Parent { get; }
     }
@@ -48,7 +48,7 @@ namespace CSRefactorCurio
     /// <summary>
     /// Simple interface for a property container.
     /// </summary>
-    public interface IPropertiesContainer<T> : IPropertiesContainer, INotifyPropertyChanged, IEnumerable<T> where T : IProperty
+    internal interface IPropertiesContainer<T> : IPropertiesContainer, INotifyPropertyChanged, IEnumerable<T> where T : IProperty
     {
         T this[string name] { get; }
     }
@@ -56,7 +56,7 @@ namespace CSRefactorCurio
     /// <summary>
     /// Wraps <see cref="EnvDTE.Property"/>
     /// </summary>
-    public class Property : ObservableBase, IProperty
+    internal class Property : ObservableBase, IProperty
     {
         protected EnvDTE.Property _native;
         protected PropertiesContainer _container = null;
@@ -105,7 +105,7 @@ namespace CSRefactorCurio
     /// <summary>
     /// Wraps <see cref="EnvDTE.ColorableItems"/>
     /// </summary>
-    public class ColorableProperty : ObservableBase, IColorableProperty
+    internal class ColorableProperty : ObservableBase, IColorableProperty
     {
         protected EnvDTE.ColorableItems _native;
         protected PropertiesContainer _container = null;
@@ -141,7 +141,7 @@ namespace CSRefactorCurio
         }
     }
 
-    public class PropertiesContainer : PropertiesContainer<EnvDTE.Properties, IProperty>
+    internal class PropertiesContainer : PropertiesContainer<EnvDTE.Properties, IProperty>
     {
         public PropertiesContainer(object nativeObj) : base(nativeObj, false)
         {
@@ -168,7 +168,7 @@ namespace CSRefactorCurio
         }
     }
 
-    public class ColorItems : PropertiesContainer<EnvDTE.FontsAndColorsItems, IColorableProperty>
+    internal class ColorItems : PropertiesContainer<EnvDTE.FontsAndColorsItems, IColorableProperty>
     {
         private EnvDTE.DTE dte;
 
@@ -272,7 +272,7 @@ namespace CSRefactorCurio
     /// <summary>
     /// Wraps <see cref="EnvDTE.Properties"/>
     /// </summary>
-    public abstract class PropertiesContainer<TNative, TWrap> : ObservableBase, IPropertiesContainer<TWrap>, IReadOnlyDictionary<string, TWrap> where TNative : IEnumerable where TWrap : IProperty
+    internal abstract class PropertiesContainer<TNative, TWrap> : ObservableBase, IPropertiesContainer<TWrap>, IReadOnlyDictionary<string, TWrap> where TNative : IEnumerable where TWrap : IProperty
     {
         protected bool _lazy;
 

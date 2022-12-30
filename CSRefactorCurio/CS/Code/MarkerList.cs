@@ -1,46 +1,19 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Collections;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace DataTools.CSTools
 {
-
-    /// <summary>
-    /// Base interface for marker lists. Inherits from <see cref="IEnumerable"/>.
-    /// </summary>
-    public interface IMarkerList : IEnumerable
-    {
-    }
-
-    /// <summary>
-    /// Base interface for strongly-typed marker lists.
-    /// </summary>
-    /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
-    public interface IMarkerList<TMarker> : IMarkerList, IList<TMarker> where TMarker : IMarker
-    {
-    }
-
-    /// <summary>
-    /// Base interface for strongly-typed, observable marker lists.
-    /// </summary>
-    /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
-    public interface IObservarbleMarkerList<TMarker> : IMarkerList<TMarker>, INotifyCollectionChanged, INotifyPropertyChanged where TMarker : IMarker
-    {
-    }
-
     /// <summary>
     /// Marker list, standard implementation.
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
-    public class MarkerList<TMarker> : Collection<TMarker>, IMarkerList<TMarker> where TMarker : IMarker
+    internal class MarkerList<TMarker> : Collection<TMarker>, IMarkerList<TMarker> where TMarker : IMarker
     {
         protected List<TMarker> List { get; }
 
@@ -62,7 +35,7 @@ namespace DataTools.CSTools
     /// Observable marker list, standard implementation.
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
-    public class ObservableMarkerList<TMarker> : MarkerList<TMarker>, IObservarbleMarkerList<TMarker> where TMarker : IMarker
+    internal class ObservableMarkerList<TMarker> : MarkerList<TMarker>, IObservarbleMarkerList<TMarker> where TMarker : IMarker
     {
         /// <summary>
         /// Gets or sets a value indicating that <see cref="INotifyCollectionChanged"/> events will not be fired.
@@ -75,6 +48,7 @@ namespace DataTools.CSTools
         protected object SyncRoot { get; } = new object();
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         // <summary>
@@ -127,7 +101,7 @@ namespace DataTools.CSTools
 
         public ObservableMarkerList(IEnumerable<TMarker> items) : base(items)
         {
-        }        
+        }
 
         /// <summary>
         /// Raise <see cref="INotifyPropertyChanged.PropertyChanged"/>.
@@ -149,7 +123,6 @@ namespace DataTools.CSTools
                 CollectionChanged?.Invoke(this, e);
                 OnPropertyChanged(nameof(Count));
             }
-
         }
 
         protected override void InsertItem(int index, TMarker item)
@@ -159,7 +132,6 @@ namespace DataTools.CSTools
                 base.InsertItem(index, item);
                 if (!DisableEvents) OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
             }
-
         }
 
         protected override void SetItem(int index, TMarker item)
@@ -201,9 +173,6 @@ namespace DataTools.CSTools
 
                 if (!DisableEvents) OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItem, index));
             }
-
         }
-
     }
-
 }

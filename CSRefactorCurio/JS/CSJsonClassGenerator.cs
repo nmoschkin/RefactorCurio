@@ -15,191 +15,24 @@ using System.Text;
 namespace DataTools.CSTools
 {
     /// <summary>
-    /// Floating point number type for generated classes
-    /// </summary>
-    public enum FPType
-    {
-        Double,
-        Decimal
-    }
-
-    /// <summary>
-    /// Preferred integer type for generated classes
-    /// </summary>
-    public enum IntType
-    {
-        Int,
-        Long
-    }
-
-    /// <summary>
-    /// Indeterminate type action
-    /// </summary>
-    public enum IndeterminateType
-    {
-        /// <summary>
-        /// Default to floating point
-        /// </summary>
-        Float,
-
-        /// <summary>
-        /// Default to integer
-        /// </summary>
-        Int
-    }
-
-    /// <summary>
     /// Json to C# Class Generator
     /// </summary>
     public class CSJsonClassGenerator : ObservableBase, IJsonCSSettings
     {
-        private ObservableCollection<string> jsonComments = new ObservableCollection<string>();
-        private int ipidx = 0;
-
-        private string text;
-        private string code;
         private string className;
-        private string nameSpace;
-
+        private string code;
         private FPType floatType = FPType.Decimal;
-        private IntType intType = IntType.Long;
-        private IndeterminateType indType = IndeterminateType.Float;
-
-        private bool isInvalid = true;
-        private bool genTC = true;
-        private bool mvvm = false;
         private bool generateDocStrings = true;
-
+        private bool genTC = true;
         private bool hastime = false;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to generate time conversion classes if UNIX-like time conversions are detected.
-        /// </summary>
-        /// <remarks>
-        /// If this property is set to true, any long values from the example data that correspond to a UNIX-like (seconds, milliseconds, or nanoseconds) timestamp within 5 years of the current date will automatically be regarded as <see cref="DateTime"/> fields, and the required <see cref="JsonConverter{T}"/>-derived classes will be generated to decode these values.<br/><br/>
-        /// If this property is set to false, long values will be converted, as-is.
-        /// </remarks>
-        public bool GenerateTimeConverter
-        {
-            get => genTC;
-            set
-            {
-                SetProperty(ref genTC, value);
-            }
-        }
-
-        /// <summary>
-        /// Generate XML Document Markup
-        /// </summary>
-        public bool GenerateDocStrings
-        {
-            get => generateDocStrings;
-            set
-            {
-                SetProperty(ref generateDocStrings, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets the input JSON
-        /// </summary>
-        public string Text
-        {
-            get => text;
-            set
-            {
-                if (SetProperty(ref text, value))
-                {
-                    JsonToCode();
-                }
-            }
-        }
-
-        public bool IsInvalid
-        {
-            get => isInvalid;
-            protected set
-            {
-                SetProperty(ref isInvalid, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets of the name of the main class.
-        /// </summary>
-        public string ClassName
-        {
-            get => className;
-            set
-            {
-                SetProperty(ref className, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the optional namespace to put the generated class in.
-        /// </summary>
-        public string Namespace
-        {
-            get => nameSpace;
-            set
-            {
-                SetProperty(ref nameSpace, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets what types will be used for floating point properties.
-        /// </summary>
-        public FPType FloatNumberType
-        {
-            get => floatType;
-            set
-            {
-                SetProperty(ref floatType, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets what type will be used for integer properties.
-        /// </summary>
-        public IntType IntNumberType
-        {
-            get => intType;
-            set
-            {
-                SetProperty(ref intType, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets what kind of number to default to if the number type is potentially indeterminate.
-        /// </summary>
-        public IndeterminateType IndeterminateType
-        {
-            get => indType;
-            set
-            {
-                SetProperty(ref indType, value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value that indicates generating code for MVVM property setters using SetProperty(ref T, value).
-        /// </summary>
-        public bool MVVMSetProperty
-        {
-            get => mvvm;
-            set
-            {
-                SetProperty(ref mvvm, value);
-            }
-        }
-
-        /// <summary>
-        /// The generated C# class code.
-        /// </summary>
-        public string OutputCode => code;
+        private IndeterminateType indType = IndeterminateType.Float;
+        private IntType intType = IntType.Long;
+        private int ipidx = 0;
+        private bool isInvalid = true;
+        private ObservableCollection<string> jsonComments = new ObservableCollection<string>();
+        private bool mvvm = false;
+        private string nameSpace;
+        private string text;
 
         /// <summary>
         /// Instantiate a new <see cref="CSJsonClassGenerator"/> with the specified JSON text and class name.
@@ -244,15 +77,88 @@ namespace DataTools.CSTools
         }
 
         /// <summary>
-        /// Parse the specified JSON text into a C# class.
+        /// Gets or sets of the name of the main class.
         /// </summary>
-        /// <param name="text">The JSON text to parse.</param>
-        public void Parse(string text)
+        public string ClassName
         {
-            if (ClassName == null) throw new ArgumentNullException($"{nameof(ClassName)} cannot be null.");
+            get => className;
+            set
+            {
+                SetProperty(ref className, value);
+            }
+        }
 
-            this.text = text.Trim();
-            JsonToCode();
+        /// <summary>
+        /// Gets or sets what types will be used for floating point properties.
+        /// </summary>
+        public FPType FloatNumberType
+        {
+            get => floatType;
+            set
+            {
+                SetProperty(ref floatType, value);
+            }
+        }
+
+        /// <summary>
+        /// Generate XML Document Markup
+        /// </summary>
+        public bool GenerateDocStrings
+        {
+            get => generateDocStrings;
+            set
+            {
+                SetProperty(ref generateDocStrings, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to generate time conversion classes if UNIX-like time conversions are detected.
+        /// </summary>
+        /// <remarks>
+        /// If this property is set to true, any long values from the example data that correspond to a UNIX-like (seconds, milliseconds, or nanoseconds) timestamp within 5 years of the current date will automatically be regarded as <see cref="DateTime"/> fields, and the required <see cref="JsonConverter{T}"/>-derived classes will be generated to decode these values.<br/><br/>
+        /// If this property is set to false, long values will be converted, as-is.
+        /// </remarks>
+        public bool GenerateTimeConverter
+        {
+            get => genTC;
+            set
+            {
+                SetProperty(ref genTC, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets what kind of number to default to if the number type is potentially indeterminate.
+        /// </summary>
+        public IndeterminateType IndeterminateType
+        {
+            get => indType;
+            set
+            {
+                SetProperty(ref indType, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets what type will be used for integer properties.
+        /// </summary>
+        public IntType IntNumberType
+        {
+            get => intType;
+            set
+            {
+                SetProperty(ref intType, value);
+            }
+        }
+
+        public bool IsInvalid
+        {
+            get => isInvalid;
+            protected set
+            {
+                SetProperty(ref isInvalid, value);
+            }
         }
 
         public ObservableCollection<string> JsonComments
@@ -262,6 +168,62 @@ namespace DataTools.CSTools
             {
                 SetProperty(ref jsonComments, value);
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates generating code for MVVM property setters using SetProperty(ref T, value).
+        /// </summary>
+        public bool MVVMSetProperty
+        {
+            get => mvvm;
+            set
+            {
+                SetProperty(ref mvvm, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the optional namespace to put the generated class in.
+        /// </summary>
+        public string Namespace
+        {
+            get => nameSpace;
+            set
+            {
+                SetProperty(ref nameSpace, value);
+            }
+        }
+
+        /// <summary>
+        /// The generated C# class code.
+        /// </summary>
+        public string OutputCode => code;
+
+        /// <summary>
+        /// Gets the input JSON
+        /// </summary>
+        public string Text
+        {
+            get => text;
+            set
+            {
+                if (SetProperty(ref text, value))
+                {
+                    JsonToCode();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parse the specified JSON text into a C# class.
+        /// </summary>
+        /// <param name="text">The JSON text to parse.</param>
+        public void Parse(string text)
+        {
+            if (ClassName == null) throw new ArgumentNullException($"{nameof(ClassName)} cannot be null.");
+
+            this.text = text.Trim();
+            JsonToCode();
         }
 
         /// <summary>
@@ -296,6 +258,21 @@ namespace DataTools.CSTools
                     jsonComments.Add(c);
                 }
             }
+        }
+
+        private string FirstToUL(string text, bool toUpper)
+        {
+            char[] chars = text.ToCharArray();
+            if (toUpper)
+            {
+                chars[0] = char.ToUpper(chars[0]);
+            }
+            else
+            {
+                chars[0] = char.ToLower(chars[0]);
+            }
+
+            return new string(chars);
         }
 
         private void JsonToCode()
@@ -419,6 +396,229 @@ namespace DataTools.CSTools
 
             OnPropertyChanged(nameof(OutputCode));
             IsInvalid = false;
+        }
+
+        private List<ParsedClass> ParseObject(JToken obj, string clsName, bool propChange)
+        {
+            List<ParsedClass> classes = new List<ParsedClass>();
+
+            if (obj.Type == JTokenType.Object)
+            {
+                var pc = new ParsedClass()
+                {
+                    Name = clsName,
+                    PropertyChanged = propChange
+                };
+
+                foreach (JProperty jp in obj)
+                {
+                    var newProp = ParseProperty(jp, propChange);
+                    pc.Properties.Add(newProp);
+                    if (newProp.PropertyClasses != null && newProp.PropertyClasses.Count > 0)
+                    {
+                        classes.AddRange(newProp.PropertyClasses);
+                    }
+                }
+
+                classes.Insert(0, pc);
+            }
+
+            return classes;
+        }
+
+        private ParsedProperty ParseProperty(JProperty jp, bool propChange)
+        {
+            int arrdepth = 0;
+            JToken val = jp.Value;
+            List<ParsedClass> classes = null;
+
+            if (val.Type == JTokenType.Array)
+            {
+                JToken jarr = val;
+
+                while (jarr.Type == JTokenType.Array)
+                {
+                    try
+                    {
+                        jarr = (jarr as JArray)[0];
+                        arrdepth++;
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                }
+
+                val = jarr;
+            }
+
+            string type;
+
+            var propName = FirstToUL(jp.Name, true);
+            var varName = FirstToUL(propName, false);
+
+            string dgetter = null;
+            string access = "public";
+            string dprop = null;
+
+            if (val.Type == JTokenType.Object)
+            {
+                classes = new List<ParsedClass>();
+                classes.AddRange(ParseObject(val, propName + "Class", propChange));
+                type = propName + "Class";
+            }
+            else
+            {
+                type = PrintType(val);
+
+                if (type.StartsWith("dt") && varName != "sequence")
+                {
+                    if (propChange)
+                    {
+                        dprop = varName;
+                    }
+                    else
+                    {
+                        dprop = "Internal" + propName;
+                    }
+
+                    if (type == "dtmilli")
+                    {
+                        dgetter = $"TimeTypes.InMilliseconds";
+                    }
+                    else if (type == "dtsecs")
+                    {
+                        dgetter = $"TimeTypes.InSeconds";
+                    }
+                    else
+                    {
+                        dgetter = $"TimeTypes.InNanoseconds";
+                    }
+
+                    access = "public";
+
+                    dprop = propName;
+                    type = "DateTime";
+                }
+
+                if (varName == "sequence")
+                {
+                    type = "long";
+                    dprop = null;
+                }
+            }
+
+            if (arrdepth > 0)
+            {
+                for (int i = 0; i < arrdepth; i++)
+                {
+                    type = "List<" + type + ">";
+                }
+            }
+
+            return new ParsedProperty()
+            {
+                Access = access,
+                IsDate = (dprop != null),
+                Type = type,
+                DateProperty = dprop,
+                DateGetter = dgetter,
+                PropertyChanged = propChange,
+                PropertyName = propName,
+                VariableName = varName,
+                PropertyClasses = classes
+            };
+        }
+
+        private string PrintClass(ParsedClass cls)
+        {
+            var sb = new StringBuilder();
+            var ns = "";
+
+            if (!string.IsNullOrEmpty(Namespace))
+            {
+                sb.AppendLine("namespace " + Namespace);
+                sb.AppendLine("{");
+                sb.AppendLine();
+                ns = "    ";
+            }
+
+            sb.AppendLine(ns + "public class " + cls.Name);
+            sb.AppendLine(ns + "{");
+
+            foreach (var pp in cls.Properties)
+            {
+                sb.AppendLine("");
+                sb.Append(PrintProperty(pp, ns));
+            }
+
+            sb.AppendLine(ns + "");
+            sb.AppendLine(ns + "}");
+
+            if (hastime && GenerateTimeConverter)
+            {
+                sb.AppendLine();
+
+                sb.Append(AppResources.TimeSource);
+
+                sb.AppendLine();
+            }
+
+            if (!string.IsNullOrEmpty(Namespace))
+            {
+                sb.AppendLine();
+                sb.AppendLine("}");
+            }
+
+            return sb.ToString();
+        }
+
+        private string PrintProperty(ParsedProperty prop, string ns = "")
+        {
+            var sb = new StringBuilder();
+
+            if (prop.PropertyChanged)
+            {
+                sb.AppendLine(ns + $"");
+                sb.AppendLine(ns + $"    private {prop.Type} {prop.VariableName};");
+            }
+
+            var txt = prop.PropertyName;
+
+            if (ipidx < jsonComments.Count) txt = jsonComments[ipidx++];
+
+            if (generateDocStrings)
+            {
+                sb.AppendLine(ns + $"");
+                sb.AppendLine(ns + $"    /// <summary>");
+                sb.AppendLine(ns + $"    /// {txt}");
+                sb.AppendLine(ns + $"    /// </summary>");
+                sb.AppendLine(ns + $"    [JsonProperty(\"{prop.VariableName}\")]");
+            }
+
+            if (prop.DateProperty != null)
+            {
+                sb.AppendLine(ns + $"    [JsonConverter(typeof(AutoTimeConverter), {prop.DateGetter})]");
+            }
+
+            if (!prop.PropertyChanged)
+            {
+                sb.AppendLine(ns + $"    {prop.Access} {prop.Type} {prop.PropertyName} {{ get; set; }}");
+            }
+            else
+            {
+                sb.AppendLine(ns + $"    {prop.Access} {prop.Type} {prop.PropertyName}");
+                sb.AppendLine(ns + "    {");
+
+                sb.AppendLine(ns + $"        get => {prop.VariableName};");
+                sb.AppendLine(ns + $"        set");
+                sb.AppendLine(ns + $"        {{");
+                sb.AppendLine(ns + $"            SetProperty(ref {prop.VariableName}, value);");
+                sb.AppendLine(ns + $"        }}");
+                sb.AppendLine(ns + "    }");
+            }
+
+            return sb.ToString();
         }
 
         private string PrintType(JToken jp)
@@ -569,29 +769,8 @@ namespace DataTools.CSTools
             }
         }
 
-        private string FirstToUL(string text, bool toUpper)
-        {
-            char[] chars = text.ToCharArray();
-            if (toUpper)
-            {
-                chars[0] = char.ToUpper(chars[0]);
-            }
-            else
-            {
-                chars[0] = char.ToLower(chars[0]);
-            }
-
-            return new string(chars);
-        }
-
         private class ParsedClass
         {
-            public string Name { get; set; }
-
-            public bool PropertyChanged { get; set; }
-
-            public List<ParsedProperty> Properties { get; set; } = new List<ParsedProperty>();
-
             public ParsedClass(string name)
             {
                 Name = name;
@@ -600,27 +779,56 @@ namespace DataTools.CSTools
             public ParsedClass()
             {
             }
+
+            public string Name { get; set; }
+
+            public List<ParsedProperty> Properties { get; set; } = new List<ParsedProperty>();
+            public bool PropertyChanged { get; set; }
         }
 
         private class ParsedProperty
         {
-            public string Type { get; set; }
-
-            public bool PropertyChanged { get; set; }
-
+            public string Access { get; set; }
+            public string DateGetter { get; set; }
+            public string DateProperty { get; set; }
             public bool IsDate { get; set; }
-
+            public bool PropertyChanged { get; set; }
+            public List<ParsedClass> PropertyClasses { get; set; }
             public string PropertyName { get; set; }
-
+            public string Type { get; set; }
             public string VariableName { get; set; }
 
-            public string DateGetter { get; set; }
+            public static bool operator !=(ParsedProperty val1, ParsedProperty val2)
+            {
+                if (val1 is object)
+                {
+                    return val1.Equals(val2);
+                }
+                else if (val2 is object)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
 
-            public string Access { get; set; }
-
-            public string DateProperty { get; set; }
-
-            public List<ParsedClass> PropertyClasses { get; set; }
+            public static bool operator ==(ParsedProperty val1, ParsedProperty val2)
+            {
+                if (val1 is object)
+                {
+                    return val1.Equals(val2);
+                }
+                else if (val2 is object)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
 
             public override bool Equals(object obj)
             {
@@ -643,261 +851,6 @@ namespace DataTools.CSTools
             {
                 return Type + " " + PropertyName;
             }
-
-            public static bool operator ==(ParsedProperty val1, ParsedProperty val2)
-            {
-                if (val1 is object)
-                {
-                    return val1.Equals(val2);
-                }
-                else if (val2 is object)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            public static bool operator !=(ParsedProperty val1, ParsedProperty val2)
-            {
-                if (val1 is object)
-                {
-                    return val1.Equals(val2);
-                }
-                else if (val2 is object)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        private ParsedProperty ParseProperty(JProperty jp, bool propChange)
-        {
-            int arrdepth = 0;
-            JToken val = jp.Value;
-            List<ParsedClass> classes = null;
-
-            if (val.Type == JTokenType.Array)
-            {
-                JToken jarr = val;
-
-                while (jarr.Type == JTokenType.Array)
-                {
-                    try
-                    {
-                        jarr = (jarr as JArray)[0];
-                        arrdepth++;
-                    }
-                    catch
-                    {
-                        break;
-                    }
-                }
-
-                val = jarr;
-            }
-
-            string type;
-
-            var propName = FirstToUL(jp.Name, true);
-            var varName = FirstToUL(propName, false);
-
-            string dgetter = null;
-            string access = "public";
-            string dprop = null;
-
-            if (val.Type == JTokenType.Object)
-            {
-                classes = new List<ParsedClass>();
-                classes.AddRange(ParseObject(val, propName + "Class", propChange));
-                type = propName + "Class";
-            }
-            else
-            {
-                type = PrintType(val);
-
-                if (type.StartsWith("dt") && varName != "sequence")
-                {
-                    if (propChange)
-                    {
-                        dprop = varName;
-                    }
-                    else
-                    {
-                        dprop = "Internal" + propName;
-                    }
-
-                    if (type == "dtmilli")
-                    {
-                        dgetter = $"TimeTypes.InMilliseconds";
-                    }
-                    else if (type == "dtsecs")
-                    {
-                        dgetter = $"TimeTypes.InSeconds";
-                    }
-                    else
-                    {
-                        dgetter = $"TimeTypes.InNanoseconds";
-                    }
-
-                    access = "public";
-
-                    dprop = propName;
-                    type = "DateTime";
-                }
-
-                if (varName == "sequence")
-                {
-                    type = "long";
-                    dprop = null;
-                }
-            }
-
-            if (arrdepth > 0)
-            {
-                for (int i = 0; i < arrdepth; i++)
-                {
-                    type = "List<" + type + ">";
-                }
-            }
-
-            return new ParsedProperty()
-            {
-                Access = access,
-                IsDate = (dprop != null),
-                Type = type,
-                DateProperty = dprop,
-                DateGetter = dgetter,
-                PropertyChanged = propChange,
-                PropertyName = propName,
-                VariableName = varName,
-                PropertyClasses = classes
-            };
-        }
-
-        private string PrintProperty(ParsedProperty prop, string ns = "")
-        {
-            var sb = new StringBuilder();
-
-            if (prop.PropertyChanged)
-            {
-                sb.AppendLine(ns + $"");
-                sb.AppendLine(ns + $"    private {prop.Type} {prop.VariableName};");
-            }
-
-            var txt = prop.PropertyName;
-
-            if (ipidx < jsonComments.Count) txt = jsonComments[ipidx++];
-
-            if (generateDocStrings)
-            {
-                sb.AppendLine(ns + $"");
-                sb.AppendLine(ns + $"    /// <summary>");
-                sb.AppendLine(ns + $"    /// {txt}");
-                sb.AppendLine(ns + $"    /// </summary>");
-                sb.AppendLine(ns + $"    [JsonProperty(\"{prop.VariableName}\")]");
-            }
-
-            if (prop.DateProperty != null)
-            {
-                sb.AppendLine(ns + $"    [JsonConverter(typeof(AutoTimeConverter), {prop.DateGetter})]");
-            }
-
-            if (!prop.PropertyChanged)
-            {
-                sb.AppendLine(ns + $"    {prop.Access} {prop.Type} {prop.PropertyName} {{ get; set; }}");
-            }
-            else
-            {
-                sb.AppendLine(ns + $"    {prop.Access} {prop.Type} {prop.PropertyName}");
-                sb.AppendLine(ns + "    {");
-
-                sb.AppendLine(ns + $"        get => {prop.VariableName};");
-                sb.AppendLine(ns + $"        set");
-                sb.AppendLine(ns + $"        {{");
-                sb.AppendLine(ns + $"            SetProperty(ref {prop.VariableName}, value);");
-                sb.AppendLine(ns + $"        }}");
-                sb.AppendLine(ns + "    }");
-            }
-
-            return sb.ToString();
-        }
-
-        private string PrintClass(ParsedClass cls)
-        {
-            var sb = new StringBuilder();
-            var ns = "";
-
-            if (!string.IsNullOrEmpty(Namespace))
-            {
-                sb.AppendLine("namespace " + Namespace);
-                sb.AppendLine("{");
-                sb.AppendLine();
-                ns = "    ";
-            }
-
-            sb.AppendLine(ns + "public class " + cls.Name);
-            sb.AppendLine(ns + "{");
-
-            foreach (var pp in cls.Properties)
-            {
-                sb.AppendLine("");
-                sb.Append(PrintProperty(pp, ns));
-            }
-
-            sb.AppendLine(ns + "");
-            sb.AppendLine(ns + "}");
-
-            if (hastime && GenerateTimeConverter)
-            {
-                sb.AppendLine();
-
-                sb.Append(AppResources.TimeSource);
-
-                sb.AppendLine();
-            }
-
-            if (!string.IsNullOrEmpty(Namespace))
-            {
-                sb.AppendLine();
-                sb.AppendLine("}");
-            }
-
-            return sb.ToString();
-        }
-
-        private List<ParsedClass> ParseObject(JToken obj, string clsName, bool propChange)
-        {
-            List<ParsedClass> classes = new List<ParsedClass>();
-
-            if (obj.Type == JTokenType.Object)
-            {
-                var pc = new ParsedClass()
-                {
-                    Name = clsName,
-                    PropertyChanged = propChange
-                };
-
-                foreach (JProperty jp in obj)
-                {
-                    var newProp = ParseProperty(jp, propChange);
-                    pc.Properties.Add(newProp);
-                    if (newProp.PropertyClasses != null && newProp.PropertyClasses.Count > 0)
-                    {
-                        classes.AddRange(newProp.PropertyClasses);
-                    }
-                }
-
-                classes.Insert(0, pc);
-            }
-
-            return classes;
         }
     }
 }

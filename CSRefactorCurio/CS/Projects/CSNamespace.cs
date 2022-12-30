@@ -13,20 +13,14 @@ namespace DataTools.CSTools
     /// <summary>
     /// A CS Refactor Curio Solution Namespace
     /// </summary>
-    public class CSNamespace : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>, INamespace
+    internal class CSNamespace : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>, INamespace
     {
-        #region Private Fields
-
         private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
         private ObservableCollection<CSMarker> markers = new ObservableCollection<CSMarker>();
         private string name;
         private ObservableCollection<CSNamespace> namespaces = new ObservableCollection<CSNamespace>();
 
         private CSNamespace parent;
-
-        #endregion Private Fields
-
-        #region Public Constructors
 
         /// <summary>
         /// Create a new namespace with the specified name and optional parent.
@@ -52,10 +46,6 @@ namespace DataTools.CSTools
                 children.Add(item);
             }
         }
-
-        #endregion Public Constructors
-
-        #region Public Properties
 
         IList IProjectNode.Children => children;
 
@@ -137,10 +127,6 @@ namespace DataTools.CSTools
 
         public string Title => name;
 
-        #endregion Public Properties
-
-        #region Public Methods
-
         /// <summary>
         /// Generate a namespace map from the specified project.
         /// </summary>
@@ -216,10 +202,6 @@ namespace DataTools.CSTools
         {
             return Name;
         }
-
-        #endregion Public Methods
-
-        #region Protected Methods
 
         /// <summary>
         /// Ensure that a dictionary map of namespaces has the specified namespace element, creating it if necessary.
@@ -298,7 +280,5 @@ namespace DataTools.CSTools
 
             return processed;
         }
-
-        #endregion Protected Methods
     }
 }

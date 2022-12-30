@@ -7,9 +7,9 @@ using System.Windows.Input;
 
 namespace CSRefactorCurio
 {
-    public delegate void ExecOwnedCommandHandler(object parameter);
+    internal delegate void ExecOwnedCommandHandler(object parameter);
 
-    public class OwnedCommand : ObservableBase, IOwnedCommand
+    internal class OwnedCommand : ObservableBase, IOwnedCommand
     {
         public event EventHandler CanExecuteChanged;
 
@@ -78,7 +78,7 @@ namespace CSRefactorCurio
         }
     }
 
-    public interface IOwnedCommand : ICommand
+    internal interface IOwnedCommand : ICommand
     {
         ICommandOwner Owner { get; }
 

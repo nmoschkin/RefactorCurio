@@ -5,15 +5,13 @@ using DataTools.CSTools;
 
 using Microsoft.VisualStudio.PlatformUI;
 
-using System.Windows.Controls;
-using System.Windows.Markup;
-
 namespace CSRefactorCurio.Dialogs
 {
     public partial class Report : DialogWindow
     {
-        ReportViewModel vm;
-        public Report(ISolution solution)
+        private ReportViewModel vm;
+
+        internal Report(ISolution solution)
         {
             InitializeComponent();
             DataContext = vm = new ReportViewModel(solution);
@@ -25,6 +23,5 @@ namespace CSRefactorCurio.Dialogs
         {
             ThemeHelper.ApplyVSTheme(this.Content);
         }
-
     }
 }

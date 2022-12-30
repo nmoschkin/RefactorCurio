@@ -10,21 +10,21 @@ using System.Text;
 
 namespace CSRefactorCurio.Reporting
 {
-    public interface IReportNode : INotifyPropertyChanged, IProjectElement
+    internal interface IReportNode : INotifyPropertyChanged, IProjectElement
     {
         object Element { get; }
 
         IList AssociatedList { get; }
     }
 
-    public interface IReportNode<T> : IReportNode, INotifyPropertyChanged
+    internal interface IReportNode<T> : IReportNode, INotifyPropertyChanged
     {
         new T Element { get; }
 
         new IList<T> AssociatedList { get; }
     }
 
-    public interface IReport : INotifyPropertyChanged
+    internal interface IReport : INotifyPropertyChanged
     {
         ISolution Solution { get; }
 
@@ -43,12 +43,12 @@ namespace CSRefactorCurio.Reporting
         void Sort();
     }
 
-    public interface IReport<TRpt> : IReport
+    internal interface IReport<TRpt> : IReport
     {
         new IList<TRpt> Reports { get; }
     }
 
-    public class ReportNode : ObservableBase, IReportNode
+    internal class ReportNode : ObservableBase, IReportNode
     {
         protected object element;
         protected IList associatedList;
@@ -88,7 +88,7 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    public class ReportNode<T> : ReportNode, IReportNode<T> where T : IProjectElement
+    internal class ReportNode<T> : ReportNode, IReportNode<T> where T : IProjectElement
     {
         private new T element;
         private new IList<T> associatedList;
@@ -124,7 +124,7 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    public abstract class ReportBase : ObservableBase, IReport
+    internal abstract class ReportBase : ObservableBase, IReport
     {
         protected IList reports;
 
@@ -169,7 +169,7 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    public abstract class ReportBase<T> : ReportBase, IReport<T> where T : IReportNode, new()
+    internal abstract class ReportBase<T> : ReportBase, IReport<T> where T : IReportNode, new()
     {
         private new IList<T> reports;
 

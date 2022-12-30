@@ -1,0 +1,32 @@
+﻿using System.Collections.Generic;
+
+namespace DataTools.CSTools
+{
+    /// <summary>
+    /// Represents a rendered and reformatted source code file containing the preamble and only the specified item from the original code.
+    /// </summary>
+    /// <typeparam name="TMarker">The type of <see cref="IMarker"/> that will be used.</typeparam>
+    /// <typeparam name="TList">The type of list that will contain the markers.</typeparam>
+    internal class AtomicGenerationInfo<TMarker, TList> where TMarker : IMarker, new() where TList : IList<TMarker>, new()
+    {
+        /// <summary>
+        /// The source code document lines.
+        /// </summary>
+        public IList<string> Lines { get; set; }
+
+        /// <summary>
+        /// The <see cref="IMarker"/> collection.
+        /// </summary>
+        public TList Markers { get; set; }
+
+        /// <summary>
+        /// Character position in the source file where the preamble begins.
+        /// </summary>
+        public int PreambleBegin { get; set; }
+
+        /// <summary>
+        /// Character position in the source file where the preamble ends.
+        /// </summary>
+        public int PreambleEnd { get; set; }
+    }
+}

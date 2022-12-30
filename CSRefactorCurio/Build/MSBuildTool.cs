@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.CSTools
 {
-
-
-    public class MSBuildTool
+    internal class MSBuildTool
     {
         [DllImport("kernel32.dll")]
         public static extern bool AllocConsole();
@@ -26,7 +22,6 @@ namespace DataTools.CSTools
             msBuild = FindMSBuild();
         }
 
-
         public bool RunMSBuild(CurioProject project)
         {
             var cmd = $"\"{project.ProjectRootPath}\\{project.ProjectFile}\" -t:Rebuild /property:Configuration=Debug /property:Platform=\"AnyCPU\"";
@@ -40,9 +35,8 @@ namespace DataTools.CSTools
 
             proc.Start();
             proc.WaitForExit();
-            
+
             return proc.ExitCode == 0;
-          
         }
 
         public string FindILDasm()
@@ -67,6 +61,5 @@ namespace DataTools.CSTools
 
             return strm.Replace("\r", "").Replace("\n", "");
         }
-
     }
 }

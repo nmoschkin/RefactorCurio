@@ -8,8 +8,7 @@ namespace CSRefactorCurio.Dialogs
 {
     public partial class JsonOptionsDialog : DialogWindow
     {
-
-        JSConvertViewModel vm;
+        private JSConvertViewModel vm;
 
         public JsonOptionsDialog()
         {
@@ -19,7 +18,7 @@ namespace CSRefactorCurio.Dialogs
             DataContext = vm;
         }
 
-        public JsonOptionsDialog(CurioProject project)
+        internal JsonOptionsDialog(CurioProject project)
         {
             InitializeComponent();
             vm = new JSConvertViewModel(project);
@@ -27,7 +26,7 @@ namespace CSRefactorCurio.Dialogs
             DataContext = vm;
         }
 
-        public JsonOptionsDialog(CurioProject project, string initPath)
+        internal JsonOptionsDialog(CurioProject project, string initPath)
         {
             InitializeComponent();
             vm = new JSConvertViewModel(project, initPath);
