@@ -3,6 +3,7 @@
 using CSRefactorCurio.Reporting;
 
 using DataTools.Code.Project;
+using DataTools.Code.Reporting;
 using DataTools.Essentials.Observable;
 
 using System.Collections.ObjectModel;

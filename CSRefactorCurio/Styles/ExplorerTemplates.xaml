@@ -160,7 +160,7 @@
         </Grid>
     </HierarchicalDataTemplate>
     <HierarchicalDataTemplate
-        DataType="{x:Type rpt:ReportNode}"
+        DataType="{x:Type rpt:CSReportBase`1}"
         ItemsSource="{Binding AssociatedList}">
         <Grid>
             <Grid.ColumnDefinitions>

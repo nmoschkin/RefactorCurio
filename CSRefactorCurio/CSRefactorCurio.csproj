@@ -77,6 +77,9 @@
     <Compile Include="Projects\Properties\PropertiesContainer.cs" />
     <Compile Include="Projects\Properties\PropertiesContainerBase.cs" />
     <Compile Include="Projects\Properties\Property.cs" />
+    <Compile Include="Reporting\CSReference.cs" />
+    <Compile Include="Reporting\HeaviestReferencesReport.cs" />
+    <Compile Include="Reporting\ReportHelper.cs" />
     <Compile Include="Styles\ExplorerTemplates.xaml.cs">
       <DependentUpon>ExplorerTemplates.xaml</DependentUpon>
     </Compile>
@@ -130,8 +133,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\ShowCurioExplorerCommand.cs" />
     <Compile Include="CSRefactorCurioPackage.cs" />
-    <Compile Include="Reporting\CSReports.cs" />
-    <Compile Include="Reporting\ReportBases.cs" />
+    <Compile Include="Reporting\MostSpreadOutNamespacesReport.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -229,22 +231,22 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="DataTools.Essentials">
-      <Version>8.0.0.1029</Version>
+      <Version>8.0.0.1030</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Graphics">
-      <Version>8.0.0.1026</Version>
-    </PackageReference>
-    <PackageReference Include="DataTools.MathTools">
-      <Version>8.0.0.1028</Version>
-    </PackageReference>
-    <PackageReference Include="DataTools.Memory">
       <Version>8.0.0.1027</Version>
     </PackageReference>
+    <PackageReference Include="DataTools.MathTools">
+      <Version>8.0.0.1029</Version>
+    </PackageReference>
+    <PackageReference Include="DataTools.Memory">
+      <Version>8.0.0.1028</Version>
+    </PackageReference>
     <PackageReference Include="DataTools.Text">
-      <Version>8.0.0.1032</Version>
+      <Version>8.0.0.1033</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Win32.Memory">
-      <Version>8.0.0.1026</Version>
+      <Version>8.0.0.1027</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
       <Version>7.0.0</Version>
