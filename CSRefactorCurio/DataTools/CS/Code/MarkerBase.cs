@@ -468,7 +468,14 @@ namespace DataTools.CSTools
 
         public override string ToString()
         {
-            return $"{Kind} {Name}{Generics}, Line: {StartLine} to {EndLine}";
+            if (StartLine == EndLine)
+            {
+                return $"{Kind} {Name}{Generics}, Line {StartLine}";
+            }
+            else
+            {
+                return $"{Kind} {Name}{Generics}, Line {StartLine} to {EndLine}";
+            }
         }
 
         /// <summary>
