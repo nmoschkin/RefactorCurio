@@ -456,28 +456,45 @@ namespace CSRefactorCurio.ViewModels
         protected void PopulateFrom(IList<IProjectElement> addto, IEnumerable source)
         {
             DataTools.CSTools.CSSolutionFolder current = null;
-
+            EnvDTE.Project item;
             foreach (object obj in source)
             {
-                if (obj is EnvDTE.Project item)
+                if (obj is EnvDTE.Project)
                 {
-                    if (item.Kind == ProjectKinds.vsProjectKindSolutionFolder)
-                    {
-                        current = new DataTools.CSTools.CSSolutionFolder(item.Name);
-                        addto.Add(current);
-
-                        PopulateFrom(current.Children, item.ProjectItems);
-                    }
-                    else if (item.FullName.ToLower().EndsWith(".csproj"))
-                    {
-                        addto.Add(new CurioProject(item.FullName, item));
-                    }
+                    item = (EnvDTE.Project)obj;
                 }
                 else if ((obj is EnvDTE.ProjectItem item2) && (item2.SubProject is EnvDTE.Project subproj))
                 {
-                    if (subproj.FullName.ToLower().EndsWith(".csproj"))
+                    item = (EnvDTE.Project)subproj;
+                }
+                else
+                {
+                    return;
+                }
+
+                if (item.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+                {
+                    current = new DataTools.CSTools.CSSolutionFolder(item.Name);
+                    addto.Add(current);
+
+                    try
                     {
-                        addto.Add(new CurioProject(subproj.FullName, subproj));
+                        PopulateFrom(current.Children, item.ProjectItems);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Write(ex);
+                    }
+                }
+                else if (item.FullName.ToLower().EndsWith(".csproj"))
+                {
+                    try
+                    {
+                        addto.Add(new CurioProject(item.FullName, item));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Write(ex);
                     }
                 }
             }

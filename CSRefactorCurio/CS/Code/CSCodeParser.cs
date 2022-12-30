@@ -366,7 +366,7 @@ namespace DataTools.CSTools
             "Guid", "DateTime",
             "string", "char", "this", "base",
             "void", "var", "dynamic", "object",
-            "Enum", "Tuple", "bool", "true", "false", "IntPtr", "UIntPtr"
+            "Enum", "Tuple", "bool", "true", "false", "nint", "IntPtr", "UIntPtr"
         };
 
         /// <summary>
