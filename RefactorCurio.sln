@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSRefactorCurio", "CSRefact
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experiments", "Experiments\Experiments.csproj", "{154436CA-7A60-4B6C-AE8F-68F5E4514553}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTools.Code", "DataTools.Code\DataTools.Code.csproj", "{DBD74038-D785-4C81-9387-56327E3B17F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,24 @@ Global
 		{154436CA-7A60-4B6C-AE8F-68F5E4514553}.Release|arm64.Build.0 = Release|Any CPU
 		{154436CA-7A60-4B6C-AE8F-68F5E4514553}.Release|x86.ActiveCfg = Release|Any CPU
 		{154436CA-7A60-4B6C-AE8F-68F5E4514553}.Release|x86.Build.0 = Release|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Debug|arm64.Build.0 = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Debug|x86.Build.0 = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Experimental|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Experimental|Any CPU.Build.0 = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Experimental|arm64.ActiveCfg = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Experimental|arm64.Build.0 = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Experimental|x86.ActiveCfg = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Experimental|x86.Build.0 = Debug|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Release|arm64.ActiveCfg = Release|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Release|arm64.Build.0 = Release|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Release|x86.ActiveCfg = Release|Any CPU
+		{DBD74038-D785-4C81-9387-56327E3B17F5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

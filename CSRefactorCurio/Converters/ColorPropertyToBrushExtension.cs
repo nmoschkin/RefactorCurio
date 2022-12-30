@@ -1,4 +1,5 @@
-﻿using DataTools.Graphics;
+﻿using DataTools.Code.Project.Properties;
+using DataTools.Graphics;
 
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell.Interop;

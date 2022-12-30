@@ -1,7 +1,7 @@
 ﻿using CSRefactorCurio.Helpers;
 using CSRefactorCurio.ViewModels;
 
-using DataTools.CSTools;
+using DataTools.Code.Project;
 
 using Microsoft.VisualStudio.PlatformUI;
 

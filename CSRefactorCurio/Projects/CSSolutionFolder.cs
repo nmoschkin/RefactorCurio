@@ -1,4 +1,5 @@
-﻿using DataTools.Essentials.Observable;
+﻿using DataTools.Code.Project;
+using DataTools.Essentials.Observable;
 
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -18,7 +19,7 @@ namespace DataTools.CSTools
             this.title = title;
         }
 
-        IList IProjectNode.Children => Children;
+        IEnumerable IProjectNode.Children => Children;
 
         /// <summary>
         /// Gets the child project elements.

@@ -1,4 +1,5 @@
-﻿using DataTools.Essentials.Observable;
+﻿using DataTools.Code.Project;
+using DataTools.Essentials.Observable;
 using DataTools.Essentials.SortedLists;
 
 using System;
@@ -47,7 +48,7 @@ namespace DataTools.CSTools
             }
         }
 
-        IList IProjectNode.Children => children;
+        IEnumerable IProjectNode.Children => children;
 
         string INamespace.Namespace
         {

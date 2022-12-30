@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+	  <UseWPF>true</UseWPF>
+	  <UseWindowsForms>true</UseWindowsForms>
+	  <SignAssembly>True</SignAssembly>
+	  <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\code-engine.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DataTools.Desktop" Version="8.0.0.1026" />
+    <PackageReference Include="DataTools.Essentials" Version="8.0.0.1029" />
+    <PackageReference Include="DataTools.Graphics" Version="8.0.0.1026" />
+    <PackageReference Include="DataTools.MathTools" Version="8.0.0.1028" />
+    <PackageReference Include="DataTools.Memory" Version="8.0.0.1027" />
+    <PackageReference Include="DataTools.Text" Version="8.0.0.1032" />
+    <PackageReference Include="DataTools.Win32" Version="8.0.0.1023" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="AppResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AppResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="AppResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

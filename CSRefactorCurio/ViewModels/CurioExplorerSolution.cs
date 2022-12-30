@@ -1,6 +1,7 @@
 ﻿using CSRefactorCurio.Dialogs;
 using CSRefactorCurio.Reporting;
 
+using DataTools.Code.Project;
 using DataTools.CSTools;
 using DataTools.Essentials.Observable;
 

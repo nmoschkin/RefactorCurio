@@ -1,4 +1,9 @@
-﻿using System.Collections;
+﻿using DataTools.Code.CS;
+using DataTools.Code.Filtering;
+using DataTools.Code.Markers;
+using DataTools.Code.Project;
+
+using System.Collections;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -10,7 +15,6 @@ namespace DataTools.CSTools
     /// </summary>
     internal class CSCodeFile : CSCodeParser<CSMarker, ObservableMarkerList<CSMarker>>, IProjectFile<ObservableMarkerList<CSMarker>>, INotifyPropertyChanged, IMarkerFilterProvider<CSMarker, ObservableMarkerList<CSMarker>>
     {
-
         private CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>> fileChain = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 
         private ObservableMarkerList<CSMarker> filteredChildren;
@@ -32,7 +36,7 @@ namespace DataTools.CSTools
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        IList IProjectNode.Children => markers;
+        IEnumerable IProjectNode.Children => markers;
 
         public virtual ObservableMarkerList<CSMarker> Children
         {
@@ -246,6 +250,5 @@ namespace DataTools.CSTools
                 SetHomeFile(item.Children);
             }
         }
-
     }
 }

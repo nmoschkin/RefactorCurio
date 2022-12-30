@@ -1,5 +1,7 @@
 ﻿using CSRefactorCurio;
 
+using DataTools.Code.Project;
+using DataTools.Code.Project.Properties;
 using DataTools.Desktop;
 using DataTools.Essentials.Observable;
 

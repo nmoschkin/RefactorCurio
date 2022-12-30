@@ -1,4 +1,5 @@
-﻿using DataTools.Desktop;
+﻿using DataTools.Code.Project;
+using DataTools.Desktop;
 using DataTools.Essentials.Observable;
 using DataTools.Essentials.SortedLists;
 
@@ -50,7 +51,7 @@ namespace DataTools.CSTools
             ReadDirectory();
         }
 
-        IList IProjectNode.Children => children;
+        IEnumerable IProjectNode.Children => children;
 
         public ObservableCollection<IProjectElement> Children
         {
@@ -478,12 +479,22 @@ namespace DataTools.CSTools
             {
                 foreach (IProjectNode pnode in children)
                 {
-                    if (pnode.Children.Contains(item))
+                    bool pb = false;
+
+                    foreach (IProjectElement pe in pnode.Children)
+                    {
+                        if (pe.Equals(item))
+                        {
+                            pb = true;
+                            break;
+                        }
+                    }
+
+                    if (pb)
                     {
                         if (pnode is CSCodeFile file)
                         {
-                            file.RemoveMarker(child);
-                            return true;
+                            return file.RemoveMarker(child);
                         }
                     }
                 }

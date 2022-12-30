@@ -1,6 +1,8 @@
 ﻿using CSRefactorCurio.Globalization.Resources;
 using CSRefactorCurio.ViewModels;
 
+using DataTools.Code.Markers;
+using DataTools.Code.Project;
 using DataTools.CSTools;
 using DataTools.Essentials.SortedLists;
 
