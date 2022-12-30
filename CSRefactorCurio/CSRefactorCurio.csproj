@@ -66,6 +66,9 @@
     <Compile Include="Styles\ExplorerTemplates.xaml.cs">
       <DependentUpon>ExplorerTemplates.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Styles\MenuStyles.xaml.cs">
+      <DependentUpon>MenuStyles.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Styles\TreeStyles.xaml.cs">
       <DependentUpon>TreeStyles.xaml</DependentUpon>
     </Compile>
@@ -173,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\ExplorerTemplates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\MenuStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,15 +1,15 @@
 ﻿<UserControl
     x:Class="CSRefactorCurio.CurioExplorer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
-    xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
-    xmlns:glob="clr-namespace:CSRefactorCurio.Globalization"
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+    xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:glob="clr-namespace:CSRefactorCurio.Globalization"
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     Name="MyToolWindow"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -18,18 +18,89 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
-                <ResourceDictionary
-                    Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
+                <ResourceDictionary>
+
+                    <ContextMenu x:Key="TreeContext" toolkit:Themes.UseVsTheme="True">
+                        <ContextMenu.Resources>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.MenuTextKey}}" />
+                                <Setter Property="Height" Value="24" />
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Padding" Value="4,2" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
+                            </Style>
+                        </ContextMenu.Resources>
+
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="ItemsControl">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                        <MenuItem
+                            toolkit:Themes.UseVsTheme="True"
+                            Command="{Binding ClickBuild}"
+                            Header="{glob:Translate ResourceKey=MI_BUILD_SOLUTION}">
+                            <MenuItem.Icon>
+                                <imaging:CrispImage
+                                    Width="16"
+                                    Height="16"
+                                    Margin="4"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Moniker="{x:Static catalog:KnownMonikers.BuildSolution}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+
+                        <MenuItem
+                            toolkit:Themes.UseVsTheme="True"
+                            Command="{Binding ReportCommand}"
+                            Header="{glob:Translate ResourceKey=REPORTS}">
+                            <MenuItem.Icon>
+                                <imaging:CrispImage
+                                    Width="16"
+                                    Height="16"
+                                    Margin="4"
+                                    Moniker="{x:Static catalog:KnownMonikers.Report}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+
+                        <!--<Separator toolkit:Themes.UseVsTheme="True" />-->
+
+                        <MenuItem
+                            toolkit:Themes.UseVsTheme="True"
+                            Command="{Binding SplitFileCommand}"
+                            Header="{glob:Translate ResourceKey=SPLIT_FILE_DEFAULT_OPTIONS}">
+                            <MenuItem.Icon>
+                                <imaging:CrispImage
+                                    Width="16"
+                                    Height="16"
+                                    Margin="4"
+                                    Moniker="{x:Static catalog:KnownMonikers.ElementSeparator}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid
-        Cursor="{Binding Cursor}">
+    <Grid Cursor="{Binding Cursor}">
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <ToolBarTray
@@ -48,8 +119,7 @@
                 ToolBar.OverflowMode="AsNeeded"
                 ToolBarTray.IsLocked="True">
                 <ToolBar.Resources>
-                    <conv:SelectionGroupConverter
-                        x:Key="selConv" />
+                    <conv:SelectionGroupConverter x:Key="selConv" />
                     <!--<Style TargetType="ToggleButton">
                     <Setter Property="Background" Value="Transparent" />
                 </Style>-->
@@ -89,88 +159,11 @@
             x:Name="ProjTree"
             Grid.Row="1"
             Background="Transparent"
+            ContextMenu="{StaticResource TreeContext}"
             ItemContainerStyle="{StaticResource BeautifulStyle}"
             ItemsSource="{Binding CurrentItems}"
             MouseDoubleClick="ProjTree_MouseDoubleClick"
-            SelectedItemChanged="ProjTree_SelectedItemChanged">
+            SelectedItemChanged="ProjTree_SelectedItemChanged" />
 
-            <TreeView.ContextMenu>
-
-                <ContextMenu
-                    toolkit:Themes.UseVsTheme="True">
-
-                    <ContextMenu.Resources>
-
-                        <Style
-                            TargetType="MenuItem">
-                            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.MenuTextKey}}" />
-                            <Setter Property="Height" Value="24" />
-                            <Setter Property="HorizontalAlignment" Value="Stretch" />
-                            <Setter Property="HorizontalContentAlignment" Value="Left" />
-                            <Setter Property="Margin" Value="0" />
-                            <Setter Property="Padding" Value="4,2" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                            <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
-                        </Style>
-                    </ContextMenu.Resources>
-
-                    <ContextMenu.ItemContainerStyle>
-                        <Style
-                            TargetType="ItemsControl">
-                            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.MenuKey}}" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Margin" Value="0" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
-                        </Style>
-                    </ContextMenu.ItemContainerStyle>
-                    <MenuItem
-                        toolkit:Themes.UseVsTheme="True"
-                        Command="{Binding ClickBuild}"
-                        Header="{glob:Translate ResourceKey=MI_BUILD_SOLUTION}">
-                        <MenuItem.Icon>
-                            <imaging:CrispImage
-                                Width="16"
-                                Height="16"
-                                Margin="4"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Moniker="{x:Static catalog:KnownMonikers.BuildSolution}" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-
-                    <MenuItem
-                        toolkit:Themes.UseVsTheme="True"
-                        Command="{Binding ReportCommand}"
-                        Header="{glob:Translate ResourceKey=REPORTS}">
-                        <MenuItem.Icon>
-                            <imaging:CrispImage
-                                Width="16"
-                                Height="16"
-                                Margin="4"
-                                Moniker="{x:Static catalog:KnownMonikers.Report}" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-
-                    <!--<Separator toolkit:Themes.UseVsTheme="True" />-->
-
-                    <MenuItem
-                        toolkit:Themes.UseVsTheme="True"
-                        Command="{Binding SplitFileCommand}"
-                        Header="{glob:Translate ResourceKey=SPLIT_FILE_DEFAULT_OPTIONS}">
-                        <MenuItem.Icon>
-                            <imaging:CrispImage
-                                Width="16"
-                                Height="16"
-                                Margin="4"
-                                Moniker="{x:Static catalog:KnownMonikers.ElementSeparator}" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-            </TreeView.ContextMenu>
-        </TreeView>
     </Grid>
 </UserControl>
