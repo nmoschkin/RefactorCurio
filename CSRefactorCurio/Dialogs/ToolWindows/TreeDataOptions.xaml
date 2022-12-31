@@ -1,0 +1,100 @@
+﻿<platform:DialogWindow
+    x:Class="CSRefactorCurio.Dialogs.TreeDataOptions"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
+    xmlns:helpers="clr-namespace:CSRefactorCurio.Helpers"
+    xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    Title="Object Filter Options"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    toolkit:Themes.UseVsTheme="True"
+    mc:Ignorable="d">
+    <Grid Background="Transparent">
+
+        <Grid.Resources>
+            <conv:BoolConverter
+                x:Key="visConv"
+                Mode="Visibility" />
+            <helpers:EnumListConverter x:Key="enumConv" />
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <Label Content="Object Visibility:" />
+
+            <CheckBox
+                Margin="16,8"
+                toolkit:Themes.UseVsTheme="True"
+                Content="Public Objects"
+                IsChecked="{Binding ShowPublics, Mode=TwoWay}" />
+
+            <CheckBox
+                Margin="16,8"
+                toolkit:Themes.UseVsTheme="True"
+                Content="Internal Objects"
+                IsChecked="{Binding ShowInternals, Mode=TwoWay}" />
+            <!--<CheckBox
+                Margin="16,8"
+                toolkit:Themes.UseVsTheme="True"
+                Content="Non-Public Objects"
+                IsChecked="{Binding Generator.GenerateTimeConverter, Mode=TwoWay}" />-->
+
+            <Label Content="References:" />
+
+            <RadioButton
+                Grid.Row="3"
+                Margin="16,8"
+                toolkit:Themes.UseVsTheme="True"
+                Content="Any Number of References"
+                GroupName="RefGroup"
+                IsChecked="{Binding RefAny, Mode=TwoWay}" />
+            <RadioButton
+                Grid.Row="4"
+                Margin="16,8"
+                toolkit:Themes.UseVsTheme="True"
+                Content="Must Have References"
+                GroupName="RefGroup"
+                IsChecked="{Binding RefHas, Mode=TwoWay}" />
+
+            <RadioButton
+                Grid.Row="5"
+                Margin="16,8"
+                toolkit:Themes.UseVsTheme="True"
+                Content="Must Not Have References"
+                GroupName="RefGroup"
+                IsChecked="{Binding RefHasNot, Mode=TwoWay}" />
+        </StackPanel>
+        <Grid Grid.Row="7">
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.Column="2"
+                Margin="8"
+                toolkit:Themes.UseVsTheme="True"
+                Command="{Binding CancelCommand}"
+                Content="Cancel" />
+
+            <Button
+                Grid.Column="3"
+                Margin="8"
+                toolkit:Themes.UseVsTheme="True"
+                Command="{Binding OKCommand}"
+                Content="OK" />
+        </Grid>
+    </Grid>
+</platform:DialogWindow>

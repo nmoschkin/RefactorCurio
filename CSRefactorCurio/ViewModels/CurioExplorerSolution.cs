@@ -23,8 +23,6 @@ namespace CSRefactorCurio.ViewModels
     /// </summary>
     internal class CurioExplorerSolution : ObservableBase, ICommandOwner, ISolution
     {
-        #region Private Fields
-
         private EnvDTE.Solution _sln;
         private int classMode = 0;
         private List<ObservableCollection<IProjectElement>> classModes;
@@ -32,16 +30,14 @@ namespace CSRefactorCurio.ViewModels
         private IOwnedCommand clickClasses;
         private IOwnedCommand clickNamespace;
         private IOwnedCommand clickProject;
+        private IOwnedCommand clickFilter;
         private Cursor cursor = Cursors.Arrow;
         private bool[] isActive = new bool[3];
         private Dictionary<string, CSNamespace> namespacesMap = new Dictionary<string, CSNamespace>();
         private IOwnedCommand reportCommand;
         private object selectedItem;
         private IOwnedCommand splitFileCommand;
-
-        #endregion Private Fields
-
-        #region Public Constructors
+        private ExplorerFilterViewModel filterOptions = new ExplorerFilterViewModel();
 
         /// <summary>
         /// Create a new Curio Solution
@@ -103,6 +99,11 @@ namespace CSRefactorCurio.ViewModels
                 }
             }, nameof(ClickProject));
 
+            clickFilter = new OwnedCommand(this, (o) =>
+            {
+                var dlg = new TreeDataOptions(filterOptions);
+            }, nameof(ClickFilter));
+
             isActive[classMode] = true;
         }
 
@@ -114,10 +115,6 @@ namespace CSRefactorCurio.ViewModels
         {
             _sln = sln;
         }
-
-        #endregion Public Constructors
-
-        #region Public Properties
 
         /// <summary>
         /// Gets or sets the display (class) mode.
@@ -164,6 +161,8 @@ namespace CSRefactorCurio.ViewModels
         public IOwnedCommand ClickNamespace => clickNamespace;
 
         public IOwnedCommand ClickProject => clickProject;
+
+        public IOwnedCommand ClickFilter => clickFilter;
 
         /// <summary>
         /// Gets the current view items.
@@ -296,18 +295,10 @@ namespace CSRefactorCurio.ViewModels
         /// </summary>
         public IOwnedCommand SplitFileCommand => splitFileCommand;
 
-        #endregion Public Properties
-
-        #region Protected Properties
-
         /// <summary>
         /// Gets or sets a value indicating that we are loading the solution and we should not be firing change events until after loading is complete.
         /// </summary>
         protected bool LoadingFlag { get; set; } = false;
-
-        #endregion Protected Properties
-
-        #region Public Methods
 
         /// <summary>
         /// Clear the current solution.
@@ -445,10 +436,6 @@ namespace CSRefactorCurio.ViewModels
             return true;
         }
 
-        #endregion Public Methods
-
-        #region Protected Methods
-
         /// <summary>
         /// Populate wrapped items from native items list.
         /// </summary>
@@ -500,10 +487,6 @@ namespace CSRefactorCurio.ViewModels
                 }
             }
         }
-
-        #endregion Protected Methods
-
-        #region Private Methods
 
         private IProjectElement FindByPath(string path, IProjectNode node)
         {
@@ -585,7 +568,5 @@ namespace CSRefactorCurio.ViewModels
         {
             if (classMode != 0 && !LoadingFlag) RefreshNamespaces();
         }
-
-        #endregion Private Methods
     }
 }

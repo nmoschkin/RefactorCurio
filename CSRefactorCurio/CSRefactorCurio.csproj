@@ -69,6 +69,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Build\MSBuildTool.cs" />
+    <Compile Include="Dialogs\ToolWindows\TreeDataOptions.xaml.cs">
+      <DependentUpon>TreeDataOptions.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Projects\Properties\ColorableProperty.cs" />
     <Compile Include="Projects\Properties\ColorItems.cs" />
     <Compile Include="Projects\CSCodeFile.cs" />
@@ -142,6 +145,7 @@
     <Compile Include="Validators\DirExistsValidator.cs" />
     <Compile Include="Helpers\BrushHelper.cs" />
     <Compile Include="ViewModels\CurioExplorerSolution.cs" />
+    <Compile Include="ViewModels\ExplorerFilterViewModel.cs" />
     <Compile Include="ViewModels\JSConvertViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\RequestCloseEventArgs.cs" />
@@ -177,6 +181,10 @@
   <ItemGroup>
     <Compile Include="ToolWindows\CurioExplorerToolWindow.cs" />
     <Page Include="Controls\SortOrderControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ToolWindows\TreeDataOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
