@@ -4,6 +4,7 @@ using DataTools.Essentials.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace DataTools.Code.Markers
 {
@@ -35,35 +36,38 @@ namespace DataTools.Code.Markers
         {
             get
             {
-                var amstr = "";
+                var amstr = new StringBuilder();
 
                 if (AccessModifiers != AccessModifiers.None)
                 {
                     var t = AccessModifiers.ToString().ToLower().Split(',');
-                    amstr = string.Join(" ", t);
-                    if (amstr != "") amstr += " ";
+
+                    if (t != null && t.Length > 0)
+                    {
+                        amstr.Append(string.Join(" ", t) + " ");
+                    }
                 }
 
-                if (IsStatic) amstr += "static ";
-                if (IsImplicit) amstr += "implicit ";
-                if (IsExplicit) amstr += "explicit ";
+                if (IsStatic) amstr.Append("static ");
+                if (IsImplicit) amstr.Append("implicit ");
+                if (IsExplicit) amstr.Append("explicit ");
 
-                if (IsAbstract) amstr += "abstract ";
-                if (IsExtern) amstr += "extern ";
-                if (IsSealed) amstr += "sealed ";
-                if (IsOverride) amstr += "override ";
-                if (IsVirtual) amstr += "virtual ";
-                if (IsAsync) amstr += "async ";
+                if (IsAbstract) amstr.Append("abstract ");
+                if (IsExtern) amstr.Append("extern ");
+                if (IsSealed) amstr.Append("sealed ");
+                if (IsOverride) amstr.Append("override ");
+                if (IsVirtual) amstr.Append("virtual ");
+                if (IsAsync) amstr.Append("async ");
 
-                if (Kind == MarkerKind.Delegate) amstr += "delegate ";
-                if (Kind == MarkerKind.Event) amstr += "event ";
-                if (kind == MarkerKind.Const) amstr += "const ";
-                if (kind == MarkerKind.Class) amstr += "class ";
-                if (kind == MarkerKind.Interface) amstr += "interface ";
-                if (kind == MarkerKind.Struct) amstr += "struct ";
-                if (kind == MarkerKind.Record) amstr += "record ";
+                if (Kind == MarkerKind.Delegate) amstr.Append("delegate ");
+                if (Kind == MarkerKind.Event) amstr.Append("event ");
+                if (kind == MarkerKind.Const) amstr.Append("const ");
+                if (kind == MarkerKind.Class) amstr.Append("class ");
+                if (kind == MarkerKind.Interface) amstr.Append("interface ");
+                if (kind == MarkerKind.Struct) amstr.Append("struct ");
+                if (kind == MarkerKind.Record) amstr.Append("record ");
 
-                return amstr;
+                return amstr.ToString();
             }
         }
 
@@ -466,6 +470,11 @@ namespace DataTools.Code.Markers
             return Clone();
         }
 
+        /// <summary>
+        /// Find the first ancestor with the specified kind.
+        /// </summary>
+        /// <param name="parentKind"></param>
+        /// <returns></returns>
         public abstract TMarker FindParent(MarkerKind parentKind);
 
         public override string ToString()
