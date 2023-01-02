@@ -15,7 +15,7 @@ namespace CSRefactorCurio.Reporting
 {
     internal delegate bool ItemFilterFunc(INamespace item);
 
-    internal class MostSpreadOutNamespacesReport : CSReportBase<ReportNode<IProjectNode>>
+    internal class MostSpreadOutNamespacesReport : ReportBase<ReportNode<IProjectNode>>
     {
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_SPREAD_OUT;

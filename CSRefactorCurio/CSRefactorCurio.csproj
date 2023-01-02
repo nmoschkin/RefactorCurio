@@ -72,6 +72,7 @@
     <Compile Include="Dialogs\ToolWindows\TreeDataOptions.xaml.cs">
       <DependentUpon>TreeDataOptions.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ReferenceFinder.cs" />
     <Compile Include="Projects\Properties\ColorableProperty.cs" />
     <Compile Include="Projects\Properties\ColorItems.cs" />
     <Compile Include="Projects\CSCodeFile.cs" />
@@ -239,22 +240,22 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="DataTools.Essentials">
-      <Version>8.0.0.1030</Version>
+      <Version>8.0.0.1031</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Graphics">
-      <Version>8.0.0.1027</Version>
-    </PackageReference>
-    <PackageReference Include="DataTools.MathTools">
-      <Version>8.0.0.1029</Version>
-    </PackageReference>
-    <PackageReference Include="DataTools.Memory">
       <Version>8.0.0.1028</Version>
     </PackageReference>
+    <PackageReference Include="DataTools.MathTools">
+      <Version>8.0.0.1030</Version>
+    </PackageReference>
+    <PackageReference Include="DataTools.Memory">
+      <Version>8.0.0.1029</Version>
+    </PackageReference>
     <PackageReference Include="DataTools.Text">
-      <Version>8.0.0.1033</Version>
+      <Version>8.0.0.1034</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Win32.Memory">
-      <Version>8.0.0.1027</Version>
+      <Version>8.0.0.1028</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
       <Version>7.0.0</Version>

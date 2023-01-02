@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace CSRefactorCurio.Reporting
 {
-    internal class HeaviestReferencesReport : CSReportBase<ReportNode<INamespace>>
+    internal class HeaviestReferencesReport : ReportBase<ReportNode<INamespace>>
     {
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_REFERENCED_OBJECTS;
@@ -44,7 +44,7 @@ namespace CSRefactorCurio.Reporting
                 if (a.Equals(b)) return 0;
 
                 var x = so.IndexOf(a.ReferencedObject.Kind);
-                var y = so.IndexOf(a.ReferencedObject.Kind);
+                var y = so.IndexOf(b.ReferencedObject.Kind);
 
                 if (x != -1 && y != -1)
                 {
@@ -53,7 +53,7 @@ namespace CSRefactorCurio.Reporting
                 }
 
                 x = so.IndexOf(a.CallingObject.Kind);
-                y = so.IndexOf(a.CallingObject.Kind);
+                y = so.IndexOf(b.CallingObject.Kind);
 
                 if (x != -1 && y != -1)
                 {

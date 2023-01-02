@@ -12,19 +12,15 @@
     xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     mc:Ignorable="d">
 
-    <Style
-        TargetType="ToolTip">
+    <Style TargetType="ToolTip">
         <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ToolWindowBackgroundKey}}" />
     </Style>
 
-    <conv:ItemCountConverter
-        x:Key="intConv" />
+    <conv:ItemCountConverter x:Key="intConv" />
 
-    <conv:MarkerKindToMonikerConverter
-        x:Key="convMon" />
+    <conv:MarkerKindToMonikerConverter x:Key="convMon" />
 
-    <Style
-        TargetType="TextBlock">
+    <Style TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsBrushes.ToolWindowTextKey}}" />
     </Style>
 
@@ -46,8 +42,7 @@
         ItemsSource="{Binding RootFolder.Children}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -67,8 +62,7 @@
         ItemsSource="{Binding Children}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -89,8 +83,7 @@
         ItemsSource="{Binding Children}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -112,8 +105,7 @@
         ItemsSource="{Binding Children}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -135,11 +127,9 @@
         ItemsSource="{Binding FilteredItems}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <imaging:CrispImage
@@ -160,12 +150,11 @@
         </Grid>
     </HierarchicalDataTemplate>
     <HierarchicalDataTemplate
-        DataType="{x:Type rpt:CSReportBase`1}"
+        DataType="{x:Type rpt:MostSpreadOutNamespacesReport}"
         ItemsSource="{Binding AssociatedList}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -186,8 +175,7 @@
         ItemsSource="{Binding Children}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -210,16 +198,11 @@
                     Text="{Binding AccessModifierString}">
                     <TextBlock.ToolTip>
                         <ToolTip>
-                            <StackPanel
-                                Orientation="Vertical">
-                                <Label
-                                    Content="{Binding Title}" />
-                                <Label
-                                    Content="{Binding}" />
-                                <Label
-                                    Content="{Binding HomeFile}" />
-                                <Label
-                                    Content="{Binding HomeFile.Project}" />
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="{Binding Title}" />
+                                <Label Content="{Binding}" />
+                                <Label Content="{Binding HomeFile}" />
+                                <Label Content="{Binding HomeFile.Project}" />
                             </StackPanel>
                         </ToolTip>
                     </TextBlock.ToolTip>
@@ -232,16 +215,11 @@
                     Text="{Binding DataTypeString}">
                     <TextBlock.ToolTip>
                         <ToolTip>
-                            <StackPanel
-                                Orientation="Vertical">
-                                <Label
-                                    Content="{Binding Title}" />
-                                <Label
-                                    Content="{Binding}" />
-                                <Label
-                                    Content="{Binding HomeFile}" />
-                                <Label
-                                    Content="{Binding HomeFile.Project}" />
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="{Binding Title}" />
+                                <Label Content="{Binding}" />
+                                <Label Content="{Binding HomeFile}" />
+                                <Label Content="{Binding HomeFile.Project}" />
                             </StackPanel>
                         </ToolTip>
                     </TextBlock.ToolTip>
@@ -254,16 +232,11 @@
                     Text="{Binding Name}">
                     <TextBlock.ToolTip>
                         <ToolTip>
-                            <StackPanel
-                                Orientation="Vertical">
-                                <Label
-                                    Content="{Binding Title}" />
-                                <Label
-                                    Content="{Binding}" />
-                                <Label
-                                    Content="{Binding HomeFile}" />
-                                <Label
-                                    Content="{Binding HomeFile.Project}" />
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="{Binding Title}" />
+                                <Label Content="{Binding}" />
+                                <Label Content="{Binding HomeFile}" />
+                                <Label Content="{Binding HomeFile.Project}" />
                             </StackPanel>
                         </ToolTip>
                     </TextBlock.ToolTip>
@@ -275,16 +248,11 @@
                     Text="{Binding Generics}">
                     <TextBlock.ToolTip>
                         <ToolTip>
-                            <StackPanel
-                                Orientation="Vertical">
-                                <Label
-                                    Content="{Binding Title}" />
-                                <Label
-                                    Content="{Binding}" />
-                                <Label
-                                    Content="{Binding HomeFile}" />
-                                <Label
-                                    Content="{Binding HomeFile.Project}" />
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="{Binding Title}" />
+                                <Label Content="{Binding}" />
+                                <Label Content="{Binding HomeFile}" />
+                                <Label Content="{Binding HomeFile.Project}" />
                             </StackPanel>
                         </ToolTip>
                     </TextBlock.ToolTip>
@@ -297,16 +265,11 @@
                     Text="{Binding MethodParamsString}">
                     <TextBlock.ToolTip>
                         <ToolTip>
-                            <StackPanel
-                                Orientation="Vertical">
-                                <Label
-                                    Content="{Binding Title}" />
-                                <Label
-                                    Content="{Binding}" />
-                                <Label
-                                    Content="{Binding HomeFile}" />
-                                <Label
-                                    Content="{Binding HomeFile.Project}" />
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="{Binding Title}" />
+                                <Label Content="{Binding}" />
+                                <Label Content="{Binding HomeFile}" />
+                                <Label Content="{Binding HomeFile.Project}" />
                             </StackPanel>
                         </ToolTip>
                     </TextBlock.ToolTip>
@@ -319,16 +282,11 @@
                     Text="{Binding Inheritance}">
                     <TextBlock.ToolTip>
                         <ToolTip>
-                            <StackPanel
-                                Orientation="Vertical">
-                                <Label
-                                    Content="{Binding Title}" />
-                                <Label
-                                    Content="{Binding}" />
-                                <Label
-                                    Content="{Binding HomeFile}" />
-                                <Label
-                                    Content="{Binding HomeFile.Project}" />
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="{Binding Title}" />
+                                <Label Content="{Binding}" />
+                                <Label Content="{Binding HomeFile}" />
+                                <Label Content="{Binding HomeFile.Project}" />
                             </StackPanel>
                         </ToolTip>
                     </TextBlock.ToolTip>
@@ -340,16 +298,11 @@
                     Text="{Binding WhereClause}">
                     <TextBlock.ToolTip>
                         <ToolTip>
-                            <StackPanel
-                                Orientation="Vertical">
-                                <Label
-                                    Content="{Binding Title}" />
-                                <Label
-                                    Content="{Binding}" />
-                                <Label
-                                    Content="{Binding HomeFile}" />
-                                <Label
-                                    Content="{Binding HomeFile.Project}" />
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="{Binding Title}" />
+                                <Label Content="{Binding}" />
+                                <Label Content="{Binding HomeFile}" />
+                                <Label Content="{Binding HomeFile.Project}" />
                             </StackPanel>
                         </ToolTip>
                     </TextBlock.ToolTip>

@@ -1,12 +1,18 @@
 ﻿using DataTools.Code.Markers;
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace DataTools.Code
 {
-    internal abstract class CodeParserBase<TMarker, TList>
+    /// <summary>
+    /// Base class for code-parsing engines
+    /// </summary>
+    /// <typeparam name="TMarker"></typeparam>
+    /// <typeparam name="TList"></typeparam>
+    internal abstract class CodeParserBase<TMarker, TList> : MarkerFinderBase
         where TMarker : IMarker<TMarker, TList>, new()
         where TList : IMarkerList<TMarker>, new()
     {
@@ -228,6 +234,36 @@ namespace DataTools.Code
                     SetAtomicFile(child, file);
                 }
             }
+        }
+
+        public override IMarker GetMarkerAtLine(int line)
+        {
+            foreach (var marker in markers)
+            {
+                var chm = ScanMarker(marker, (m) =>
+                {
+                    return line >= m.StartLine && line <= m.EndLine;
+                });
+
+                if (chm != null) return chm;
+            }
+
+            return null;
+        }
+
+        public override IMarker GetMarkerAt(int index)
+        {
+            foreach (var marker in markers)
+            {
+                var chm = ScanMarker(marker, (m) =>
+                {
+                    return index >= m.StartPos && index <= m.EndPos;
+                });
+
+                if (chm != null) return chm;
+            }
+
+            return null;
         }
     }
 }

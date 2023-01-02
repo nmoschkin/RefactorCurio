@@ -3,7 +3,6 @@
 using DataTools.Code.Filtering;
 using DataTools.Code.Markers;
 using DataTools.Code.Project;
-using DataTools.Code.Reporting;
 using DataTools.CSTools;
 
 using System.Collections.Generic;
@@ -11,13 +10,6 @@ using System.Linq;
 
 namespace CSRefactorCurio.Reporting
 {
-    internal abstract class CSReportBase<T> : ReportBase<T> where T : IReportNode, new()
-    {
-        protected CSReportBase(ISolution solution) : base(solution)
-        {
-        }
-    }
-
     internal static class ReportHelper
     {
         public static Dictionary<string, List<CSCodeFile>> CountFilesForNamespaces(Dictionary<string, List<INamespace>> allfqn)

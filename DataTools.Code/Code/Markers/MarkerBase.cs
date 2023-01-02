@@ -4,16 +4,17 @@ using DataTools.Essentials.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DataTools.Code.Markers
 {
     /// <summary>
-    /// Abstract base that imlements <see cref="IMarker"/>.
+    /// Abstract base that implements <see cref="IMarker"/>.
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> that will be used.</typeparam>
     /// <typeparam name="TList">The type of list that will contain child markers.</typeparam>
-    internal abstract class MarkerBase<TMarker, TList> : IMarker<TMarker, TList>
+    internal abstract class MarkerBase<TMarker, TList> : MarkerFinderBase, IMarker<TMarker, TList>
         where TMarker : IMarker, new()
         where TList : IMarkerList<TMarker>, new()
     {
@@ -494,5 +495,35 @@ namespace DataTools.Code.Markers
         /// </summary>
         /// <returns></returns>
         public abstract string FormatContents();
+
+        public override IMarker GetMarkerAtLine(int line)
+        {
+            foreach (var marker in Children)
+            {
+                var chm = ScanMarker(marker, (m) =>
+                {
+                    return line >= m.StartLine && line <= m.EndLine;
+                });
+
+                if (chm != null) return chm;
+            }
+
+            return null;
+        }
+
+        public override IMarker GetMarkerAt(int index)
+        {
+            foreach (var marker in Children)
+            {
+                var chm = ScanMarker(marker, (m) =>
+                {
+                    return index >= m.StartPos && index <= m.EndPos;
+                });
+
+                if (chm != null) return chm;
+            }
+
+            return null;
+        }
     }
 }
