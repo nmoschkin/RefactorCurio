@@ -1,9 +1,10 @@
-﻿using DataTools.Code.Markers;
+﻿using DataTools.Code.Filtering.Base;
+using DataTools.Code.Markers;
 
 using System;
 using System.Collections.Generic;
 
-namespace DataTools.Code.Filtering
+namespace DataTools.Code.CS.Filtering
 {
     /// <summary>
     /// File marker sort and filter.

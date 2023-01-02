@@ -8,16 +8,17 @@
 	  <UseWindowsForms>true</UseWindowsForms>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\code-engine.snk</AssemblyOriginatorKeyFile>
+	  <RootNamespace>DataTools</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DataTools.Desktop" Version="8.0.0.1037" />
-    <PackageReference Include="DataTools.Essentials" Version="8.0.0.1037" />
-    <PackageReference Include="DataTools.Graphics" Version="8.0.0.1037" />
-    <PackageReference Include="DataTools.MathTools" Version="8.0.0.1037" />
-    <PackageReference Include="DataTools.Memory" Version="8.0.0.1037" />
-    <PackageReference Include="DataTools.Text" Version="8.0.0.1037" />
-    <PackageReference Include="DataTools.Win32" Version="8.0.0.1037" />
+    <PackageReference Include="DataTools.Desktop" Version="8.0.0.1038" />
+    <PackageReference Include="DataTools.Essentials" Version="8.0.0.1038" />
+    <PackageReference Include="DataTools.Graphics" Version="8.0.0.1038" />
+    <PackageReference Include="DataTools.MathTools" Version="8.0.0.1038" />
+    <PackageReference Include="DataTools.Memory" Version="8.0.0.1038" />
+    <PackageReference Include="DataTools.Text" Version="8.0.0.1038" />
+    <PackageReference Include="DataTools.Win32" Version="8.0.0.1038" />
   </ItemGroup>
 
   <ItemGroup>

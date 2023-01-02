@@ -1,10 +1,12 @@
-﻿using DataTools.Code.Markers;
+﻿using DataTools.Code.Filtering;
+using DataTools.Code.Filtering.Base;
+using DataTools.Code.Markers;
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataTools.Code.Filtering
+namespace DataTools.Code.CS.Filtering
 {
     /// <summary>
     /// The default file filter chain for consisting of the XML combiner and the File Sorter/Filter.

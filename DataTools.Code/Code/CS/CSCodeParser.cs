@@ -16,7 +16,9 @@ namespace DataTools.Code.CS
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/></typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
-    internal class CSCodeParser<TMarker, TList> : CodeParserBase<TMarker, TList> where TMarker : IMarker<TMarker, TList>, new() where TList : class, IMarkerList<TMarker>, new()
+    internal class CSCodeParser<TMarker, TList> : CodeParserBase<TMarker, TList>
+        where TMarker : IMarker<TMarker, TList>, new()
+        where TList : class, IMarkerList<TMarker>, new()
     {
         public override TList GetMarkersForCommit()
         {
@@ -871,7 +873,7 @@ namespace DataTools.Code.CS
             {
                 ch = w[i];
 
-                if (AllowedChar(ch, true))
+                if (AllowedChar(ch, true) && i < c - 1)
                 {
                     if (fl) break;
                     tsb.Append(ch);
@@ -904,16 +906,32 @@ namespace DataTools.Code.CS
                     try
                     {
                         var t = TextTools.TextBetween(w, i, ref l, '(', ')', out int? ax, out int? bx, withDelimiters: true);
+
                         if (t != null && bx != null)
                         {
                             i = (int)bx;
-                            tsb.Append(t);
                             fl = true;
+
+                            tsb.Append(t);
+
+                            var j = i + 1;
+                            while (j < c - 1)
+                            {
+                                if (char.IsWhiteSpace(w[j])) continue;
+                                else if (w[j] == '?')
+                                {
+                                    tsb.Append('?');
+                                    i = j;
+                                    break;
+                                }
+                                else break;
+                            }
                         }
                         else
                         {
                             return 0;
                         }
+
                         lww = false;
                     }
                     catch (Exception ex)
@@ -943,8 +961,15 @@ namespace DataTools.Code.CS
                         Console.WriteLine(ex.ToString());
                     }
                 }
-                else if (ch == ' ')
+                else if (char.IsWhiteSpace(ch) || (AllowedChar(ch, true) && i == c - 1))
                 {
+                    if (!char.IsWhiteSpace(ch))
+                    {
+                        if (fl) break;
+                        tsb.Append(ch);
+                        lww = true;
+                    }
+
                     if (lww)
                     {
                         var del = tsb.ToString();
@@ -1051,6 +1076,11 @@ namespace DataTools.Code.CS
                         case MarkerKind.Record:
                         case MarkerKind.Enum:
                             marker.Name = tsb.ToString();
+                            marker.Generics = generics1;
+                            break;
+
+                        case MarkerKind.Event:
+                            marker.DataType = tsb.ToString();
                             marker.Generics = generics1;
                             break;
 

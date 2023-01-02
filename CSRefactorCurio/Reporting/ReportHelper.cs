@@ -1,6 +1,6 @@
 ﻿using CSRefactorCurio.ViewModels;
 
-using DataTools.Code.Filtering;
+using DataTools.Code.Filtering.Base;
 using DataTools.Code.Markers;
 using DataTools.Code.Project;
 using DataTools.CSTools;

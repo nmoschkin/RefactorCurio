@@ -1,17 +1,17 @@
 ﻿using DataTools.Code.Markers;
 
-namespace DataTools.Code.Filtering
+namespace DataTools.Code.Filtering.Base
 {
     /// <summary>
     /// A base class for providing a system for filtering <see cref="IMarker"/> items.
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
-    /// <typeparam name="TFilter">The type of <see cref="MarkerFilter{TMarker, TList}"/>.</typeparam>
+    /// <typeparam name="TFilter">The type of <see cref="MarkerFilterManager{TMarker, TList}"/>.</typeparam>
     internal interface IMarkerFilterProvider<TMarker, TList, TFilter>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
-        where TFilter : MarkerFilter<TMarker, TList>, new()
+        where TFilter : MarkerFilterManager<TMarker, TList>, new()
     {
         /// <summary>
         /// Gets the filter engine currently being used by the filter provider
@@ -39,11 +39,11 @@ namespace DataTools.Code.Filtering
     }
 
     /// <summary>
-    /// A base class for providing a system for filtering <see cref="IMarker"/> items using the default <see cref="MarkerFilter{TMarker, TList}"/> engine..
+    /// A base class for providing a system for filtering <see cref="IMarker"/> items using the default <see cref="MarkerFilterManager{TMarker, TList}"/> engine..
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
-    internal interface IMarkerFilterProvider<TMarker, TList> : IMarkerFilterProvider<TMarker, TList, MarkerFilter<TMarker, TList>>
+    internal interface IMarkerFilterProvider<TMarker, TList> : IMarkerFilterProvider<TMarker, TList, MarkerFilterManager<TMarker, TList>>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {

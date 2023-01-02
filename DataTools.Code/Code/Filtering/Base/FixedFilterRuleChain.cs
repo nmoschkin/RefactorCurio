@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace DataTools.Code.Filtering
+namespace DataTools.Code.Filtering.Base
 {
     /// <summary>
     /// A simple and open chained filter rule for strongly typed filters.

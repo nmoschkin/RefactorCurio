@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DataTools.Code.Filtering
+namespace DataTools.Code.Filtering.Base
 {
     internal static class DefaultOrders
     {

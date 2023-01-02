@@ -1,6 +1,6 @@
 ﻿using DataTools.Code.Markers;
 
-namespace DataTools.Code.Filtering
+namespace DataTools.Code.Filtering.Base
 {
     /// <summary>
     /// Represents the base for marker filter rules.

@@ -1,13 +1,14 @@
-﻿using DataTools.Code.Markers;
+﻿using DataTools.Code.Filtering.Base;
+using DataTools.Code.Markers;
 
 namespace DataTools.Code.Filtering
 {
     /// <summary>
-    /// Interface for an object that works with filter rules to filter <see cref="IMarker"/> items.
+    /// An object that works with filter rules to filter <see cref="IMarker"/> items.
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/> to filter.</typeparam>
     /// <typeparam name="TList">The <see cref="IMarker{TMarker, TList}"/>.</typeparam>
-    internal class MarkerFilter<TMarker, TList>
+    internal class MarkerFilterManager<TMarker, TList>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {

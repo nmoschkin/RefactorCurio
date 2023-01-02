@@ -1,4 +1,5 @@
-﻿using DataTools.Code.Markers;
+﻿using DataTools.Code.Filtering.Base;
+using DataTools.Code.Markers;
 
 namespace DataTools.Code.Filtering
 {

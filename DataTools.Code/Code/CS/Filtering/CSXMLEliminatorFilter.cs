@@ -1,8 +1,9 @@
-﻿using DataTools.Code.Markers;
+﻿using DataTools.Code.Filtering.Base;
+using DataTools.Code.Markers;
 
 using System.Linq;
 
-namespace DataTools.Code.Filtering
+namespace DataTools.Code.CS.Filtering
 {
     /// <summary>
     /// Eliminates XML Document tags and comments and disintegrates merged compartments.

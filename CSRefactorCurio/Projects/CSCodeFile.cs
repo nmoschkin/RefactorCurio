@@ -1,5 +1,7 @@
 ﻿using DataTools.Code.CS;
+using DataTools.Code.CS.Filtering;
 using DataTools.Code.Filtering;
+using DataTools.Code.Filtering.Base;
 using DataTools.Code.Markers;
 using DataTools.Code.Project;
 
@@ -32,6 +34,14 @@ namespace DataTools.CSTools
         {
             Project = project;
             markers.CollectionChanged += OnChildrenChanged;
+        }
+
+        /// <summary>
+        /// Instantiate a blank code file reader from a string.
+        /// </summary>
+        public CSCodeFile(string text) : this((CurioProject)null)
+        {
+            Parse(text);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -87,7 +97,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilter<CSMarker, ObservableMarkerList<CSMarker>>();
+        public MarkerFilterManager<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilterManager<CSMarker, ObservableMarkerList<CSMarker>>();
 
         public virtual ObservableMarkerList<CSMarker> FilteredItems
         {
@@ -142,7 +152,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public new static CSCodeFile LoadFromFile(string path, CurioProject project, bool lazy)
+        public static CSCodeFile LoadFromFile(string path, CurioProject project, bool lazy)
         {
             var cf = new CSCodeFile(project);
             cf.LoadFile(path, lazy);

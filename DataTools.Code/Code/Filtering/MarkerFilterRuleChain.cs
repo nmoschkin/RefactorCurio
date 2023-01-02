@@ -1,4 +1,5 @@
-﻿using DataTools.Code.Markers;
+﻿using DataTools.Code.Filtering.Base;
+using DataTools.Code.Markers;
 
 using System.Collections.Generic;
 
@@ -75,6 +76,8 @@ namespace DataTools.Code.Filtering
     /// <summary>
     /// A simple and open chained filter rule for strongly typed filters.
     /// </summary>
+    /// <typeparam name="TMarker">The type that implements <see cref="IMarker{TMarker, TList}"/>.</typeparam>
+    /// <typeparam name="TList">The type that implements a <see cref="IMarkerList{TMarker}"/> for <see cref="IMarker{TMarker, TList}.Children"/>.</typeparam>
     internal class MarkerFilterRuleChain<TMarker, TList> : MarkerFilterRule<TMarker, TList>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
@@ -127,6 +130,21 @@ namespace DataTools.Code.Filtering
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Runs each element in the rule chain, in enumeration order.
+        /// </summary>
+        /// <param name="items">The items to test.</param>
+        /// <returns>True if all items pass, otherwise false.</returns>
+        public virtual bool IsValid(IEnumerable<TMarker> items)
+        {
+            foreach (var item in items)
+            {
+                if (!IsValid(item)) return false;
+            }
+
+            return true;
         }
 
         /// <summary>
