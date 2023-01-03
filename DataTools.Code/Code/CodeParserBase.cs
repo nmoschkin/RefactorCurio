@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace DataTools.Code
 {
@@ -135,6 +136,13 @@ namespace DataTools.Code
         public abstract TList GetMarkersForCommit();
 
         /// <summary>
+        /// Load the text for the marker
+        /// </summary>
+        /// <param name="marker">The marker to load the text for.</param>
+        /// <returns>The number of characters in the marker.</returns>
+        public abstract int LoadMarkerText(IMarker marker);
+
+        /// <summary>
         /// Write the results of the refactor and reorganized file structure to disk.
         /// </summary>
         /// <param name="path">The destination path.</param>
@@ -261,6 +269,86 @@ namespace DataTools.Code
                 });
 
                 if (chm != null) return chm;
+            }
+
+            return null;
+        }
+
+        public string[] GetLines(int startline, int endline)
+        {
+            var filename = Filename;
+
+            using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                var bufflen = 1024;
+                var buff = new byte[bufflen];
+
+                int c = 0;
+                int line = 1;
+                int all_start = -1;
+                int all_end = -1;
+                int cline = -1;
+                int w = 0;
+                bool found = false;
+
+                do
+                {
+                    c = fs.Read(buff, 0, bufflen);
+                    if (c > 0)
+                    {
+                        for (int i = 0; i < c; i++)
+                        {
+                            if (cline == -1) cline = w;
+
+                            if (all_start == -1 && line == startline)
+                            {
+                                all_start = w;
+                            }
+
+                            if (buff[i] == '\n')
+                            {
+                                if (line == endline)
+                                {
+                                    all_end = w;
+                                    found = true;
+                                    break;
+                                }
+
+                                line++;
+                                cline = -1;
+                            }
+
+                            if (all_end == -1 && line == endline)
+                            {
+                                all_end = w;
+                            }
+                            else if (all_end == w)
+                            {
+                                break;
+                            }
+
+                            w++;
+                        }
+                    }
+
+                    if (found) break;
+                } while (c == bufflen);
+
+                if (all_end == 0)
+                {
+                    all_end = w - 1;
+                }
+
+                if (all_start < all_end)
+                {
+                    fs.Seek(all_start, SeekOrigin.Begin);
+                    bufflen = (all_end - all_start) + 1;
+                    buff = new byte[bufflen];
+
+                    fs.Read(buff, 0, bufflen);
+
+                    return Encoding.UTF8.GetString(buff).Replace("\r", "").Trim('\n').Split('\n');
+                }
             }
 
             return null;

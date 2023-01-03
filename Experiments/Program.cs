@@ -16,7 +16,7 @@ namespace Experiments
             //var str = tool.FindILDasm();
             //var data = File.ReadAllText(path);
 
-            var file = CSCodeFile.LoadFromFile("E:\\Projects\\Personal Projects\\Repos\\RefactorCurio\\Experiments\\Class1.cs");
+            var file = CSCodeFile.LoadFromFile("E:\\Projects\\Personal Projects\\Repos\\RefactorCurio\\DataTools.Code\\Code\\CS\\CSCodeParser.cs");
 
             //var outdir = @"C:\Users\theim\Desktop\Spasms";
             //file.OutputMarkers(outdir);

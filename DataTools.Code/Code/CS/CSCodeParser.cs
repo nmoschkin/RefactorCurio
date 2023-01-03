@@ -77,6 +77,27 @@ namespace DataTools.Code.CS
             return res;
         }
 
+        public override int LoadMarkerText(IMarker marker)
+        {
+            if (string.IsNullOrEmpty(marker.Content))
+            {
+                string text;
+
+                if (string.IsNullOrEmpty(this.Text))
+                {
+                    text = File.ReadAllText(Filename);
+                }
+                else
+                {
+                    text = this.Text;
+                }
+
+                marker.Content = text.Substring(marker.StartPos, marker.EndPos - marker.StartPos - 1);
+            }
+
+            return marker.Content?.Length ?? 0;
+        }
+
         /// <summary>
         /// Parse the given C# source code text.
         /// </summary>
@@ -89,7 +110,7 @@ namespace DataTools.Code.CS
                 ParseSuccess = false;
 
                 this.text = text;
-                lines = text.Replace("\r\n", "\n").Split('\n');
+                lines = text.Replace("\r", "").Split('\n');
 
                 try
                 {
@@ -119,6 +140,9 @@ namespace DataTools.Code.CS
                     lastErrors.Add(ex.Message);
                     IsLazyLoad = true;
                 }
+
+                lines = null;
+                this.text = null;
 
                 return ParseSuccess;
             }
@@ -1450,11 +1474,6 @@ namespace DataTools.Code.CS
             {
                 if (markers[i].Children != null) PostScanTasks(markers[i].Children);
 
-                //if (unrecognizedWords.Contains(markers[i].Name))
-                //{
-                //    unrecognizedWords.Remove(markers[i].Name);
-                //}
-
                 if (i < c - 1)
                 {
                     if (markers[i].Kind == MarkerKind.Do && markers[i + 1].Kind == MarkerKind.DoWhile)
@@ -1489,98 +1508,8 @@ namespace DataTools.Code.CS
                         markers.RemoveAt(i + 1);
                         c--;
                     }
-                    //else if (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment)
-                    //{
-                    //    int x = i;
-
-                    //    while (i < c && (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment))
-                    //    {
-                    //        i++;
-                    //    }
-
-                    //    if (i < c)
-                    //    {
-                    //        var mknew = new TMarker();
-
-                    //        mknew.StartPos = markers[x].StartPos;
-                    //        mknew.StartLine = markers[x].StartLine;
-                    //        mknew.StartColumn = markers[x].StartColumn;
-
-                    //        mknew.Children = new TList();
-                    //        mknew.Content = "";
-
-                    //        for (int z = x; z <= i; z++)
-                    //        {
-                    //            if (markers[z].Children != null) PostScanTasks(markers[z].Children);
-                    //            mknew.Content += markers[z].Content;
-                    //            mknew.Children.Add(markers[z]);
-                    //        }
-
-                    //        mknew.EndPos = markers[i].EndPos;
-                    //        mknew.EndLine = markers[i].EndLine;
-                    //        mknew.EndColumn = markers[i].EndColumn;
-
-                    //        mknew.Kind = MarkerKind.Consolidation;
-                    //        mknew.Name = markers[i].Name;
-                    //        mknew.ScanHit = markers[i].ScanHit;
-                    //        mknew.Generics = markers[i].Generics;
-
-                    //        mknew.AccessModifiers = markers[i].AccessModifiers;
-                    //        mknew.IsAbstract = markers[i].IsAbstract;
-                    //        mknew.IsVirtual = markers[i].IsVirtual;
-                    //        mknew.IsStatic = markers[i].IsStatic;
-                    //        mknew.IsExtern = markers[i].IsExtern;
-                    //        mknew.IsOverride = markers[i].IsOverride;
-                    //        mknew.IsNew = markers[i].IsNew;
-                    //        mknew.IsAsync = markers[i].IsAsync;
-
-                    //        if (markers is List<TMarker> l)
-                    //        {
-                    //            l.RemoveRange(x, (i - x) + 1);
-                    //        }
-                    //        else
-                    //        {
-                    //            for (int y = 0; y < (i - x) + 1; y++)
-                    //            {
-                    //                markers.RemoveAt(x);
-                    //            }
-                    //        }
-
-                    //        markers.Insert(x, mknew);
-                    //        c -= (i - x);
-                    //        i = x;
-                    //    }
-                    //}
                 }
             }
-        }
-
-        /// <summary>
-        /// Translate <paramref name="activas"/> to access modifiers.
-        /// </summary>
-        /// <param name="activas"></param>
-        /// <returns></returns>
-        private AccessModifiers ActivasToAccessModifiers(Dictionary<string, bool> activas)
-        {
-            var test = new string[] { "public", "private", "internal", "protected" };
-
-            var sb = new StringBuilder();
-
-            foreach (var t in test)
-            {
-                if (activas[t])
-                {
-                    if (sb.Length > 0) sb.Append(",");
-                    sb.Append(TextTools.TitleCase(t));
-                }
-            }
-
-            if (Enum.TryParse(sb.ToString(), out AccessModifiers result))
-            {
-                return result;
-            }
-
-            return AccessModifiers.None;
         }
 
         private int CountLines(string text)
