@@ -466,6 +466,16 @@ namespace DataTools.Code.CS
                                 };
 
                                 TypeAndMethodParse(lookback, currMarker);
+
+                                if (currMarker.IsExtern && currMarker.Attributes != null && currMarker.Attributes.Count > 0)
+                                {
+                                    var extattr = currMarker.Attributes.FirstOrDefault(x => x.StartsWith("DllImport"));
+                                    if (!string.IsNullOrEmpty(extattr))
+                                    {
+                                        currMarker.ImportInfo = ImportInfo.Parse(extattr, currMarker.Name);
+                                    }
+                                }
+
                                 if (currMarker.Kind == MarkerKind.Namespace)
                                 {
                                     currNS = currMarker.Name;

@@ -195,6 +195,8 @@ namespace DataTools.Code.Markers
             }
         }
 
+        public virtual IImportInfo ImportInfo { get; set; }
+
         public virtual List<string> Inheritances { get; set; }
 
         public virtual string InheritanceString { get; set; }

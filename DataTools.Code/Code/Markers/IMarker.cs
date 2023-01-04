@@ -61,6 +61,11 @@ namespace DataTools.Code.Markers
         IProjectNode HomeFile { get; set; }
 
         /// <summary>
+        /// If the <see cref="IsExtern"/> property, this sub-record will contain the DLL import information.
+        /// </summary>
+        IImportInfo ImportInfo { get; set; }
+
+        /// <summary>
         /// If applicable, the inheritances of this element.
         /// </summary>
         List<string> Inheritances { get; set; }
