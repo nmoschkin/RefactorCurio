@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DataTools.Code.Markers
 {
+    /// <summary>
+    /// Implements methods that are common to classes that provide the ability to locate markers.
+    /// </summary>
     internal interface IMarkerFinder
     {
         /// <summary>

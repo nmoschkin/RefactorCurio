@@ -2,6 +2,9 @@
 
 namespace DataTools.Code.Markers
 {
+    /// <summary>
+    /// This is a base class for marker finders.
+    /// </summary>
     internal abstract class MarkerFinderBase : IMarkerFinder
     {
         public abstract IMarker GetMarkerAtLine(int line);
