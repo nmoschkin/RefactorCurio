@@ -240,22 +240,22 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="DataTools.Essentials">
-      <Version>8.0.0.1050</Version>
+      <Version>8.0.0.1051</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Graphics">
-      <Version>8.0.0.1050</Version>
+      <Version>8.0.0.1051</Version>
     </PackageReference>
     <PackageReference Include="DataTools.MathTools">
-      <Version>8.0.0.1050</Version>
+      <Version>8.0.0.1051</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Memory">
-      <Version>8.0.0.1050</Version>
+      <Version>8.0.0.1051</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Text">
-      <Version>8.0.0.1050</Version>
+      <Version>8.0.0.1051</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Win32.Memory">
-      <Version>8.0.0.1050</Version>
+      <Version>8.0.0.1051</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
       <Version>7.0.0</Version>
@@ -291,6 +291,9 @@
       <Project>{dbd74038-d785-4c81-9387-56327e3b17f5}</Project>
       <Name>DataTools.Code</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Projects\Filters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

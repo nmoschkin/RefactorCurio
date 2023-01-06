@@ -8,12 +8,12 @@ namespace DataTools.Code.Filtering
     /// </summary>
     internal class MarkerKindFilterRule : MarkerFilterRule
     {
-        public MarkerKindFilterRule(CodeElementType kind)
+        public MarkerKindFilterRule(MarkerKind kind)
         {
             Kind = kind;
         }
 
-        public CodeElementType Kind { get; }
+        public MarkerKind Kind { get; }
 
         public override bool IsValid(IMarker item)
         {

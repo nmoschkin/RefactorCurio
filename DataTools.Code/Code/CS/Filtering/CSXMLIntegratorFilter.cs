@@ -20,11 +20,11 @@ namespace DataTools.Code.CS.Filtering
 
             for (int i = index; i < c; i++)
             {
-                if (markers[i].Kind == CodeElementType.Directive && markers[i].Name.StartsWith("#if"))
+                if (markers[i].Kind == MarkerKind.Directive && markers[i].Name.StartsWith("#if"))
                 {
                     cdepth++;
                 }
-                else if (markers[i].Kind == CodeElementType.Directive && markers[i].Name == "#endif")
+                else if (markers[i].Kind == MarkerKind.Directive && markers[i].Name == "#endif")
                 {
                     cdepth--;
                     if (cdepth == 0)
@@ -57,7 +57,7 @@ namespace DataTools.Code.CS.Filtering
 
             for (i = 0; i < c; i++)
             {
-                if (markers[i].Kind == CodeElementType.Directive && markers[i].Name.StartsWith("#if "))
+                if (markers[i].Kind == MarkerKind.Directive && markers[i].Name.StartsWith("#if "))
                 {
                     var xmarker = FindEndIf(markers, i, 0, out int? ri);
 
@@ -103,12 +103,12 @@ namespace DataTools.Code.CS.Filtering
                     }
                 }
 
-                if (markers[i].Kind == CodeElementType.XMLDoc || markers[i].Kind == CodeElementType.LineComment || markers[i].Kind == CodeElementType.BlockComment)
+                if (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment || markers[i].Kind == MarkerKind.BlockComment)
                 {
                     int oi = i;
                     int x = i;
 
-                    while (i < c && (markers[i].Kind == CodeElementType.XMLDoc || markers[i].Kind == CodeElementType.LineComment || markers[i].Kind == CodeElementType.BlockComment))
+                    while (i < c && (markers[i].Kind == MarkerKind.XMLDoc || markers[i].Kind == MarkerKind.LineComment || markers[i].Kind == MarkerKind.BlockComment))
                     {
                         i++;
                     }
@@ -150,11 +150,11 @@ namespace DataTools.Code.CS.Filtering
                 {
                     switch (markers[i].Kind)
                     {
-                        case CodeElementType.Namespace:
+                        case MarkerKind.Namespace:
                             foreach (var newItem in ApplyFilter(markers[i].Children)) lnew.Add(newItem);
                             break;
 
-                        case CodeElementType.Using:
+                        case MarkerKind.Using:
                             break;
 
                         default:
