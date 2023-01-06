@@ -36,6 +36,10 @@ namespace DataTools.CSTools
             markers.CollectionChanged += OnChildrenChanged;
         }
 
+        IEnumerable IProjectNode.Children => markers;
+
+        ISolutionElement IProjectElement.ParentElement => Project;
+
         /// <summary>
         /// Instantiate a blank code file reader from a string.
         /// </summary>
@@ -45,8 +49,6 @@ namespace DataTools.CSTools
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        IEnumerable IProjectNode.Children => markers;
 
         public virtual ObservableMarkerList<CSMarker> Children
         {
@@ -171,6 +173,33 @@ namespace DataTools.CSTools
         public MarkerFilterRule ProvideFilterRule(ObservableMarkerList<CSMarker> items)
         {
             return fileChain;
+        }
+
+        /// <summary>
+        /// Install a new filter chain based on the default chain (presumably with extra filters)
+        /// </summary>
+        /// <param name="chain">The new filter chain to install.</param>
+        /// <param name="runFilters">True to run the filter chain after it's installed.</param>
+        /// <returns>The previous filter chain.</returns>
+        public CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>> InstallNewFilterChain(CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>> chain, bool runFilters = true)
+        {
+            var oldchain = fileChain;
+
+            if (chain != null && chain != fileChain)
+            {
+                fileChain = chain;
+                if (runFilters)
+                {
+                    RunFilters(markers);
+                }
+                else
+                {
+                    IsLazyLoad = true;
+                    FilteredItems = null;
+                }
+            }
+
+            return oldchain;
         }
 
         /// <summary>

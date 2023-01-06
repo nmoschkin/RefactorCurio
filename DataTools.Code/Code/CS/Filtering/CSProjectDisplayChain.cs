@@ -15,15 +15,33 @@ namespace DataTools.Code.CS.Filtering
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {
+        private IEnumerable<MarkerFilterRule<TMarker, TList>> extraFilters;
+
         public override FilterChainKind FilterChainKind => FilterChainKind.PassAll;
 
-        protected override IEnumerable<MarkerFilterRule<TMarker, TList>> ProvideFilterChain()
+        /// <summary>
+        /// Create a new <see cref="CSProjectDisplayChain{TMarker, TList}"/> filter chain with optional additional filters.
+        /// </summary>
+        /// <param name="extraFilters">Additional filters.</param>
+        public CSProjectDisplayChain(IEnumerable<MarkerFilterRule<TMarker, TList>> extraFilters = null) : base()
         {
-            return new MarkerFilterRule<TMarker, TList>[]
+            this.extraFilters = extraFilters;
+        }
+
+        protected override sealed IEnumerable<MarkerFilterRule<TMarker, TList>> ProvideFilterChain()
+        {
+            var l = new List<MarkerFilterRule<TMarker, TList>>
             {
                 new CSXMLEliminatorFilter<TMarker, TList>(),
                 new CSFileSortFilter<TMarker, TList>()
             };
+
+            if (extraFilters != null)
+            {
+                l.AddRange(extraFilters);
+            }
+
+            return l.ToArray();
         }
     }
 }

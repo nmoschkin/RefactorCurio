@@ -24,7 +24,7 @@ namespace DataTools.Code.CS.Filtering
                 {
                     var cItem = p1item.Clone<TMarker>(false);
 
-                    if ((cItem.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
+                    if ((cItem.Kind & CodeElementType.IsBlockLevel) == CodeElementType.IsBlockLevel)
                     {
                         cItem.Children = new TList();
                     }
@@ -39,7 +39,7 @@ namespace DataTools.Code.CS.Filtering
             {
                 var p2item = l[i];
 
-                if ((p2item.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
+                if ((p2item.Kind & CodeElementType.IsBlockLevel) == CodeElementType.IsBlockLevel)
                 {
                     p2item.Children = new TList();
                 }
@@ -52,7 +52,7 @@ namespace DataTools.Code.CS.Filtering
                     {
                         var cItem = child.Clone<TMarker>(false);
 
-                        if ((cItem.Kind & MarkerKind.IsBlockLevel) == MarkerKind.IsBlockLevel)
+                        if ((cItem.Kind & CodeElementType.IsBlockLevel) == CodeElementType.IsBlockLevel)
                         {
                             cItem.Children = new TList();
                         }
@@ -61,7 +61,7 @@ namespace DataTools.Code.CS.Filtering
                     }
                 }
 
-                if (p2item.Kind == MarkerKind.Consolidation)
+                if (p2item.Kind == CodeElementType.Consolidation)
                 {
                     l[i] = l2.Last();
                 }
@@ -74,7 +74,7 @@ namespace DataTools.Code.CS.Filtering
 
         public override bool IsValid(IMarker item)
         {
-            return item.Kind != MarkerKind.XMLDoc && item.Kind != MarkerKind.BlockComment && item.Kind != MarkerKind.LineComment;
+            return item.Kind != CodeElementType.XMLDoc && item.Kind != CodeElementType.BlockComment && item.Kind != CodeElementType.LineComment;
         }
     }
 }

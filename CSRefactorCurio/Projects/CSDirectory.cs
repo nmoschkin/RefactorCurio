@@ -1,10 +1,8 @@
 ﻿using DataTools.Code.Project;
 using DataTools.Desktop;
-using DataTools.Essentials.Observable;
 using DataTools.Essentials.SortedLists;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -15,16 +13,13 @@ namespace DataTools.CSTools
     /// <summary>
     /// CS Refactor Curio Solution Source Code Directory object.
     /// </summary>
-    internal class CSDirectory : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>
+    internal class CSDirectory : ProjectNodeBase<ObservableCollection<IProjectElement>>
     {
-        private ObservableCollection<IProjectElement> children;
         private ObservableCollection<CSDirectory> directories;
         private ObservableCollection<CSCodeFile> files;
         private List<string> namespaces;
-        private WeakReference<CSDirectory> parent = null;
         private string path = null;
         private WeakReference<CurioProject> project = null;
-        private string title = null;
 
         /// <summary>
         /// Create a new directory element for the specified project.
@@ -32,18 +27,12 @@ namespace DataTools.CSTools
         /// <param name="project">The project to create the element for.</param>
         /// <param name="path">The valid path to the folder.</param>
         /// <param name="parent">Optional parent subfolder within the specified project.</param>
-        public CSDirectory(CurioProject project, string path, CSDirectory parent = null)
+        public CSDirectory(CurioProject project, string path, CSDirectory parent = null) : base((IProjectElement)parent ?? project)
         {
             if (parent != null && project != parent.Project) throw new ArgumentException("Parent directory must be a member of the same project being referenced.");
 
             files = new ObservableCollection<CSCodeFile>();
             directories = new ObservableCollection<CSDirectory>();
-            children = new ObservableCollection<IProjectElement>();
-
-            if (parent != null)
-            {
-                this.parent = new WeakReference<CSDirectory>(parent);
-            }
 
             this.project = new WeakReference<CurioProject>(project);
             Path = path;
@@ -51,18 +40,7 @@ namespace DataTools.CSTools
             ReadDirectory();
         }
 
-        IEnumerable IProjectNode.Children => children;
-
-        public ObservableCollection<IProjectElement> Children
-        {
-            get => children;
-            protected set
-            {
-                SetProperty(ref children, value);
-            }
-        }
-
-        public ElementType ChildType => ElementType.File;
+        public override ElementType ChildType => ElementType.File;
 
         /// <summary>
         /// Gets the observable list of subdirectories.
@@ -76,7 +54,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public ElementType ElementType => ElementType.Directory;
+        public override ElementType ElementType => ElementType.Directory;
 
         /// <summary>
         /// Gets the observable list of source code files.
@@ -104,19 +82,7 @@ namespace DataTools.CSTools
         /// <summary>
         /// Gets the parent directory or null if this is the project root folder.
         /// </summary>
-        public CSDirectory Parent
-        {
-            get
-            {
-                if (parent == null) return null;
-
-                if (parent.TryGetTarget(out var root))
-                {
-                    return root;
-                }
-                return null;
-            }
-        }
+        public CSDirectory ParentFolder => base.ParentElement as CSDirectory;
 
         /// <summary>
         /// Gets the absolute path of the current directory.
@@ -149,15 +115,6 @@ namespace DataTools.CSTools
                 }
 
                 return null;
-            }
-        }
-
-        public string Title
-        {
-            get => title;
-            protected set
-            {
-                SetProperty(ref title, value);
             }
         }
 

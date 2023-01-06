@@ -1,4 +1,4 @@
-﻿using CSRefactorCurio.ViewModels;
+﻿using CSRefactorCurio.Projects;
 
 using DataTools.Code.Project;
 using DataTools.CSTools;

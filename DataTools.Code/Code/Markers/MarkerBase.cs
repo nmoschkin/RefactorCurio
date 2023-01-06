@@ -117,7 +117,7 @@ namespace DataTools.Code.Markers
                     var hf = HomeFile;
                     if (hf is IProjectFile cf)
                     {
-                        content = cf.Text.Substring(StartPos, EndPos - StartPos + 1);
+                        content = cf.Text?.Substring(StartPos, EndPos - StartPos + 1);
                     }
                 }
 
@@ -303,6 +303,8 @@ namespace DataTools.Code.Markers
             }
         }
 
+        ISolutionElement IProjectElement.ParentElement => ParentElement ?? HomeFile;
+
         public virtual string ParentElementPath
         {
             get => parentElementString;
@@ -453,8 +455,14 @@ namespace DataTools.Code.Markers
         public T Clone<T>(bool deep) where T : MarkerBase<TMarker, TList>, new()
         {
             var newItem = new T();
-
-            ObjectMerge.MergeObjects(this, newItem);
+            try
+            {
+                ObjectMerge.MergeObjects(this, newItem);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
 
             if (!deep) return newItem;
 

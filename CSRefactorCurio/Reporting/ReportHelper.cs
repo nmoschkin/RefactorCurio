@@ -1,4 +1,4 @@
-﻿using CSRefactorCurio.ViewModels;
+﻿using CSRefactorCurio.Projects;
 
 using DataTools.Code.Filtering.Base;
 using DataTools.Code.Markers;
@@ -173,7 +173,7 @@ namespace CSRefactorCurio.Reporting
             return AllFullyQualifiedNames(namespaces, dict, filter);
         }
 
-        public static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, MarkerKind[] filter = null) where T : INamespace
+        public static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, CodeElementType[] filter = null) where T : INamespace
         {
             if (filter == null || filter.Length == 0)
             {

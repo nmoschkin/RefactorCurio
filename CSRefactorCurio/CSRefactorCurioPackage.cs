@@ -7,7 +7,7 @@ global using System;
 
 global using Task = System.Threading.Tasks.Task;
 
-using CSRefactorCurio.ViewModels;
+using CSRefactorCurio.Projects;
 
 using Microsoft.VisualStudio.PlatformUI;
 

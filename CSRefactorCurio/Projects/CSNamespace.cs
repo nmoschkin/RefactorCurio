@@ -1,9 +1,7 @@
 ﻿using DataTools.Code.Project;
-using DataTools.Essentials.Observable;
 using DataTools.Essentials.SortedLists;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -14,24 +12,20 @@ namespace DataTools.CSTools
     /// <summary>
     /// A CS Refactor Curio Solution Namespace
     /// </summary>
-    internal class CSNamespace : ObservableBase, IProjectNode<ObservableCollection<IProjectElement>>, INamespace
+    internal class CSNamespace : ProjectNodeBase<ObservableCollection<IProjectElement>>, INamespace
     {
-        private ObservableCollection<IProjectElement> children = new ObservableCollection<IProjectElement>();
         private ObservableCollection<CSMarker> markers = new ObservableCollection<CSMarker>();
         private string name;
         private ObservableCollection<CSNamespace> namespaces = new ObservableCollection<CSNamespace>();
-
-        private CSNamespace parent;
 
         /// <summary>
         /// Create a new namespace with the specified name and optional parent.
         /// </summary>
         /// <param name="name">Fully qualified namespace.</param>
         /// <param name="parent">Parent</param>
-        public CSNamespace(string name, CSNamespace parent = null)
+        public CSNamespace(string name, CSNamespace parent = null) : base(parent)
         {
             this.name = name;
-            this.parent = parent;
         }
 
         /// <summary>
@@ -40,15 +34,10 @@ namespace DataTools.CSTools
         /// <param name="items">The initial children.</param>
         /// <param name="name">Fully qualified namespace.</param>
         /// <param name="parent">Parent</param>
-        public CSNamespace(string name, IEnumerable<IProjectElement> items, CSNamespace parent = null) : this(name, parent)
+        public CSNamespace(string name, IEnumerable<IProjectElement> items, CSNamespace parent = null) : base(parent, items)
         {
-            foreach (var item in items)
-            {
-                children.Add(item);
-            }
+            this.name = name;
         }
-
-        IEnumerable IProjectNode.Children => children;
 
         string INamespace.Namespace
         {
@@ -64,26 +53,14 @@ namespace DataTools.CSTools
 
         public string FullyQualifiedName => name;
 
-        /// <summary>
-        /// Gets the child objects (either namespaces or markers).
-        /// </summary>
-        public ObservableCollection<IProjectElement> Children
-        {
-            get => children;
-            protected set
-            {
-                SetProperty(ref children, value);
-            }
-        }
+        public override ElementType ChildType => ElementType.SolutionFolder | ElementType.Namespace;
 
-        public ElementType ChildType => ElementType.SolutionFolder | ElementType.Namespace;
-
-        public ElementType ElementType => ElementType.Namespace;
+        public override ElementType ElementType => ElementType.Namespace;
 
         /// <summary>
         /// True if this is the root.
         /// </summary>
-        public bool IsRoot => parent == null;
+        public bool IsRoot => ParentElement == null;
 
         /// <summary>
         /// Gets the observable collection of code elements that are at home in this namespace.
@@ -124,9 +101,7 @@ namespace DataTools.CSTools
         /// <summary>
         /// Gets the parent namespace, or null if this is a root namespace.
         /// </summary>
-        public CSNamespace Parent => parent;
-
-        public string Title => name;
+        public new CSNamespace ParentElement => (base.ParentElement as CSNamespace);
 
         /// <summary>
         /// Generate a namespace map from the specified project.
@@ -170,7 +145,7 @@ namespace DataTools.CSTools
                 statusBar.Progress(false);
             }
 
-            return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.Parent == null));
+            return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.ParentElement == null));
         }
 
         /// <summary>

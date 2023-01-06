@@ -3,7 +3,7 @@
 namespace DataTools.Code.Filtering.Base
 {
     /// <summary>
-    /// A base class for providing a system for filtering <see cref="IMarker"/> items.
+    /// An interface for providing a system for filtering <see cref="IMarker"/> items.
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
@@ -39,7 +39,7 @@ namespace DataTools.Code.Filtering.Base
     }
 
     /// <summary>
-    /// A base class for providing a system for filtering <see cref="IMarker"/> items using the default <see cref="MarkerFilterManager{TMarker, TList}"/> engine..
+    /// An interface for providing a system for filtering <see cref="IMarker"/> items using the default <see cref="MarkerFilterManager{TMarker, TList}"/> engine..
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>

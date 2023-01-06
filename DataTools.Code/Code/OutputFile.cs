@@ -72,25 +72,25 @@ namespace DataTools.Code
         /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
         /// <param name="cs">An optional reference <see cref="CSCodeParser{TMarker, TList}"/> with configuration information.</param>
         /// <returns>A new output file.</returns>
-        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, MarkerKind mkind, string name, string text, bool sepDirs, CodeParserBase<TI, TL> cs = null) where TI : IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
+        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, CodeElementType mkind, string name, string text, bool sepDirs, CodeParserBase<TI, TL> cs = null) where TI : IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
         {
             path = path.Trim().Trim('\\');
             string kind = "";
             switch (mkind)
             {
-                case MarkerKind.Class:
+                case CodeElementType.Class:
                     kind = cs?.ClassDirName ?? "Classes";
                     break;
 
-                case MarkerKind.Interface:
+                case CodeElementType.Interface:
                     kind = cs?.InterfaceDirName ?? "Interfaces";
                     break;
 
-                case MarkerKind.Struct:
+                case CodeElementType.Struct:
                     kind = cs?.StructDirName ?? "Structs";
                     break;
 
-                case MarkerKind.Enum:
+                case CodeElementType.Enum:
                     kind = cs?.EnumDirName ?? "Enums";
                     break;
             }

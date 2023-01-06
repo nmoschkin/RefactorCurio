@@ -24,17 +24,17 @@ namespace DataTools.Code.CS.Filtering
 
             foreach (var item in items)
             {
-                if (item.Kind == MarkerKind.Namespace)
+                if (item.Kind == CodeElementType.Namespace)
                 {
                     foreach (var subitem in item.Children)
                     {
-                        if (((IList<MarkerKind>)SortKindOrder).Contains(subitem.Kind))
+                        if (((IList<CodeElementType>)SortKindOrder).Contains(subitem.Kind))
                         {
                             rl.Add(subitem.Clone<TMarker>(false));
                         }
                     }
                 }
-                else if (((IList<MarkerKind>)SortKindOrder).Contains(item.Kind))
+                else if (((IList<CodeElementType>)SortKindOrder).Contains(item.Kind))
                 {
                     rl.Add(item.Clone<TMarker>(false));
                 }
@@ -52,11 +52,11 @@ namespace DataTools.Code.CS.Filtering
         /// Gets or sets the sort kind order for this filter.
         /// Items will be sorted according to kind, and being present in the list conveys an item kind's validity.
         /// </summary>
-        public MarkerKind[] SortKindOrder { get; set; } = DefaultOrders.DefaultSortOrder;
+        public CodeElementType[] SortKindOrder { get; set; } = DefaultOrders.DefaultSortOrder;
 
         public override bool IsValid(IMarker item)
         {
-            return ((IList<MarkerKind>)SortKindOrder).Contains(item.Kind);
+            return ((IList<CodeElementType>)SortKindOrder).Contains(item.Kind);
         }
 
         public bool Descending
@@ -80,7 +80,7 @@ namespace DataTools.Code.CS.Filtering
             }
             else
             {
-                var sk = SortKindOrder as IList<MarkerKind>;
+                var sk = SortKindOrder as IList<CodeElementType>;
 
                 var a = sk.IndexOf(x.Kind);
                 var b = sk.IndexOf(y.Kind);

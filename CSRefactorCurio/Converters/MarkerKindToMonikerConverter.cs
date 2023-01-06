@@ -18,63 +18,63 @@ namespace CSRefactorCurio.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             
-            if (value is MarkerKind kind)
+            if (value is CodeElementType kind)
             {
 
                 switch (kind)
                 {
-                    case MarkerKind.Class:
+                    case CodeElementType.Class:
                         return KnownMonikers.Class;
 
-                    case MarkerKind.Enum:
+                    case CodeElementType.Enum:
                         return KnownMonikers.Enumeration;
 
-                    case MarkerKind.Interface:
+                    case CodeElementType.Interface:
                         return KnownMonikers.Interface;
 
-                    case MarkerKind.Property:
+                    case CodeElementType.Property:
                         return KnownMonikers.Property;
 
-                    case MarkerKind.Struct:
+                    case CodeElementType.Struct:
                         return KnownMonikers.Structure;
 
-                    case MarkerKind.Delegate:
+                    case CodeElementType.Delegate:
                         return KnownMonikers.Delegate;
 
-                    case MarkerKind.Namespace:
+                    case CodeElementType.Namespace:
                         return KnownMonikers.Namespace;
 
-                    case MarkerKind.Event:
+                    case CodeElementType.Event:
                         return KnownMonikers.Event;
 
-                    case MarkerKind.Field:
-                    case MarkerKind.FieldValue:
+                    case CodeElementType.Field:
+                    case CodeElementType.FieldValue:
                         return KnownMonikers.Field;
 
-                    case MarkerKind.Method:
+                    case CodeElementType.Method:
                         return KnownMonikers.Method;
 
-                    case MarkerKind.Constructor:
+                    case CodeElementType.Constructor:
                         return KnownMonikers.NewClass;
 
-                    case MarkerKind.Destructor:
+                    case CodeElementType.Destructor:
                         return KnownMonikers.EndCall;
 
-                    case MarkerKind.Const:
+                    case CodeElementType.Const:
                         return KnownMonikers.Constant;
 
-                    case MarkerKind.XMLDoc:
+                    case CodeElementType.XMLDoc:
                         return KnownMonikers.XMLCommentTag;
 
 
-                    case MarkerKind.Get:
-                    case MarkerKind.Set:
-                    case MarkerKind.Add:
-                    case MarkerKind.Remove:
+                    case CodeElementType.Get:
+                    case CodeElementType.Set:
+                    case CodeElementType.Add:
+                    case CodeElementType.Remove:
                         return KnownMonikers.Part;
 
-                    case MarkerKind.LineComment:
-                    case MarkerKind.BlockComment:
+                    case CodeElementType.LineComment:
+                    case CodeElementType.BlockComment:
                         return KnownMonikers.Comment;
                 }
             }

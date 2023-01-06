@@ -13,7 +13,13 @@ namespace DataTools.Code.Reporting
         protected IList associatedList;
         protected string title;
 
+        public virtual ISolutionElement ParentElement => element as ISolutionElement;
+
         public ElementType ElementType => ElementType.ReportNode;
+
+        public ReportNode()
+        {
+        }
 
         [Browsable(true)]
         public virtual string Title
@@ -52,6 +58,10 @@ namespace DataTools.Code.Reporting
         private new T element;
         private new IList<T> associatedList;
 
+        public ReportNode()
+        {
+        }
+
         public override string Title
         {
             get => element?.Title ?? base.Title;
@@ -70,6 +80,8 @@ namespace DataTools.Code.Reporting
                 if (SetProperty(ref element, value)) base.element = value;
             }
         }
+
+        public override ISolutionElement ParentElement => element;
 
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]

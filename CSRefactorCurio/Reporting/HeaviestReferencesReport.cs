@@ -37,7 +37,7 @@ namespace CSRefactorCurio.Reporting
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
             var allref = ReportHelper.GetReferences(Solution.Projects, allFQN);
-            var so = (IList<MarkerKind>)DefaultOrders.DefaultSortOrder;
+            var so = (IList<CodeElementType>)DefaultOrders.DefaultSortOrder;
 
             allref.Sort((a, b) =>
             {

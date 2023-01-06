@@ -1,9 +1,9 @@
 ﻿using CSRefactorCurio;
+using CSRefactorCurio.Projects;
 
 using DataTools.Code.Project;
 using DataTools.Code.Project.Properties;
 using DataTools.Desktop;
-using DataTools.Essentials.Observable;
 
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +15,7 @@ namespace DataTools.CSTools
     /// <summary>
     /// CS Refactor Curio Project Class
     /// </summary>
-    internal class CurioProject : ObservableBase, IProjectHost, IDisposable
+    internal class CurioProject : ProjectElementBase, IProjectHost, IDisposable
     {
         protected bool disposedValue;
 
@@ -32,7 +32,6 @@ namespace DataTools.CSTools
         private CSDirectory rootFolder = null;
         private string rootPath = "";
         private object selectedItem = null;
-        private string title = null;
         private XmlDocument xml;
 
         /// <summary>
@@ -41,7 +40,7 @@ namespace DataTools.CSTools
         /// <param name="filename">The project file to load.</param>
         /// <param name="nativeProject">The COM object from the DTE.</param>
         /// <exception cref="FileNotFoundException">If the project cannot be loaded.</exception>
-        public CurioProject(string filename, EnvDTE.Project nativeProject)
+        public CurioProject(string filename, EnvDTE.Project nativeProject, CurioExplorerSolution parent = null) : base(parent)
         {
             _project = nativeProject;
             PopulateProjectProperties();
@@ -59,11 +58,6 @@ namespace DataTools.CSTools
             monitor.Watch();
         }
 
-        ~CurioProject()
-        {
-            monitor?.Dispose();
-        }
-
         /// <summary>
         /// Gets the assembly name for the project.
         /// </summary>
@@ -74,7 +68,7 @@ namespace DataTools.CSTools
         /// </summary>
         public string DefaultNamespace => defns;
 
-        public ElementType ElementType => ElementType.Project;
+        public override ElementType ElementType => ElementType.Project;
 
         /// <summary>
         /// List of explicitly excluded files.
@@ -166,7 +160,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public string Title
+        public override string Title
         {
             get => title;
             protected set
@@ -174,14 +168,6 @@ namespace DataTools.CSTools
                 if (disposedValue) throw new ObjectDisposedException(GetType().FullName);
                 SetProperty(ref title, value);
             }
-        }
-
-        public virtual void Dispose()
-        {
-            ((IDisposable)monitor).Dispose();
-            monitor = null;
-            disposedValue = true;
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -305,6 +291,35 @@ namespace DataTools.CSTools
             {
                 assyname = (string)properties["AssemblyName"].Value;
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                //if (disposing)
+                //{
+                //    // Nothing to do in this section.
+                //}
+
+                ((IDisposable)monitor).Dispose();
+                monitor = null;
+
+                disposedValue = true;
+            }
+        }
+
+        ~CurioProject()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

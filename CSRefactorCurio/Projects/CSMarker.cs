@@ -14,7 +14,7 @@ namespace DataTools.CSTools
     /// </summary>
     internal class CSMarker : MarkerBase<CSMarker, ObservableMarkerList<CSMarker>>, IProjectNode<ObservableMarkerList<CSMarker>>
     {
-        public override CSMarker FindParent(MarkerKind parentKind)
+        public override CSMarker FindParent(CodeElementType parentKind)
         {
             var p = this.ParentElement as CSMarker;
 
@@ -50,12 +50,12 @@ namespace DataTools.CSTools
                 {
                     switch (marker.Kind)
                     {
-                        case MarkerKind.LineComment:
-                        case MarkerKind.BlockComment:
-                        case MarkerKind.XMLDoc:
+                        case CodeElementType.LineComment:
+                        case CodeElementType.BlockComment:
+                        case CodeElementType.XMLDoc:
                             continue;
 
-                        case MarkerKind.Directive:
+                        case CodeElementType.Directive:
                             if (marker.Content.StartsWith("#region") || marker.Content.StartsWith("#endregion"))
                             {
                                 continue;
@@ -107,7 +107,7 @@ namespace DataTools.CSTools
         {
             List<string> usings = new List<string>();
 
-            if (kind == MarkerKind.Using)
+            if (kind == CodeElementType.Using)
             {
                 usings.Add(Name);
             }
@@ -124,7 +124,7 @@ namespace DataTools.CSTools
         {
             List<string> usings = new List<string>();
 
-            if (kind == MarkerKind.Using && AccessModifiers == AccessModifiers.Global)
+            if (kind == CodeElementType.Using && AccessModifiers == AccessModifiers.Global)
             {
                 usings.Add(Name);
             }

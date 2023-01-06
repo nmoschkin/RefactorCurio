@@ -41,6 +41,7 @@ namespace DataTools.Code.Filtering.Base
         /// <returns></returns>
         public override TList ApplyFilter(TList items)
         {
+            filterChain.FilterChainKind = FilterChainKind;
             return filterChain.ApplyFilter(items);
         }
 
@@ -51,6 +52,7 @@ namespace DataTools.Code.Filtering.Base
         /// <returns>True if the item passes, otherwise false.</returns>
         public override bool IsValid(IMarker item)
         {
+            filterChain.FilterChainKind = FilterChainKind;
             return filterChain.IsValid(item);
         }
 

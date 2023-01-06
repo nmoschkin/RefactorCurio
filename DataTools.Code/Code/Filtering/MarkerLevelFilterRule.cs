@@ -12,7 +12,7 @@ namespace DataTools.Code.Filtering
         /// </summary>
         /// <param name="kind">The kind</param>
         /// <param name="level">The level</param>
-        public MarkerLevelFilterRule(MarkerKind kind, int level) : base(kind)
+        public MarkerLevelFilterRule(CodeElementType kind, int level) : base(kind)
         {
             Level = level;
         }

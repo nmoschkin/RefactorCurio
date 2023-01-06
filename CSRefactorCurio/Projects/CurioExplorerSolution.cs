@@ -1,5 +1,6 @@
 ﻿using CSRefactorCurio.Dialogs;
 using CSRefactorCurio.Reporting;
+using CSRefactorCurio.ViewModels;
 
 using DataTools.Code.Project;
 using DataTools.CSTools;
@@ -16,7 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace CSRefactorCurio.ViewModels
+namespace CSRefactorCurio.Projects
 {
     /// <summary>
     /// The heart of the Curio Refactor Studio Solution
@@ -300,6 +301,10 @@ namespace CSRefactorCurio.ViewModels
         /// </summary>
         protected bool LoadingFlag { get; set; } = false;
 
+        public ElementType ElementType => ElementType.Solution;
+
+        public string Title => Path.GetFileNameWithoutExtension(Solution?.FullName ?? "");
+
         /// <summary>
         /// Clear the current solution.
         /// </summary>
@@ -430,7 +435,7 @@ namespace CSRefactorCurio.ViewModels
         {
             if (commandId == nameof(splitFileCommand))
             {
-                return (SelectedItem is CSCodeFile);
+                return SelectedItem is CSCodeFile;
             }
 
             return true;
@@ -443,7 +448,7 @@ namespace CSRefactorCurio.ViewModels
         /// <param name="source">The source of native items is this list.</param>
         protected void PopulateFrom(IList<IProjectElement> addto, IEnumerable source)
         {
-            DataTools.CSTools.CSSolutionFolder current = null;
+            CSSolutionFolder current = null;
             EnvDTE.Project item;
             foreach (object obj in source)
             {
@@ -451,9 +456,9 @@ namespace CSRefactorCurio.ViewModels
                 {
                     item = (EnvDTE.Project)obj;
                 }
-                else if ((obj is EnvDTE.ProjectItem item2) && (item2.SubProject is EnvDTE.Project subproj))
+                else if (obj is EnvDTE.ProjectItem item2 && item2.SubProject is EnvDTE.Project subproj)
                 {
-                    item = (EnvDTE.Project)subproj;
+                    item = subproj;
                 }
                 else
                 {
@@ -462,7 +467,7 @@ namespace CSRefactorCurio.ViewModels
 
                 if (item.Kind == ProjectKinds.vsProjectKindSolutionFolder)
                 {
-                    current = new DataTools.CSTools.CSSolutionFolder(item.Name);
+                    current = new CSSolutionFolder(item.Name, this);
                     addto.Add(current);
 
                     try
@@ -478,7 +483,7 @@ namespace CSRefactorCurio.ViewModels
                 {
                     try
                     {
-                        addto.Add(new CurioProject(item.FullName, item));
+                        addto.Add(new CurioProject(item.FullName, item, this));
                     }
                     catch (Exception ex)
                     {
