@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CSRefactorCurio
 {
-    internal interface ICommandOwner : INotifyPropertyChanged
+    public interface ICommandOwner : INotifyPropertyChanged
     {
         bool RequestCanExecute(string commandId);
     }

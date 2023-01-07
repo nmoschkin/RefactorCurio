@@ -5,7 +5,7 @@ namespace DataTools.Code.Project
     /// <summary>
     /// Represents a basic solution element.
     /// </summary>
-    internal interface ISolutionElement
+    public interface ISolutionElement
     {
         /// <summary>
         /// The element type.
@@ -21,7 +21,7 @@ namespace DataTools.Code.Project
     /// <summary>
     /// Represents a basic project element.
     /// </summary>
-    internal interface IProjectElement : ISolutionElement
+    public interface IProjectElement : ISolutionElement
     {
         /// <summary>
         /// Gets the parent element, if any.

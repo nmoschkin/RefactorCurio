@@ -6,7 +6,7 @@ namespace DataTools.Code
     /// Detected access modifiers
     /// </summary>
     [Flags]
-    internal enum AccessModifiers
+    public enum AccessModifiers
     {
         /// <summary>
         /// None

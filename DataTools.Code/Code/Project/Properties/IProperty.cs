@@ -5,7 +5,7 @@ namespace DataTools.Code.Project.Properties
     /// <summary>
     /// Simple interface for the EnvDTE properties.
     /// </summary>
-    internal interface IProperty : INotifyPropertyChanged
+    public interface IProperty : INotifyPropertyChanged
     {
         IPropertiesContainer Container { get; }
 

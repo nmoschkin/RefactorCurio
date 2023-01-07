@@ -7,7 +7,7 @@ namespace DataTools.Code.Project
     /// <summary>
     /// Represents a top-level project host element.
     /// </summary>
-    internal interface IProjectHost : IProjectElement, INotifyPropertyChanged
+    public interface IProjectHost : IProjectElement, INotifyPropertyChanged
     {
         /// <summary>
         /// The project properties.

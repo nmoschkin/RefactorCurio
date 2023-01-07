@@ -6,14 +6,14 @@ using System.ComponentModel;
 
 namespace DataTools.Code.Reporting
 {
-    internal interface IReportNode : INotifyPropertyChanged, IProjectElement
+    public interface IReportNode : INotifyPropertyChanged, IProjectElement
     {
         object Element { get; }
 
         IList AssociatedList { get; }
     }
 
-    internal interface IReportNode<T> : IReportNode, INotifyPropertyChanged
+    public interface IReportNode<T> : IReportNode, INotifyPropertyChanged
     {
         new T Element { get; }
 

@@ -7,7 +7,7 @@ namespace DataTools.Code.Filtering.Base
     /// <summary>
     /// A simple and open chained filter rule for strongly typed filters.
     /// </summary>
-    internal abstract class FixedFilterRuleChain<TMarker, TList> : MarkerFilterRule<TMarker, TList>
+    public abstract class FixedFilterRuleChain<TMarker, TList> : MarkerFilterRule<TMarker, TList>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {

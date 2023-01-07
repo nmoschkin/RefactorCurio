@@ -10,6 +10,10 @@ namespace CSRefactorCurio.Options
         [ComVisible(true)]
         public class CSAppOptionsOptions : BaseOptionPage<CSAppOptions>
         { }
+
+        [ComVisible(true)]
+        public class FilterOptionsOptions : BaseOptionPage<FilterOptions>
+        { }
     }
 
     public class CSAppOptions : BaseOptionModel<CSAppOptions>

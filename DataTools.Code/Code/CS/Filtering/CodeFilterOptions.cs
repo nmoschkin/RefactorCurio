@@ -15,7 +15,7 @@ namespace DataTools.Code.CS.Filtering
     /// <remarks>
     /// Nullable elements for indicating filter validity.
     /// </remarks>
-    internal class CodeFilterOptions : ICodeElement, ICloneable
+    public class CodeFilterOptions : ICodeElement, ICloneable
     {
         protected static readonly PropertyInfo[] codeFilterProps = typeof(CodeFilterOptions).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 

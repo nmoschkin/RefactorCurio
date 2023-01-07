@@ -8,7 +8,7 @@ namespace DataTools.Code.Markers
     /// <summary>
     /// Implements methods that are common to classes that provide the ability to locate markers.
     /// </summary>
-    internal interface IMarkerFinder
+    public interface IMarkerFinder
     {
         /// <summary>
         /// Return the first, deepest marker at the specific line.

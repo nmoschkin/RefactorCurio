@@ -6,7 +6,7 @@ namespace DataTools.Code.Markers
     /// <summary>
     /// An identifiable distinct element of code
     /// </summary>
-    internal interface ICodeElement : ICloneable
+    public interface ICodeElement : ICloneable
     {
         /// <summary>
         /// If applicable, the <see cref="AccessModifiers"/> for the element.

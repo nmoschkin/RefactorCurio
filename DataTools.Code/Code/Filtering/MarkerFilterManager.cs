@@ -8,7 +8,7 @@ namespace DataTools.Code.Filtering
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/> to filter.</typeparam>
     /// <typeparam name="TList">The <see cref="IMarker{TMarker, TList}"/>.</typeparam>
-    internal class MarkerFilterManager<TMarker, TList>
+    public class MarkerFilterManager<TMarker, TList>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {

@@ -1,6 +1,6 @@
 ﻿namespace DataTools.Code.Project
 {
-    internal interface INamespace : IProjectNode
+    public interface INamespace : IProjectNode
     {
         /// <summary>
         /// Home namespace of this element.

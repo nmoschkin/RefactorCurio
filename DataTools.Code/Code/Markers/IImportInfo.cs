@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DataTools.Code.Markers
 {
-    internal interface IImportInfo : ICloneable, IEquatable<IImportInfo>
+    public interface IImportInfo : ICloneable, IEquatable<IImportInfo>
     {
         string Library { get; set; }
 

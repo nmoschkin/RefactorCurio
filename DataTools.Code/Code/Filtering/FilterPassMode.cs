@@ -3,7 +3,7 @@
     /// <summary>
     /// Filter Pass Mode
     /// </summary>
-    internal enum FilterPassMode
+    public enum FilterPassMode
     {
         /// <summary>
         /// All rules must pass for validity.

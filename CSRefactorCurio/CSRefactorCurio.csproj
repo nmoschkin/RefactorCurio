@@ -73,6 +73,14 @@
       <DependentUpon>TreeDataOptions.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ReferenceFinder.cs" />
+    <Compile Include="Options\FilterOptions.cs" />
+    <Compile Include="Options\FilterOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\FilterOptionsView.xaml.cs">
+      <DependentUpon>FilterOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\FilterProfile.cs" />
     <Compile Include="Projects\Properties\ColorableProperty.cs" />
     <Compile Include="Projects\Properties\ColorItems.cs" />
     <Compile Include="Projects\CSCodeFile.cs" />
@@ -186,6 +194,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ToolWindows\TreeDataOptions.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\FilterOptionsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

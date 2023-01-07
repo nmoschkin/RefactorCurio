@@ -9,7 +9,7 @@ namespace DataTools.Code
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> that will be used.</typeparam>
     /// <typeparam name="TList">The type of list that will contain the markers.</typeparam>
-    internal class AtomicGenerationInfo<TMarker, TList> where TMarker : IMarker, new() where TList : IList<TMarker>, new()
+    public class AtomicGenerationInfo<TMarker, TList> where TMarker : IMarker, new() where TList : IList<TMarker>, new()
     {
         /// <summary>
         /// The source code document lines.

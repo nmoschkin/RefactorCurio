@@ -2,7 +2,7 @@
 
 namespace DataTools.Code.Filtering.Base
 {
-    internal static class DefaultOrders
+    public static class DefaultOrders
     {
         /// <summary>
         /// Gets the default sort order for filters, lists, and rules.

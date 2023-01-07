@@ -6,7 +6,7 @@ namespace DataTools.Code.Project
     /// Project element types.
     /// </summary>
     [Flags]
-    internal enum ElementType
+    public enum ElementType
     {
         /// <summary>
         /// Unknown/generic element type.

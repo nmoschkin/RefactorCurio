@@ -8,7 +8,7 @@ namespace DataTools.Code.Filtering.Base
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
     /// <typeparam name="TFilter">The type of <see cref="MarkerFilterManager{TMarker, TList}"/>.</typeparam>
-    internal interface IMarkerFilterProvider<TMarker, TList, TFilter>
+    public interface IMarkerFilterProvider<TMarker, TList, TFilter>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
         where TFilter : MarkerFilterManager<TMarker, TList>, new()
@@ -43,7 +43,7 @@ namespace DataTools.Code.Filtering.Base
     /// </summary>
     /// <typeparam name="TMarker">The type of <see cref="IMarker"/> item.</typeparam>
     /// <typeparam name="TList">The type of <see cref="IMarkerList{TMarker}"/>.</typeparam>
-    internal interface IMarkerFilterProvider<TMarker, TList> : IMarkerFilterProvider<TMarker, TList, MarkerFilterManager<TMarker, TList>>
+    public interface IMarkerFilterProvider<TMarker, TList> : IMarkerFilterProvider<TMarker, TList, MarkerFilterManager<TMarker, TList>>
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {

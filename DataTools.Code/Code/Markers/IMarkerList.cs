@@ -6,7 +6,7 @@ namespace DataTools.Code.Markers
     /// <summary>
     /// Base interface for marker lists. Inherits from <see cref="IEnumerable"/>.
     /// </summary>
-    internal interface IMarkerList : IEnumerable
+    public interface IMarkerList : IEnumerable
     {
     }
 
@@ -14,7 +14,7 @@ namespace DataTools.Code.Markers
     /// Base interface for strongly-typed marker lists.
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
-    internal interface IMarkerList<TMarker> : IMarkerList, IList<TMarker> where TMarker : IMarker
+    public interface IMarkerList<TMarker> : IMarkerList, IList<TMarker> where TMarker : IMarker
     {
     }
 }

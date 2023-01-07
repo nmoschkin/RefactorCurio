@@ -5,7 +5,7 @@ namespace DataTools.Code.Project.Properties
     /// <summary>
     /// Simple interface for the colorable property.
     /// </summary>
-    internal interface IColorableProperty : IProperty
+    public interface IColorableProperty : IProperty
     {
         Color Background { get; }
 

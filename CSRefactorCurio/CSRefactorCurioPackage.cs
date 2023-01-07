@@ -7,6 +7,7 @@ global using System;
 
 global using Task = System.Threading.Tasks.Task;
 
+using CSRefactorCurio.Options;
 using CSRefactorCurio.Projects;
 
 using Microsoft.VisualStudio.PlatformUI;
@@ -28,6 +29,8 @@ namespace CSRefactorCurio
     // Register the options with this attribute on your package class:
     [ProvideOptionPage(typeof(Options.OptionsProvider.CSAppOptionsOptions), "Curio Refactor Studio", "JSON to C# Generation", 0, 0, true)]
     [ProvideProfile(typeof(Options.OptionsProvider.CSAppOptionsOptions), "Curio Refactor Studio", "JSON to C# Generation", 0, 0, true)]
+    [ProvideOptionPage(typeof(FilterOptionsPage), "Curio Refactor Studio", "Filter", 0, 0, true)]
+    [ProvideProfile(typeof(FilterOptionsPage), "Curio Refactor Studio", "Filter", 0, 0, true)]
     [ProvideUIContextRule(JsonItemContextGuid,
     name: "Filter For JSON Files",
     expression: "JsonSel",

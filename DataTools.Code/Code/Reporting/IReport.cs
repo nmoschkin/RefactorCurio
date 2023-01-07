@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace DataTools.Code.Reporting
 {
-    internal interface IReport : INotifyPropertyChanged
+    public interface IReport : INotifyPropertyChanged
     {
         ISolution Solution { get; }
 
@@ -25,7 +25,7 @@ namespace DataTools.Code.Reporting
         void Sort();
     }
 
-    internal interface IReport<TRpt> : IReport
+    public interface IReport<TRpt> : IReport
     {
         new IList<TRpt> Reports { get; }
     }

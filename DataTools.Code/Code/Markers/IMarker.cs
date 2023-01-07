@@ -8,7 +8,7 @@ namespace DataTools.Code.Markers
     /// <summary>
     /// Represents a logical segment in a source code file.
     /// </summary>
-    internal interface IMarker : ICodeElement, IProjectNode, INamespace, ICloneable
+    public interface IMarker : ICodeElement, IProjectNode, INamespace, ICloneable
     {
         /// <summary>
         /// Gets or sets the <see cref="IMarker"/> parent element.
@@ -104,7 +104,7 @@ namespace DataTools.Code.Markers
     /// </summary>
     /// <typeparam name="TMarker"></typeparam>
     /// <typeparam name="TList"></typeparam>
-    internal interface IMarker<TMarker, TList> : IMarker where TMarker : IMarker, new() where TList : IMarkerList<TMarker>, new()
+    public interface IMarker<TMarker, TList> : IMarker where TMarker : IMarker, new() where TList : IMarkerList<TMarker>, new()
     {
         /// <summary>
         /// The generated atomic source file information for this object.

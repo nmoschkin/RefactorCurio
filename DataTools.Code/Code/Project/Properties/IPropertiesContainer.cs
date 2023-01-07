@@ -8,7 +8,7 @@ namespace DataTools.Code.Project.Properties
     /// <summary>
     /// Simple interface for a property container.
     /// </summary>
-    internal interface IPropertiesContainer
+    public interface IPropertiesContainer
     {
         object Parent { get; }
     }
@@ -16,7 +16,7 @@ namespace DataTools.Code.Project.Properties
     /// <summary>
     /// Simple interface for a property container.
     /// </summary>
-    internal interface IPropertiesContainer<T> : IPropertiesContainer, INotifyPropertyChanged, IEnumerable<T> where T : IProperty
+    public interface IPropertiesContainer<T> : IPropertiesContainer, INotifyPropertyChanged, IEnumerable<T> where T : IProperty
     {
         T this[string name] { get; }
     }

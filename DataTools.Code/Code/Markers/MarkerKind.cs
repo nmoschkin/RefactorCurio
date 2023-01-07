@@ -5,7 +5,7 @@ namespace DataTools.Code.Markers
     /// <summary>
     /// Identify known and unknown logical elements.
     /// </summary>
-    internal enum MarkerKind
+    public enum MarkerKind
     {
         /// <summary>
         /// Unknown or Code

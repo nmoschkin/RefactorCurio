@@ -17,7 +17,7 @@ namespace DataTools.Code.Filtering.Base
     /// The return result will be a <typeparamref name="TList"/> of clones of all objects that are valid or contain valid children.<br />
     /// The new, cloned <typeparamref name="TMarker"/> objects will contain only valid children, or children that contain valid children.
     /// </remarks>
-    internal abstract class DeepFilterRule<TMarker, TList> : MarkerFilterRule<TMarker, TList>
+    public abstract class DeepFilterRule<TMarker, TList> : MarkerFilterRule<TMarker, TList>
         where TMarker : IMarker<TMarker, TList>, new()
         where TList : IMarkerList<TMarker>, new()
     {
@@ -120,6 +120,7 @@ namespace DataTools.Code.Filtering.Base
 
             if (l.Count == 0) return new TList();
 
+            // our final list will be all elements who have no TMarker parents
             var e = l.Select(x =>
             {
                 if (x.ParentElement is TMarker zpn)

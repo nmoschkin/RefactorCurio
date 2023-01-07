@@ -2,7 +2,7 @@
 
 namespace DataTools.Code.Project
 {
-    internal interface ISolution : ISolutionElement
+    public interface ISolution : ISolutionElement
     {
         IList<IProjectElement> Namespaces { get; }
 

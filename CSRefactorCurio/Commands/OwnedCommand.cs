@@ -78,7 +78,7 @@ namespace CSRefactorCurio
         }
     }
 
-    internal interface IOwnedCommand : ICommand
+    public interface IOwnedCommand : ICommand
     {
         ICommandOwner Owner { get; }
 

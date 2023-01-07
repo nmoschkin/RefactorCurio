@@ -13,7 +13,7 @@ namespace DataTools.Code.Filtering.Base
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/> element type.</typeparam>
     /// <typeparam name="TList">The <see cref="IMarkerList{TMarker}"/> type.</typeparam>
-    internal abstract class SortFilterRule<TMarker, TList> : MarkerFilterRule<TMarker, TList>, IComparer<TMarker>
+    public abstract class SortFilterRule<TMarker, TList> : MarkerFilterRule<TMarker, TList>, IComparer<TMarker>
         where TMarker : IMarker, new()
         where TList : IMarkerList<TMarker>, new()
     {

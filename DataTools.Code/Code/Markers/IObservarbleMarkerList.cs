@@ -7,7 +7,7 @@ namespace DataTools.Code.Markers
     /// Base interface for strongly-typed, observable marker lists.
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/></typeparam>
-    internal interface IObservarbleMarkerList<TMarker> : IMarkerList<TMarker>, INotifyCollectionChanged, INotifyPropertyChanged where TMarker : IMarker
+    public interface IObservarbleMarkerList<TMarker> : IMarkerList<TMarker>, INotifyCollectionChanged, INotifyPropertyChanged where TMarker : IMarker
     {
     }
 }
