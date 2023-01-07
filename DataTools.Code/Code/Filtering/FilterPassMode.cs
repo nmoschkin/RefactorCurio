@@ -1,9 +1,9 @@
 ﻿namespace DataTools.Code.Filtering
 {
     /// <summary>
-    /// Filter Chain Kinds
+    /// Filter Pass Mode
     /// </summary>
-    internal enum FilterChainKind
+    internal enum FilterPassMode
     {
         /// <summary>
         /// All rules must pass for validity.

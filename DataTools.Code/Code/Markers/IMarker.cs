@@ -10,6 +10,12 @@ namespace DataTools.Code.Markers
     /// </summary>
     internal interface IMarker : ICodeElement, IProjectNode, INamespace, ICloneable
     {
+        /// <summary>
+        /// Gets or sets the <see cref="IMarker"/> parent element.
+        /// </summary>
+        /// <remarks>
+        /// Implementations would be wise to store this as a <see cref="WeakReference{T}"/>.
+        /// </remarks>
         new IMarker ParentElement { get; set; }
 
         /// <summary>
@@ -48,21 +54,6 @@ namespace DataTools.Code.Markers
         int Level { get; set; }
 
         /// <summary>
-        /// If applicable, the list of method parameters.
-        /// </summary>
-        List<string> MethodParams { get; set; }
-
-        /// <summary>
-        /// If applicable, the method parameter string.
-        /// </summary>
-        string MethodParamsString { get; set; }
-
-        /// <summary>
-        /// The name of the element.
-        /// </summary>
-        string Name { get; set; }
-
-        /// <summary>
         /// The name of the parent element.
         /// </summary>
         string ParentElementPath { get; set; }
@@ -91,11 +82,6 @@ namespace DataTools.Code.Markers
         /// A list of words we did not understand. We'll examine these for type references.
         /// </summary>
         List<string> UnknownWords { get; set; }
-
-        /// <summary>
-        /// If applicable, the where clause of this element.
-        /// </summary>
-        string WhereClause { get; set; }
 
         /// <summary>
         /// Clone this marker into another object that implmenets <see cref="IMarker"/>.

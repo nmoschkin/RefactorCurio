@@ -32,7 +32,7 @@ namespace DataTools.Code.Filtering
         /// <summary>
         /// Gets or sets the kind of chain (pass all or pass any).
         /// </summary>
-        public virtual FilterChainKind FilterChainKind { get; set; } = FilterChainKind.PassAll;
+        public virtual FilterPassMode FilterChainKind { get; set; } = FilterPassMode.PassAll;
 
         /// <summary>
         /// Gets or sets the rule chain that will be used to validate items.
@@ -50,7 +50,7 @@ namespace DataTools.Code.Filtering
         /// <returns>True if the item passes, otherwise false.</returns>
         public override bool IsValid(IMarker item)
         {
-            if (FilterChainKind == FilterChainKind.PassAll)
+            if (FilterChainKind == FilterPassMode.PassAll)
             {
                 foreach (var rule in rules)
                 {
@@ -59,7 +59,7 @@ namespace DataTools.Code.Filtering
 
                 return true;
             }
-            else if (FilterChainKind == FilterChainKind.PassAny)
+            else if (FilterChainKind == FilterPassMode.PassAny)
             {
                 foreach (var rule in rules)
                 {
@@ -104,7 +104,7 @@ namespace DataTools.Code.Filtering
         /// <summary>
         /// Gets or sets the kind of chain (pass all or pass any).
         /// </summary>
-        public virtual FilterChainKind FilterChainKind { get; set; } = FilterChainKind.PassAll;
+        public virtual FilterPassMode FilterChainKind { get; set; } = FilterPassMode.PassAll;
 
         /// <summary>
         /// Gets or sets the rule chain that will be used to validate items.
@@ -154,7 +154,7 @@ namespace DataTools.Code.Filtering
         /// <returns>True if the item passes, otherwise false.</returns>
         public override bool IsValid(IMarker item)
         {
-            if (FilterChainKind == FilterChainKind.PassAll)
+            if (FilterChainKind == FilterPassMode.PassAll)
             {
                 foreach (var rule in rules)
                 {
@@ -163,7 +163,7 @@ namespace DataTools.Code.Filtering
 
                 return true;
             }
-            else if (FilterChainKind == FilterChainKind.PassAny)
+            else if (FilterChainKind == FilterPassMode.PassAny)
             {
                 foreach (var rule in rules)
                 {

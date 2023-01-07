@@ -118,5 +118,49 @@ namespace DataTools.Code.Markers
         {
             return $"{EntryPoint} [Module: {Library}, CharSet: {CharSet}]";
         }
+
+        public bool Equals(IImportInfo other)
+        {
+            return
+                this.Library == other.Library &&
+                this.BestFitMapping == other.BestFitMapping &&
+                this.CallingConvention == other.CallingConvention &&
+                this.CharSet == other.CharSet &&
+                this.EntryPoint == other.EntryPoint &&
+                this.ExactSpelling == other.ExactSpelling &&
+                this.PreserveSig == other.PreserveSig &&
+                this.SetLastError == other.SetLastError &&
+                this.ThrowOnUnmappableChar == other.ThrowOnUnmappableChar;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is IImportInfo other) return Equals(other);
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return
+                (Library,
+                BestFitMapping,
+                CallingConvention,
+                CharSet,
+                EntryPoint,
+                ExactSpelling,
+                PreserveSig,
+                SetLastError,
+                ThrowOnUnmappableChar).GetHashCode();
+        }
+
+        public ImportInfo Clone()
+        {
+            return (ImportInfo)MemberwiseClone();
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DataTools.Code.Markers
 {
@@ -11,10 +12,15 @@ namespace DataTools.Code.Markers
 
         public abstract IMarker GetMarkerAt(int index);
 
-        public virtual IMarker ScanMarker(IMarker marker, Func<IMarker, bool> scanFunc)
+        public virtual IMarker ScanMarker(IEnumerable<IMarker> markers, Func<IMarker, bool> scanFunc)
         {
-            if (scanFunc(marker))
+            foreach (var marker in markers)
             {
+                if (scanFunc(marker))
+                {
+                    return marker;
+                }
+
                 if (marker.Children != null)
                 {
                     foreach (IMarker chm in marker.Children)
@@ -23,8 +29,25 @@ namespace DataTools.Code.Markers
                         if (res != null) return res;
                     }
                 }
+            }
 
+            return null;
+        }
+
+        public virtual IMarker ScanMarker(IMarker marker, Func<IMarker, bool> scanFunc)
+        {
+            if (scanFunc(marker))
+            {
                 return marker;
+            }
+
+            if (marker.Children != null)
+            {
+                foreach (IMarker chm in marker.Children)
+                {
+                    var res = ScanMarker(chm, scanFunc);
+                    if (res != null) return res;
+                }
             }
 
             return null;
@@ -34,16 +57,16 @@ namespace DataTools.Code.Markers
         {
             if (scanFunc(marker))
             {
-                if (marker.Children != null)
-                {
-                    foreach (IMarker chm in marker.Children)
-                    {
-                        var res = ScanMarker(chm, scanFunc);
-                        if (res != null && res is T tres) return tres;
-                    }
-                }
-
                 return marker;
+            }
+
+            if (marker.Children != null)
+            {
+                foreach (IMarker chm in marker.Children)
+                {
+                    var res = ScanMarker(chm, scanFunc);
+                    if (res != null && res is T tres) return tres;
+                }
             }
 
             return null;

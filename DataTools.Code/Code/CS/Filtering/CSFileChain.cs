@@ -17,7 +17,7 @@ namespace DataTools.Code.CS.Filtering
         where TList : IMarkerList<TMarker>, new()
         where TMarker : IMarker<TMarker, TList>, new()
     {
-        public override FilterChainKind FilterChainKind => FilterChainKind.PassAll;
+        public override FilterPassMode PassMode => FilterPassMode.PassAll;
 
         protected override IEnumerable<MarkerFilterRule<TMarker, TList>> ProvideFilterChain()
         {

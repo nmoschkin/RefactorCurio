@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DataTools.Code.Markers
 {
     /// <summary>
     /// An identifiable distinct element of code
     /// </summary>
-    internal interface ICodeElement
+    internal interface ICodeElement : ICloneable
     {
         /// <summary>
         /// If applicable, the <see cref="AccessModifiers"/> for the element.
@@ -98,8 +99,35 @@ namespace DataTools.Code.Markers
         bool IsVirtual { get; set; }
 
         /// <summary>
+        /// If applicable, the list of method parameters.
+        /// </summary>
+        List<string> MethodParams { get; set; }
+
+        /// <summary>
+        /// If applicable, the method parameter string.
+        /// </summary>
+        string MethodParamsString { get; set; }
+
+        /// <summary>
+        /// The name of the element.
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
+        /// If applicable, the where clause of this element.
+        /// </summary>
+        string WhereClause { get; set; }
+
+        /// <summary>
         /// The identified element marker kind.
         /// </summary>
         MarkerKind Kind { get; set; }
+
+        /// <summary>
+        /// Clone this object (presumably deeply) into a new <see cref="ICodeElement"/> instance of the specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        T Clone<T>() where T : ICodeElement, new();
     }
 }

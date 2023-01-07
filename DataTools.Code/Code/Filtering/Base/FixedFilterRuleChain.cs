@@ -19,7 +19,7 @@ namespace DataTools.Code.Filtering.Base
         public FixedFilterRuleChain()
         {
             filterChain = new MarkerFilterRuleChain<TMarker, TList>();
-            filterChain.FilterChainKind = FilterChainKind;
+            filterChain.FilterChainKind = PassMode;
 
             var newRules = ProvideFilterChain();
 
@@ -32,7 +32,7 @@ namespace DataTools.Code.Filtering.Base
         /// <summary>
         /// Gets the kind of filter chain (validate any or validate all).
         /// </summary>
-        public abstract FilterChainKind FilterChainKind { get; }
+        public abstract FilterPassMode PassMode { get; }
 
         /// <summary>
         /// Runs each filter in succession, using the results of the previous filter in the chain to run the next filter in the chain.
@@ -41,7 +41,7 @@ namespace DataTools.Code.Filtering.Base
         /// <returns></returns>
         public override TList ApplyFilter(TList items)
         {
-            filterChain.FilterChainKind = FilterChainKind;
+            filterChain.FilterChainKind = PassMode;
             return filterChain.ApplyFilter(items);
         }
 
@@ -52,7 +52,7 @@ namespace DataTools.Code.Filtering.Base
         /// <returns>True if the item passes, otherwise false.</returns>
         public override bool IsValid(IMarker item)
         {
-            filterChain.FilterChainKind = FilterChainKind;
+            filterChain.FilterChainKind = PassMode;
             return filterChain.IsValid(item);
         }
 

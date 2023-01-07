@@ -1,6 +1,9 @@
-﻿using DataTools.CSTools;
+﻿using DataTools.Code.CS.Filtering;
+using DataTools.Code.Markers;
+using DataTools.CSTools;
 
 using System;
+using System.Collections;
 using System.Linq;
 using System.Text;
 
@@ -18,10 +21,47 @@ namespace Experiments
 
             var file = CSCodeFile.LoadFromFile("E:\\Projects\\Personal Projects\\Repos\\misctools\\DataTools\\Win32\\DataTools.Win32\\User32\\Classes\\User32.cs");
 
+            var first = file.ScanMarker(file.Markers, (m) =>
+            {
+                return m.IsExtern == true;
+            });
+
+            CodeFilterOptions cfo = new CodeFilterOptions(first, true);
+
+            var b = cfo.Validate(first);
+
+            Console.WriteLine($"{b}");
+
+            var cfr = new CodeFilterRule<CSMarker, ObservableMarkerList<CSMarker>>(new CodeFilterOptions() { IsExtern = true });
+
+            var results = cfr.ApplyFilter(file.Markers);
+
+            WriteResult(results);
+
+            Console.Read();
             //var outdir = @"C:\Users\theim\Desktop\Spasms";
             //file.OutputMarkers(outdir);
 
             //var markers = file.GetMarkersForCommit();
+        }
+
+        private static void WriteResult(IEnumerable results)
+        {
+            foreach (IMarker elem in results)
+            {
+                if (elem.Kind == MarkerKind.XMLDoc)
+                {
+                    Console.Write(elem.Content);
+                }
+                else
+                {
+                    Console.WriteLine(elem);
+                }
+                if (elem.Children != null)
+                {
+                    WriteResult(elem.Children);
+                }
+            }
         }
     }
 }

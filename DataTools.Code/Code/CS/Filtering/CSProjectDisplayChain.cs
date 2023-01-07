@@ -17,7 +17,7 @@ namespace DataTools.Code.CS.Filtering
     {
         private IEnumerable<MarkerFilterRule<TMarker, TList>> extraFilters;
 
-        public override FilterChainKind FilterChainKind => FilterChainKind.PassAll;
+        public override FilterPassMode PassMode => FilterPassMode.PassAll;
 
         /// <summary>
         /// Create a new <see cref="CSProjectDisplayChain{TMarker, TList}"/> filter chain with optional additional filters.

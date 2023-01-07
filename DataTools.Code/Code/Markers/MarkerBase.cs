@@ -356,6 +356,30 @@ namespace DataTools.Code.Markers
             return newItem;
         }
 
+        T ICodeElement.Clone<T>()
+        {
+            var tout = new T();
+
+            ObjectMerge.MergeObjects(this, tout);
+
+            if (Attributes != null)
+            {
+                tout.Attributes = new List<string>(Attributes);
+            }
+
+            if (MethodParams != null)
+            {
+                tout.MethodParams = new List<string>(MethodParams);
+            }
+
+            if (Inheritances != null)
+            {
+                tout.Inheritances = new List<string>(Inheritances);
+            }
+
+            return tout;
+        }
+
         T IMarker.Clone<T>(bool deep)
         {
             var pis = typeof(T).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);

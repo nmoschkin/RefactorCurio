@@ -1,5 +1,7 @@
 ﻿using DataTools.Code.Markers;
 
+using System.Linq;
+
 namespace DataTools.Code.Filtering.Base
 {
     /// <summary>
@@ -20,7 +22,9 @@ namespace DataTools.Code.Filtering.Base
     /// </summary>
     /// <typeparam name="TMarker">The <see cref="IMarker"/> element type.</typeparam>
     /// <typeparam name="TList">The <see cref="IMarkerList{TMarker}"/> type.</typeparam>
-    internal abstract class MarkerFilterRule<TMarker, TList> : MarkerFilterRule where TMarker : IMarker, new() where TList : IMarkerList<TMarker>, new()
+    internal abstract class MarkerFilterRule<TMarker, TList> : MarkerFilterRule
+        where TMarker : IMarker, new()
+        where TList : IMarkerList<TMarker>, new()
     {
         /// <summary>
         /// Filter the items based on the rule rule.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -22,6 +23,14 @@ namespace DataTools.Code.Markers
         /// <param name="index"></param>
         /// <returns></returns>
         IMarker GetMarkerAt(int index);
+
+        /// <summary>
+        /// Find a marker somewhere in the specified markers and their descendants using a validation function.
+        /// </summary>
+        /// <param name="marker">The markers to scan along with their descendants.</param>
+        /// <param name="scanFunc">The validation function used to evaluate a marker for match positivity.</param>
+        /// <returns>The first marker that was evaluated as true by <paramref name="scanFunc"/>, or null if no match was found.</returns>
+        IMarker ScanMarker(IEnumerable<IMarker> markers, Func<IMarker, bool> scanFunc);
 
         /// <summary>
         /// Find a marker somewhere in the specified marker and its descendants using a validation function.
