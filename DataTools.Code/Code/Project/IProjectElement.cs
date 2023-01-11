@@ -3,7 +3,7 @@
 namespace DataTools.Code.Project
 {
     /// <summary>
-    /// Represents a basic solution element.
+    /// Represents the basis for all solution elements.
     /// </summary>
     public interface ISolutionElement
     {
@@ -19,12 +19,12 @@ namespace DataTools.Code.Project
     }
 
     /// <summary>
-    /// Represents a basic project element.
+    /// Represents the basis for all project elements.
     /// </summary>
     public interface IProjectElement : ISolutionElement
     {
         /// <summary>
-        /// Gets the parent element, if any.
+        /// Gets the parent element (if any.)
         /// </summary>
         ISolutionElement ParentElement { get; }
     }

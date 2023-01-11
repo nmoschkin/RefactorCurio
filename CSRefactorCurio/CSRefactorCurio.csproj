@@ -69,8 +69,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Build\MSBuildTool.cs" />
+    <Compile Include="Commands\IOwnedCommand.cs" />
     <Compile Include="Dialogs\ToolWindows\FilterDialog.xaml.cs">
       <DependentUpon>FilterDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ToolWindows\EmitDialog.xaml.cs">
+      <DependentUpon>EmitDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ToolWindows\TreeDataOptions.xaml.cs">
       <DependentUpon>TreeDataOptions.xaml</DependentUpon>
@@ -162,10 +166,12 @@
     <Compile Include="Validators\DirExistsValidator.cs" />
     <Compile Include="Helpers\BrushHelper.cs" />
     <Compile Include="Projects\CurioExplorerSolution.cs" />
+    <Compile Include="ViewModels\EmitVMViewModel.cs" />
     <Compile Include="ViewModels\ExplorerFilterViewModel.cs" />
     <Compile Include="ViewModels\JSConvertViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\RequestCloseEventArgs.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="VSCommandTable1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -204,6 +210,10 @@
     <Page Include="Dialogs\ToolWindows\FilterDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ToolWindows\EmitDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\ToolWindows\TreeDataOptions.xaml">
       <SubType>Designer</SubType>
@@ -264,22 +274,22 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="DataTools.Essentials">
-      <Version>8.0.0.1054</Version>
+      <Version>8.0.0.1057</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Graphics">
-      <Version>8.0.0.1054</Version>
+      <Version>8.0.0.1057</Version>
     </PackageReference>
     <PackageReference Include="DataTools.MathTools">
-      <Version>8.0.0.1054</Version>
+      <Version>8.0.0.1057</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Memory">
-      <Version>8.0.0.1054</Version>
+      <Version>8.0.0.1057</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Text">
-      <Version>8.0.0.1054</Version>
+      <Version>8.0.0.1057</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Win32.Memory">
-      <Version>8.0.0.1054</Version>
+      <Version>8.0.0.1057</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
       <Version>7.0.0</Version>

@@ -120,11 +120,20 @@
   <data name="ABORT" xml:space="preserve">
     <value>Abort</value>
   </data>
+  <data name="ADD_CHANGED_PROPERTY" xml:space="preserve">
+    <value>Add Changed Property</value>
+  </data>
   <data name="APPLY" xml:space="preserve">
     <value>Apply</value>
   </data>
   <data name="ASCENDING" xml:space="preserve">
     <value>Ascending</value>
+  </data>
+  <data name="BROWSE" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="BROWSE_ELLIPSES" xml:space="preserve">
+    <value>Browse ...</value>
   </data>
   <data name="BUILD" xml:space="preserve">
     <value>Build</value>
@@ -144,14 +153,38 @@
   <data name="CLASSES" xml:space="preserve">
     <value>Classes</value>
   </data>
+  <data name="CLEAR" xml:space="preserve">
+    <value>Clear</value>
+  </data>
   <data name="COMBINE_SELECTED_FILES" xml:space="preserve">
     <value>Combine Selected Files</value>
   </data>
   <data name="COUNT" xml:space="preserve">
     <value>Count</value>
   </data>
+  <data name="CREATE_SETTINGS_CLASS" xml:space="preserve">
+    <value>Create a Settings Class</value>
+  </data>
+  <data name="DEFAULT" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="DEFAULT_SETTINGS" xml:space="preserve">
+    <value>Default Settings</value>
+  </data>
+  <data name="DELETE" xml:space="preserve">
+    <value>Delete</value>
+  </data>
   <data name="DESCENDING" xml:space="preserve">
     <value>Descending</value>
+  </data>
+  <data name="DESTINATION_DIRECTORY" xml:space="preserve">
+    <value>Destination Directory</value>
+  </data>
+  <data name="DESTINATION_FILE" xml:space="preserve">
+    <value>Destination File</value>
+  </data>
+  <data name="DESTINATION_PATH" xml:space="preserve">
+    <value>Destination Path</value>
   </data>
   <data name="DETAILS" xml:space="preserve">
     <value>Details</value>
@@ -165,6 +198,18 @@
   <data name="DISABLED" xml:space="preserve">
     <value>Disabled</value>
   </data>
+  <data name="DISCARD" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="EMIT_TITLE" xml:space="preserve">
+    <value>Generate Code</value>
+  </data>
+  <data name="EMIT_VIEWMODEL" xml:space="preserve">
+    <value>Generate View Model</value>
+  </data>
+  <data name="EMIT_VIEWMODEL_MODE" xml:space="preserve">
+    <value>ViewModel Generation Mode</value>
+  </data>
   <data name="ENABLED" xml:space="preserve">
     <value>Enabled</value>
   </data>
@@ -176,6 +221,12 @@
   </data>
   <data name="EXPAND_LIST" xml:space="preserve">
     <value>Expand List</value>
+  </data>
+  <data name="EXPORT" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="EXPORT_SETTINGS" xml:space="preserve">
+    <value>Export Settings</value>
   </data>
   <data name="EXTRACT_SELECTED" xml:space="preserve">
     <value>Extract Selected</value>
@@ -189,11 +240,23 @@
   <data name="FILES" xml:space="preserve">
     <value>Files</value>
   </data>
+  <data name="FILTER_ITEMS" xml:space="preserve">
+    <value>Filter Items</value>
+  </data>
   <data name="FOLDER" xml:space="preserve">
     <value>Folder</value>
   </data>
   <data name="FOLDERS" xml:space="preserve">
     <value>Folders</value>
+  </data>
+  <data name="FRIEND" xml:space="preserve">
+    <value>Friend</value>
+  </data>
+  <data name="IMPORT" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="IMPORT_SETTINGS" xml:space="preserve">
+    <value>Import Settings</value>
   </data>
   <data name="INTERFACE" xml:space="preserve">
     <value>Interface</value>
@@ -201,11 +264,26 @@
   <data name="INTERFACES" xml:space="preserve">
     <value>Interfaces</value>
   </data>
+  <data name="INTERNAL" xml:space="preserve">
+    <value>Internal</value>
+  </data>
+  <data name="LOAD" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="LOAD_FILTER_PROFILE" xml:space="preserve">
+    <value>Load Filter Profile</value>
+  </data>
   <data name="MI_BUILD_SOLUTION" xml:space="preserve">
     <value>_Build Solution</value>
   </data>
   <data name="MI_MAP_DEPENDENCIES" xml:space="preserve">
     <value>_Map Dependencies</value>
+  </data>
+  <data name="MODE_INHERIT" xml:space="preserve">
+    <value>Inherit From Class</value>
+  </data>
+  <data name="MODE_SOURCE" xml:space="preserve">
+    <value>Use Source Object</value>
   </data>
   <data name="NAME" xml:space="preserve">
     <value>Name</value>
@@ -215,6 +293,9 @@
   </data>
   <data name="NAMESPACES" xml:space="preserve">
     <value>Namespaces</value>
+  </data>
+  <data name="NEW_CLASS_NAME" xml:space="preserve">
+    <value>New Class Name</value>
   </data>
   <data name="NEW_FILES_HERE" xml:space="preserve">
     <value>New Files Here</value>
@@ -252,11 +333,23 @@
   <data name="OPEN_OBJECT_IN_CODE" xml:space="preserve">
     <value>Open Object In Code</value>
   </data>
+  <data name="PRIVATE" xml:space="preserve">
+    <value>Private</value>
+  </data>
   <data name="PROCEED_CONFIRM" xml:space="preserve">
     <value>Do you wish to proceed?</value>
   </data>
   <data name="PROJECT" xml:space="preserve">
     <value>Project</value>
+  </data>
+  <data name="PROTECTED" xml:space="preserve">
+    <value>Protected</value>
+  </data>
+  <data name="PUBLIC" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="PUBLIC_PROPERTIES" xml:space="preserve">
+    <value>Public Properties</value>
   </data>
   <data name="RECORD" xml:space="preserve">
     <value>Record</value>
@@ -269,6 +362,9 @@
   </data>
   <data name="RELOAD" xml:space="preserve">
     <value>Reload</value>
+  </data>
+  <data name="REMOVE" xml:space="preserve">
+    <value>Remove</value>
   </data>
   <data name="REORDER_ITEMS" xml:space="preserve">
     <value>Reorder Items</value>
@@ -306,14 +402,38 @@
   <data name="RETRY" xml:space="preserve">
     <value>Retry</value>
   </data>
+  <data name="REVERT" xml:space="preserve">
+    <value>Revert</value>
+  </data>
   <data name="RUN_SELECTED_REPORT" xml:space="preserve">
     <value>Run Selected Report</value>
+  </data>
+  <data name="SAVE" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SAVE_AS" xml:space="preserve">
+    <value>Save As</value>
+  </data>
+  <data name="SAVE_AS_NEW_FILTER_PROFILE" xml:space="preserve">
+    <value>Save As New Filter Profile</value>
+  </data>
+  <data name="SAVE_FILTER_PROFILE" xml:space="preserve">
+    <value>Save Filter Profile</value>
   </data>
   <data name="SCAN" xml:space="preserve">
     <value>Scan</value>
   </data>
   <data name="SCAN_NOW" xml:space="preserve">
     <value>Scan Now</value>
+  </data>
+  <data name="SELECT_MEMBERS_TO_INCLUDE" xml:space="preserve">
+    <value>Select Members To Include</value>
+  </data>
+  <data name="SET_AS_DEFAULT" xml:space="preserve">
+    <value>Set As Default</value>
+  </data>
+  <data name="SHARE_SETTINGS" xml:space="preserve">
+    <value>Share Settings</value>
   </data>
   <data name="SOLUTION" xml:space="preserve">
     <value>Solution</value>

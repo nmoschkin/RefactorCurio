@@ -1,6 +1,5 @@
 ﻿using DataTools.Code.JS;
 using DataTools.CSTools;
-using DataTools.Essentials.Observable;
 
 using System;
 using System.Collections.Generic;
@@ -11,10 +10,8 @@ using System.Windows.Forms;
 
 namespace CSRefactorCurio.ViewModels
 {
-    internal class JSConvertViewModel : ObservableBase, ICommandOwner
+    internal class JSConvertViewModel : ViewModelBase
     {
-        public event EventHandler<RequestCloseEventArgs> RequestClose;
-
         private string lastcn = "";
 
         private CSJsonClassGenerator generator;
@@ -26,16 +23,7 @@ namespace CSRefactorCurio.ViewModels
         private ObservableCollection<string> ns = new ObservableCollection<string>();
         private ObservableCollection<CurioProject> projects = new ObservableCollection<CurioProject>();
 
-        private IOwnedCommand okCommand;
-        private IOwnedCommand cancelCommand;
-        private IOwnedCommand resetCommand;
         private IOwnedCommand browseCommand;
-
-        public IOwnedCommand OKCommand => okCommand;
-
-        public IOwnedCommand CancelCommand => cancelCommand;
-
-        public IOwnedCommand ResetCommand => resetCommand;
 
         public IOwnedCommand BrowseCommand => browseCommand;
 
@@ -96,26 +84,12 @@ namespace CSRefactorCurio.ViewModels
             }
         }
 
-        public JSConvertViewModel()
+        public JSConvertViewModel() : base(true, true, true, false)
         {
             foreach (var p in CSRefactorCurioPackage.Instance.CurioSolution.Projects)
             {
                 projects.Add((CurioProject)p);
             }
-
-            okCommand = new OwnedCommand(this, (o) =>
-            {
-                RequestClose?.Invoke(this, new RequestCloseEventArgs(true));
-            }, nameof(OKCommand));
-
-            cancelCommand = new OwnedCommand(this, (o) =>
-            {
-                RequestClose?.Invoke(this, new RequestCloseEventArgs(true));
-            }, nameof(CancelCommand));
-
-            resetCommand = new OwnedCommand(this, (o) =>
-            {
-            }, nameof(ResetCommand));
 
             browseCommand = new OwnedCommand(this, (o) =>
             {
@@ -129,6 +103,8 @@ namespace CSRefactorCurio.ViewModels
                     Directory = dlg.SelectedPath;
                 }
             }, nameof(BrowseCommand));
+
+            AutoRegisterCommands(this);
         }
 
         public JSConvertViewModel(CurioProject project) : this()
@@ -206,7 +182,7 @@ namespace CSRefactorCurio.ViewModels
             }
         }
 
-        public bool RequestCanExecute(string commandId)
+        public override bool RequestCanExecute(string commandId)
         {
             if (commandId == nameof(OKCommand))
             {

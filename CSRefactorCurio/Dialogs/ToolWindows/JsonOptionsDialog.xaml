@@ -17,27 +17,21 @@
     d:DesignWidth="600"
     toolkit:Themes.UseVsTheme="True"
     mc:Ignorable="d">
-    <Grid
-        Background="Transparent">
+    <Grid Background="Transparent">
 
         <Grid.Resources>
             <conv:BoolConverter
                 x:Key="visConv"
                 Mode="Visibility" />
-            <helpers:EnumListConverter
-                x:Key="enumConv" />
+            <helpers:EnumListConverter x:Key="enumConv" />
         </Grid.Resources>
 
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBox
@@ -56,8 +50,7 @@
             Content="Generate Time Conversion Classes"
             IsChecked="{Binding Generator.GenerateTimeConverter, Mode=TwoWay}" />
 
-        <Grid
-            Grid.Row="2">
+        <Grid Grid.Row="2">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -70,8 +63,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Orientation="Vertical">
-                <Label
-                    Content="Floating Point Type:" />
+                <Label Content="Floating Point Type:" />
                 <ComboBox
                     Margin="8"
                     ItemsSource="{helpers:EnumList Type={x:Type js:FPType}}"
@@ -83,8 +75,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Orientation="Vertical">
-                <Label
-                    Content="Integer Type:" />
+                <Label Content="Integer Type:" />
                 <ComboBox
                     Margin="8"
                     ItemsSource="{helpers:EnumList Type={x:Type js:IntType}}"
@@ -96,8 +87,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Orientation="Vertical">
-                <Label
-                    Content="Indeterminate Type:" />
+                <Label Content="Indeterminate Type:" />
                 <ComboBox
                     Margin="8"
                     ItemsSource="{helpers:EnumList Type={x:Type js:IndeterminateType}}"
@@ -120,11 +110,9 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <Label
@@ -153,6 +141,7 @@
             <ComboBox
                 Grid.Row="1"
                 Grid.Column="1"
+                Grid.ColumnSpan="2"
                 Margin="4,4,0,4"
                 HorizontalAlignment="Stretch"
                 IsEditable="True"
@@ -226,18 +215,14 @@
                 Content="..." />
         </Grid>
 
-        <Grid
-            Grid.Row="4">
+        <Grid Grid.Row="4">
 
             <Grid.ColumnDefinitions>
 
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
-                <ColumnDefinition
-                    Width="Auto" />
-                <ColumnDefinition
-                    Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <Button

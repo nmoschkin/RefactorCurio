@@ -1,10 +1,10 @@
 ﻿using CSRefactorCurio.Dialogs;
 using CSRefactorCurio.Reporting;
+using CSRefactorCurio.ViewModels;
 
 using DataTools.Code.CS.Filtering;
 using DataTools.Code.Project;
 using DataTools.CSTools;
-using DataTools.Essentials.Observable;
 
 using EnvDTE80;
 
@@ -22,7 +22,7 @@ namespace CSRefactorCurio.Projects
     /// <summary>
     /// The heart of the Curio Refactor Studio Solution
     /// </summary>
-    internal class CurioExplorerSolution : ObservableBase, ICommandOwner, ISolution
+    internal class CurioExplorerSolution : ViewModelBase, ISolution
     {
         private EnvDTE.Solution _sln;
         private int classMode = 0;
@@ -43,7 +43,7 @@ namespace CSRefactorCurio.Projects
         /// <summary>
         /// Create a new Curio Solution
         /// </summary>
-        public CurioExplorerSolution()
+        public CurioExplorerSolution() : base(false, false, false, false)
         {
             classModes = new List<ObservableCollection<IProjectElement>>()
             {
@@ -107,6 +107,8 @@ namespace CSRefactorCurio.Projects
             }, nameof(ClickFilter));
 
             isActive[classMode] = true;
+
+            AutoRegisterCommands(this);
         }
 
         /// <summary>
@@ -304,7 +306,7 @@ namespace CSRefactorCurio.Projects
 
         public ElementType ElementType => ElementType.Solution;
 
-        public string Title => Path.GetFileNameWithoutExtension(Solution?.FullName ?? "");
+        public override string Title => Path.GetFileNameWithoutExtension(Solution?.FullName ?? "");
 
         /// <summary>
         /// Clear the current solution.

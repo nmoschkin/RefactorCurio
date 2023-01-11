@@ -1,0 +1,94 @@
+﻿<platform:DialogWindow
+    x:Class="CSRefactorCurio.Dialogs.EmitDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
+    xmlns:glob="clr-namespace:CSRefactorCurio.Globalization"
+    xmlns:helpers="clr-namespace:CSRefactorCurio.Helpers"
+    xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    Title="{glob:Translate ResourceKey=EMIT_VIEWMODEL}"
+    Width="600"
+    Height="500"
+    d:DesignHeight="500"
+    d:DesignWidth="600"
+    toolkit:Themes.UseVsTheme="True"
+    mc:Ignorable="d">
+    <platform:DialogWindow.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+    </platform:DialogWindow.Resources>
+
+    <Grid Background="Transparent">
+
+        <Grid.Resources>
+            <conv:BoolConverter
+                x:Key="visConv"
+                Mode="Visibility" />
+            <helpers:EnumListConverter x:Key="enumConv" />
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+
+            <Label Content="{glob:Translate ResourceKey=NEW_CLASS_NAME, AddColon=True}" />
+
+            <TextBox Margin="16,4" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <Label Content="{glob:Translate ResourceKey=EMIT_VIEWMODEL_MODE, AddColon=True}" />
+
+            <RadioButton
+                Margin="16,4"
+                Content="{glob:Translate ResourceKey=MODE_INHERIT}"
+                GroupName="VIEWMODEL_MODE" />
+
+            <RadioButton
+                Margin="16,4"
+                Content="{glob:Translate ResourceKey=MODE_SOURCE}"
+                GroupName="VIEWMODEL_MODE" />
+        </StackPanel>
+
+        <Grid Grid.Row="4">
+
+            <Grid.ColumnDefinitions>
+
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.Column="0"
+                Margin="8"
+                Command="{Binding ResetCommand}"
+                Content="{glob:Translate ResourceKey=RESET}" />
+
+            <Button
+                Grid.Column="2"
+                Margin="8"
+                Command="{Binding CancelCommand}"
+                Content="{glob:Translate ResourceKey=CANCEL}" />
+
+            <Button
+                Grid.Column="3"
+                Margin="8"
+                Command="{Binding OKCommand}"
+                Content="{glob:Translate ResourceKey=OK}" />
+        </Grid>
+    </Grid>
+</platform:DialogWindow>

@@ -1,0 +1,213 @@
+﻿using CSRefactorCurio.Globalization.Resources;
+
+using DataTools.Code.Markers;
+using DataTools.CSTools;
+using DataTools.Essentials.Observable;
+
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Text;
+
+namespace CSRefactorCurio.ViewModels
+{
+    public enum EmitViewModelMode
+    {
+        Inherit,
+        Source
+    }
+
+    internal class EmitVMViewModel : ViewModelBase
+    {
+        private EmitViewModelMode mode;
+        private ObservableCollection<BoolMarker> methods = new ObservableCollection<BoolMarker>();
+        private ObservableCollection<BoolMarker> properties = new ObservableCollection<BoolMarker>();
+
+        private string newFilename;
+
+        private bool insertIntoCurrent;
+
+        private CSMarker sourceClass;
+        private string className;
+        private bool cloneAvailable;
+
+        /// <summary>
+        /// Wrapper class for marker selection
+        /// </summary>
+        internal class BoolMarker : ObservableBase
+        {
+            private CSMarker marker;
+            private bool selected;
+
+            public BoolMarker(CSMarker marker)
+            {
+                this.marker = marker;
+            }
+
+            public string Title => marker.Name;
+
+            public CSMarker Marker => marker;
+
+            public bool IsSelected
+            {
+                get => selected;
+                set
+                {
+                    SetProperty(ref selected, value);
+                }
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            methods.CollectionChanged -= OnMethodCollectionChanged;
+            properties.CollectionChanged -= OnPropertyCollectionChanged;
+
+            methods.Clear();
+            properties.Clear();
+
+            base.Dispose(disposing);
+        }
+
+        public EmitVMViewModel(CSMarker sourceClass) : base(true, true, true, false)
+        {
+            if (sourceClass.Kind != MarkerKind.Class) throw new ArgumentException("Source Marker Must Be A Class");
+
+            this.sourceClass = sourceClass;
+
+            methods.CollectionChanged += OnMethodCollectionChanged;
+            properties.CollectionChanged += OnPropertyCollectionChanged;
+
+            className = sourceClass.Name + "ViewModel";
+
+            if (sourceClass.HomeFile?.Filename is string s)
+            {
+                newFilename = Path.Combine(Path.GetDirectoryName(s), className + ".cs");
+            }
+
+            var mtd = sourceClass.Children.Where(c => c.Kind == MarkerKind.Method && c.AccessModifiers == DataTools.Code.AccessModifiers.Public).ToList();
+            var prp = sourceClass.Children.Where(c => c.Kind == MarkerKind.Property && c.AccessModifiers == DataTools.Code.AccessModifiers.Public).ToList();
+
+            prp = prp.Where(p => p.Children.Count(pc => pc.Name == "set") > 0).ToList();
+
+            foreach (var m in mtd)
+            {
+                methods.Add(new BoolMarker(m));
+            }
+
+            foreach (var p in prp)
+            {
+                properties.Add(new BoolMarker(p));
+            }
+
+            OnPropertyChanged(nameof(Title));
+            AutoRegisterCommands(this);
+        }
+
+        private void OnPropertyCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Changed = true;
+        }
+
+        private void OnMethodCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Changed = true;
+        }
+
+        public CSMarker SourceClass => sourceClass;
+
+        public override string Title
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                if (Changed)
+                {
+                    sb.Append("* ");
+                }
+
+                sb.Append(AppResources.EMIT_VIEWMODEL);
+
+                if (!string.IsNullOrEmpty(className))
+                {
+                    sb.Append($" ({className})");
+                }
+
+                return sb.ToString();
+            }
+        }
+
+        public string ClassName
+        {
+            get => className;
+            set
+            {
+                if (SetProperty(ref className, value))
+                {
+                    Changed = true;
+                }
+            }
+        }
+
+        public bool InsertIntoCurrent
+        {
+            get => insertIntoCurrent;
+            set
+            {
+                if (SetProperty(ref insertIntoCurrent, value))
+                {
+                    Changed = true;
+                }
+            }
+        }
+
+        public string NewFilename
+        {
+            get => newFilename;
+            set
+            {
+                if (SetProperty(ref newFilename, value))
+                {
+                    Changed = true;
+                }
+            }
+        }
+
+        public EmitViewModelMode Mode
+        {
+            get => mode;
+            set
+            {
+                if (SetProperty(ref mode, value))
+                {
+                    Changed = true;
+                }
+            }
+        }
+
+        public ObservableCollection<BoolMarker> Methods
+        {
+            get => methods;
+            set
+            {
+                if (SetProperty(ref methods, value))
+                {
+                    Changed = true;
+                }
+            }
+        }
+
+        public ObservableCollection<BoolMarker> Properties
+        {
+            get => properties;
+            set
+            {
+                if (SetProperty(ref properties, value))
+                {
+                    Changed = true;
+                }
+            }
+        }
+    }
+}

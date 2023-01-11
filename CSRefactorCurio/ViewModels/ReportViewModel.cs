@@ -4,15 +4,16 @@ using CSRefactorCurio.Reporting;
 
 using DataTools.Code.Project;
 using DataTools.Code.Reporting;
-using DataTools.Essentials.Observable;
 
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace CSRefactorCurio.ViewModels
 {
-    internal class ReportViewModel : ObservableBase, ICommandOwner
+    internal class ReportViewModel : ViewModelBase
     {
+        public virtual event EventHandler<RequestCloseEventArgs> RequestClose;
+
         private ISolution solution;
 
         public string[] ReportTypes { get; }
@@ -36,7 +37,7 @@ namespace CSRefactorCurio.ViewModels
             }
         }
 
-        public ReportViewModel(ISolution solution)
+        public ReportViewModel(ISolution solution) : base(false, false, false, false)
         {
             ReportTypes = new string[] { AppResources.REPORT_MOST_INTERDEPENDENT, AppResources.REPORT_MOST_REFERENCED_OBJECTS, AppResources.REPORT_MOST_SPREAD_OUT };
             this.solution = solution;
@@ -48,6 +49,8 @@ namespace CSRefactorCurio.ViewModels
                 var b = solution.Namespaces.Where(o => o is INamespace).Select(o => o as INamespace).ToList();
                 SelectedReport.CompileReport(b);
             }, nameof(RunReportCommand));
+
+            AutoRegisterCommands(this);
         }
 
         public ReportViewModel() : this(CSRefactorCurioPackage.Instance.CurioSolution)

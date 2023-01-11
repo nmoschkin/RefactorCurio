@@ -70,6 +70,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Changed Property.
+        /// </summary>
+        internal static string ADD_CHANGED_PROPERTY {
+            get {
+                return ResourceManager.GetString("ADD_CHANGED_PROPERTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apply.
         /// </summary>
         internal static string APPLY {
@@ -84,6 +93,24 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string ASCENDING {
             get {
                 return ResourceManager.GetString("ASCENDING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse.
+        /// </summary>
+        internal static string BROWSE {
+            get {
+                return ResourceManager.GetString("BROWSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse ....
+        /// </summary>
+        internal static string BROWSE_ELLIPSES {
+            get {
+                return ResourceManager.GetString("BROWSE_ELLIPSES", resourceCulture);
             }
         }
         
@@ -142,6 +169,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        internal static string CLEAR {
+            get {
+                return ResourceManager.GetString("CLEAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Combine Selected Files.
         /// </summary>
         internal static string COMBINE_SELECTED_FILES {
@@ -160,11 +196,74 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create a Settings Class.
+        /// </summary>
+        internal static string CREATE_SETTINGS_CLASS {
+            get {
+                return ResourceManager.GetString("CREATE_SETTINGS_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string DEFAULT {
+            get {
+                return ResourceManager.GetString("DEFAULT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default Settings.
+        /// </summary>
+        internal static string DEFAULT_SETTINGS {
+            get {
+                return ResourceManager.GetString("DEFAULT_SETTINGS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        internal static string DELETE {
+            get {
+                return ResourceManager.GetString("DELETE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Descending.
         /// </summary>
         internal static string DESCENDING {
             get {
                 return ResourceManager.GetString("DESCENDING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination Directory.
+        /// </summary>
+        internal static string DESTINATION_DIRECTORY {
+            get {
+                return ResourceManager.GetString("DESTINATION_DIRECTORY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination File.
+        /// </summary>
+        internal static string DESTINATION_FILE {
+            get {
+                return ResourceManager.GetString("DESTINATION_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination Path.
+        /// </summary>
+        internal static string DESTINATION_PATH {
+            get {
+                return ResourceManager.GetString("DESTINATION_PATH", resourceCulture);
             }
         }
         
@@ -205,6 +304,42 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Discard.
+        /// </summary>
+        internal static string DISCARD {
+            get {
+                return ResourceManager.GetString("DISCARD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate Code.
+        /// </summary>
+        internal static string EMIT_TITLE {
+            get {
+                return ResourceManager.GetString("EMIT_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate View Model.
+        /// </summary>
+        internal static string EMIT_VIEWMODEL {
+            get {
+                return ResourceManager.GetString("EMIT_VIEWMODEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ViewModel Generation Mode.
+        /// </summary>
+        internal static string EMIT_VIEWMODEL_MODE {
+            get {
+                return ResourceManager.GetString("EMIT_VIEWMODEL_MODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         internal static string ENABLED {
@@ -237,6 +372,24 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string EXPAND_LIST {
             get {
                 return ResourceManager.GetString("EXPAND_LIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export.
+        /// </summary>
+        internal static string EXPORT {
+            get {
+                return ResourceManager.GetString("EXPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Settings.
+        /// </summary>
+        internal static string EXPORT_SETTINGS {
+            get {
+                return ResourceManager.GetString("EXPORT_SETTINGS", resourceCulture);
             }
         }
         
@@ -277,6 +430,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filter Items.
+        /// </summary>
+        internal static string FILTER_ITEMS {
+            get {
+                return ResourceManager.GetString("FILTER_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Folder.
         /// </summary>
         internal static string FOLDER {
@@ -291,6 +453,33 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string FOLDERS {
             get {
                 return ResourceManager.GetString("FOLDERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Friend.
+        /// </summary>
+        internal static string FRIEND {
+            get {
+                return ResourceManager.GetString("FRIEND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import.
+        /// </summary>
+        internal static string IMPORT {
+            get {
+                return ResourceManager.GetString("IMPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import Settings.
+        /// </summary>
+        internal static string IMPORT_SETTINGS {
+            get {
+                return ResourceManager.GetString("IMPORT_SETTINGS", resourceCulture);
             }
         }
         
@@ -313,6 +502,33 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal.
+        /// </summary>
+        internal static string INTERNAL {
+            get {
+                return ResourceManager.GetString("INTERNAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load.
+        /// </summary>
+        internal static string LOAD {
+            get {
+                return ResourceManager.GetString("LOAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load Filter Profile.
+        /// </summary>
+        internal static string LOAD_FILTER_PROFILE {
+            get {
+                return ResourceManager.GetString("LOAD_FILTER_PROFILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Build Solution.
         /// </summary>
         internal static string MI_BUILD_SOLUTION {
@@ -327,6 +543,24 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string MI_MAP_DEPENDENCIES {
             get {
                 return ResourceManager.GetString("MI_MAP_DEPENDENCIES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inherit From Class.
+        /// </summary>
+        internal static string MODE_INHERIT {
+            get {
+                return ResourceManager.GetString("MODE_INHERIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Source Object.
+        /// </summary>
+        internal static string MODE_SOURCE {
+            get {
+                return ResourceManager.GetString("MODE_SOURCE", resourceCulture);
             }
         }
         
@@ -354,6 +588,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string NAMESPACES {
             get {
                 return ResourceManager.GetString("NAMESPACES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Class Name.
+        /// </summary>
+        internal static string NEW_CLASS_NAME {
+            get {
+                return ResourceManager.GetString("NEW_CLASS_NAME", resourceCulture);
             }
         }
         
@@ -466,6 +709,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Private.
+        /// </summary>
+        internal static string PRIVATE {
+            get {
+                return ResourceManager.GetString("PRIVATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you wish to proceed?.
         /// </summary>
         internal static string PROCEED_CONFIRM {
@@ -480,6 +732,33 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string PROJECT {
             get {
                 return ResourceManager.GetString("PROJECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Protected.
+        /// </summary>
+        internal static string PROTECTED {
+            get {
+                return ResourceManager.GetString("PROTECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Public.
+        /// </summary>
+        internal static string PUBLIC {
+            get {
+                return ResourceManager.GetString("PUBLIC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Public Properties.
+        /// </summary>
+        internal static string PUBLIC_PROPERTIES {
+            get {
+                return ResourceManager.GetString("PUBLIC_PROPERTIES", resourceCulture);
             }
         }
         
@@ -516,6 +795,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string RELOAD {
             get {
                 return ResourceManager.GetString("RELOAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string REMOVE {
+            get {
+                return ResourceManager.GetString("REMOVE", resourceCulture);
             }
         }
         
@@ -628,11 +916,56 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Revert.
+        /// </summary>
+        internal static string REVERT {
+            get {
+                return ResourceManager.GetString("REVERT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Run Selected Report.
         /// </summary>
         internal static string RUN_SELECTED_REPORT {
             get {
                 return ResourceManager.GetString("RUN_SELECTED_REPORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string SAVE {
+            get {
+                return ResourceManager.GetString("SAVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save As.
+        /// </summary>
+        internal static string SAVE_AS {
+            get {
+                return ResourceManager.GetString("SAVE_AS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save As New Filter Profile.
+        /// </summary>
+        internal static string SAVE_AS_NEW_FILTER_PROFILE {
+            get {
+                return ResourceManager.GetString("SAVE_AS_NEW_FILTER_PROFILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save Filter Profile.
+        /// </summary>
+        internal static string SAVE_FILTER_PROFILE {
+            get {
+                return ResourceManager.GetString("SAVE_FILTER_PROFILE", resourceCulture);
             }
         }
         
@@ -651,6 +984,33 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string SCAN_NOW {
             get {
                 return ResourceManager.GetString("SCAN_NOW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Members To Include.
+        /// </summary>
+        internal static string SELECT_MEMBERS_TO_INCLUDE {
+            get {
+                return ResourceManager.GetString("SELECT_MEMBERS_TO_INCLUDE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set As Default.
+        /// </summary>
+        internal static string SET_AS_DEFAULT {
+            get {
+                return ResourceManager.GetString("SET_AS_DEFAULT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Share Settings.
+        /// </summary>
+        internal static string SHARE_SETTINGS {
+            get {
+                return ResourceManager.GetString("SHARE_SETTINGS", resourceCulture);
             }
         }
         
