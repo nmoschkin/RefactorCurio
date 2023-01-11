@@ -448,6 +448,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open Filter Dialog.
+        /// </summary>
+        internal static string OPEN_FILTER_DIALOG {
+            get {
+                return ResourceManager.GetString("OPEN_FILTER_DIALOG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Object In Code.
         /// </summary>
         internal static string OPEN_OBJECT_IN_CODE {

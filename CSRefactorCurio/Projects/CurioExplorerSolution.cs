@@ -1,7 +1,7 @@
 ﻿using CSRefactorCurio.Dialogs;
 using CSRefactorCurio.Reporting;
-using CSRefactorCurio.ViewModels;
 
+using DataTools.Code.CS.Filtering;
 using DataTools.Code.Project;
 using DataTools.CSTools;
 using DataTools.Essentials.Observable;
@@ -38,7 +38,7 @@ namespace CSRefactorCurio.Projects
         private IOwnedCommand reportCommand;
         private object selectedItem;
         private IOwnedCommand splitFileCommand;
-        private ExplorerFilterViewModel filterOptions = new ExplorerFilterViewModel();
+        private CodeFilterOptions filterOptions = new CodeFilterOptions();
 
         /// <summary>
         /// Create a new Curio Solution
@@ -102,7 +102,8 @@ namespace CSRefactorCurio.Projects
 
             clickFilter = new OwnedCommand(this, (o) =>
             {
-                var dlg = new TreeDataOptions(filterOptions);
+                var dlg = new FilterDialog(filterOptions);
+                dlg.ShowDialog();
             }, nameof(ClickFilter));
 
             isActive[classMode] = true;

@@ -246,6 +246,9 @@
   <data name="ONE_OBJECT" xml:space="preserve">
     <value>(1 Object)</value>
   </data>
+  <data name="OPEN_FILTER_DIALOG" xml:space="preserve">
+    <value>Open Filter Dialog</value>
+  </data>
   <data name="OPEN_OBJECT_IN_CODE" xml:space="preserve">
     <value>Open Object In Code</value>
   </data>

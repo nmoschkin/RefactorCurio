@@ -11,8 +11,24 @@ namespace Experiments
 {
     internal class Program
     {
+        [STAThread]
         private static void Main(string[] args)
         {
+            var testr = "🂢";
+
+            foreach (var che in testr)
+            {
+                if (char.IsHighSurrogate(che)) Console.WriteLine($"High Surrogate {((int)che):x2} {che}");
+                if (char.IsLowSurrogate(che)) Console.WriteLine($"Low Surrogate {((int)che):x2} {che}");
+            }
+
+            var ba = Encoding.UTF8.GetBytes(testr);
+
+            if (char.IsSurrogatePair(testr, 0))
+            {
+                Console.WriteLine("bingo");
+            }
+
             //var path = @"E:\Projects\Personal Projects\Repos\DataTools\Win32\DataTools.Win32.Memory\VirtualMemPtr.cs";
 
             //var tool = new MSBuildTool();

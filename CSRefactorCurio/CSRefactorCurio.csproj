@@ -69,8 +69,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Build\MSBuildTool.cs" />
+    <Compile Include="Dialogs\ToolWindows\FilterDialog.xaml.cs">
+      <DependentUpon>FilterDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ToolWindows\TreeDataOptions.xaml.cs">
       <DependentUpon>TreeDataOptions.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Globalization\Resources\CodeResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CodeResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ReferenceFinder.cs" />
     <Compile Include="Options\FilterOptions.cs" />
@@ -193,6 +201,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\ToolWindows\FilterDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\ToolWindows\TreeDataOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -252,22 +264,22 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="DataTools.Essentials">
-      <Version>8.0.0.1052</Version>
+      <Version>8.0.0.1054</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Graphics">
-      <Version>8.0.0.1052</Version>
+      <Version>8.0.0.1054</Version>
     </PackageReference>
     <PackageReference Include="DataTools.MathTools">
-      <Version>8.0.0.1052</Version>
+      <Version>8.0.0.1054</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Memory">
-      <Version>8.0.0.1052</Version>
+      <Version>8.0.0.1054</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Text">
-      <Version>8.0.0.1052</Version>
+      <Version>8.0.0.1054</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Win32.Memory">
-      <Version>8.0.0.1052</Version>
+      <Version>8.0.0.1054</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
       <Version>7.0.0</Version>
@@ -293,6 +305,10 @@
     <EmbeddedResource Include="Globalization\Resources\AppResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Globalization\Resources\CodeResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CodeResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -18,10 +18,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
-                <ResourceDictionary
-                    Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
                 <ResourceDictionary>
 
                     <ContextMenu
@@ -32,8 +30,7 @@
                             <ResourceDictionary>
                                 <ResourceDictionary.MergedDictionaries>
                                     <ResourceDictionary>
-                                        <Style
-                                            TargetType="ItemsControl">
+                                        <Style TargetType="ItemsControl">
                                             <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ButtonFaceKey}}" />
                                             <Setter Property="BorderThickness" Value="1" />
                                             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsBrushes.ActiveBorderKey}}" />
@@ -42,8 +39,7 @@
                                             <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
                                         </Style>
                                     </ResourceDictionary>
-                                    <ResourceDictionary
-                                        Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
+                                    <ResourceDictionary Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
                                 </ResourceDictionary.MergedDictionaries>
                             </ResourceDictionary>
                         </ContextMenu.Resources>
@@ -90,17 +86,28 @@
                                         Moniker="{x:Static catalog:KnownMonikers.ElementSeparator}" />
                                 </MenuItem.Icon>
                             </MenuItem>
+
+                            <MenuItem
+                                toolkit:Themes.UseVsTheme="True"
+                                Command="{Binding ClickFilter}"
+                                Header="{glob:Translate ResourceKey=OPEN_FILTER_DIALOG}">
+                                <MenuItem.Icon>
+                                    <imaging:CrispImage
+                                        Width="16"
+                                        Height="16"
+                                        Margin="4"
+                                        Moniker="{x:Static catalog:KnownMonikers.ElementSeparator}" />
+                                </MenuItem.Icon>
+                            </MenuItem>
                         </ContextMenu.Items>
                     </ContextMenu>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid
-        Cursor="{Binding Cursor}">
+    <Grid Cursor="{Binding Cursor}">
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <ToolBarTray
@@ -119,8 +126,7 @@
                 ToolBar.OverflowMode="AsNeeded"
                 ToolBarTray.IsLocked="True">
                 <ToolBar.Resources>
-                    <conv:SelectionGroupConverter
-                        x:Key="selConv" />
+                    <conv:SelectionGroupConverter x:Key="selConv" />
                     <!--<Style TargetType="ToggleButton">
                     <Setter Property="Background" Value="Transparent" />
                 </Style>-->
