@@ -8,8 +8,9 @@
     xmlns:conv="clr-namespace:CSRefactorCurio.Converters"
     xmlns:glob="clr-namespace:CSRefactorCurio.Globalization"
     xmlns:helpers="clr-namespace:CSRefactorCurio.Helpers"
+    xmlns:vm="clr-namespace:CSRefactorCurio.ViewModels"
     xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
-    Title="{glob:Translate ResourceKey=EMIT_VIEWMODEL}"
+    Title="{Binding Title}"
     Width="600"
     Height="500"
     d:DesignHeight="500"
@@ -22,6 +23,20 @@
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="14" />
         </Style>
+
+        <DataTemplate
+            x:Key="MemberTemplate"
+            DataType="{x:Type vm:BoolMarker}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Content="{Binding IsSelected}" />
+                <Label Content="{Binding Marker.Name}" />
+            </Grid>
+        </DataTemplate>
     </platform:DialogWindow.Resources>
 
     <Grid Background="Transparent">
@@ -36,7 +51,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -62,6 +77,34 @@
                 GroupName="VIEWMODEL_MODE" />
         </StackPanel>
 
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="{glob:Translate ResourceKey=PUBLIC_PROPERTIES, AddColon=True}" />
+            <ListView
+                Grid.Row="1"
+                Margin="8"
+                ItemTemplate="{StaticResource MemberTemplate}"
+                ItemsSource="{Binding Properties}" />
+
+            <Label
+                Grid.Column="1"
+                Content="{glob:Translate ResourceKey=PUBLIC_METHODS,
+                                         AddColon=True}" />
+            <ListView
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="8"
+                ItemTemplate="{StaticResource MemberTemplate}"
+                ItemsSource="{Binding Methods}" />
+        </Grid>
         <Grid Grid.Row="4">
 
             <Grid.ColumnDefinitions>

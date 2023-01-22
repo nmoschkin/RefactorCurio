@@ -9,6 +9,7 @@ global using Task = System.Threading.Tasks.Task;
 
 using CSRefactorCurio.Options;
 using CSRefactorCurio.Projects;
+using CSRefactorCurio.ViewModels;
 
 using Microsoft.VisualStudio.PlatformUI;
 
@@ -92,13 +93,14 @@ namespace CSRefactorCurio
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            CurioSolution = new CurioExplorerSolution();
             Instance = this;
 
             await this.RegisterCommandsAsync();
             this.RegisterToolWindows();
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            ViewModelBase.Initialize();
+            CurioSolution = new CurioExplorerSolution();
 
             EnvDTE.DTE dte = (EnvDTE.DTE)await GetServiceAsync(typeof(EnvDTE.DTE));
 

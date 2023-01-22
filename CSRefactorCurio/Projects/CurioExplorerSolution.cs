@@ -32,6 +32,7 @@ namespace CSRefactorCurio.Projects
         private IOwnedCommand clickNamespace;
         private IOwnedCommand clickProject;
         private IOwnedCommand clickFilter;
+        private IOwnedCommand clickViewModel;
         private Cursor cursor = Cursors.Arrow;
         private bool[] isActive = new bool[3];
         private Dictionary<string, CSNamespace> namespacesMap = new Dictionary<string, CSNamespace>();
@@ -106,6 +107,15 @@ namespace CSRefactorCurio.Projects
                 dlg.ShowDialog();
             }, nameof(ClickFilter));
 
+            clickViewModel = new OwnedCommand(this, (o) =>
+            {
+                if (SelectedItem is CSMarker cs && cs.Kind == DataTools.Code.Markers.MarkerKind.Class)
+                {
+                    var dlg = new EmitDialog(cs);
+                    dlg.ShowDialog();
+                }
+            });
+
             isActive[classMode] = true;
 
             AutoRegisterCommands(this);
@@ -167,6 +177,8 @@ namespace CSRefactorCurio.Projects
         public IOwnedCommand ClickProject => clickProject;
 
         public IOwnedCommand ClickFilter => clickFilter;
+
+        public IOwnedCommand ClickViewModel => clickViewModel;
 
         /// <summary>
         /// Gets the current view items.

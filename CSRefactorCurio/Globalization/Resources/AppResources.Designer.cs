@@ -754,6 +754,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Public Methods.
+        /// </summary>
+        internal static string PUBLIC_METHODS {
+            get {
+                return ResourceManager.GetString("PUBLIC_METHODS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Public Properties.
         /// </summary>
         internal static string PUBLIC_PROPERTIES {

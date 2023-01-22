@@ -18,6 +18,33 @@ namespace CSRefactorCurio.ViewModels
         Source
     }
 
+    /// <summary>
+    /// Wrapper class for marker selection
+    /// </summary>
+    internal class BoolMarker : ObservableBase
+    {
+        private CSMarker marker;
+        private bool selected;
+
+        public BoolMarker(CSMarker marker)
+        {
+            this.marker = marker;
+        }
+
+        public string Title => marker.Name;
+
+        public CSMarker Marker => marker;
+
+        public bool IsSelected
+        {
+            get => selected;
+            set
+            {
+                SetProperty(ref selected, value);
+            }
+        }
+    }
+
     internal class EmitVMViewModel : ViewModelBase
     {
         private EmitViewModelMode mode;
@@ -32,40 +59,16 @@ namespace CSRefactorCurio.ViewModels
         private string className;
         private bool cloneAvailable;
 
-        /// <summary>
-        /// Wrapper class for marker selection
-        /// </summary>
-        internal class BoolMarker : ObservableBase
-        {
-            private CSMarker marker;
-            private bool selected;
-
-            public BoolMarker(CSMarker marker)
-            {
-                this.marker = marker;
-            }
-
-            public string Title => marker.Name;
-
-            public CSMarker Marker => marker;
-
-            public bool IsSelected
-            {
-                get => selected;
-                set
-                {
-                    SetProperty(ref selected, value);
-                }
-            }
-        }
-
         protected override void Dispose(bool disposing)
         {
             methods.CollectionChanged -= OnMethodCollectionChanged;
             properties.CollectionChanged -= OnPropertyCollectionChanged;
 
-            methods.Clear();
-            properties.Clear();
+            sync.Post((o) =>
+            {
+                methods.Clear();
+                properties.Clear();
+            }, null);
 
             base.Dispose(disposing);
         }

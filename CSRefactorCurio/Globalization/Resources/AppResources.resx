@@ -348,6 +348,9 @@
   <data name="PUBLIC" xml:space="preserve">
     <value>Public</value>
   </data>
+  <data name="PUBLIC_METHODS" xml:space="preserve">
+    <value>Public Methods</value>
+  </data>
   <data name="PUBLIC_PROPERTIES" xml:space="preserve">
     <value>Public Properties</value>
   </data>

@@ -87,10 +87,27 @@
                                 </MenuItem.Icon>
                             </MenuItem>
 
+                            <Separator toolkit:Themes.UseVsTheme="True" />
+
                             <MenuItem
                                 toolkit:Themes.UseVsTheme="True"
                                 Command="{Binding ClickFilter}"
                                 Header="{glob:Translate ResourceKey=OPEN_FILTER_DIALOG}">
+                                <MenuItem.Icon>
+                                    <imaging:CrispImage
+                                        Width="16"
+                                        Height="16"
+                                        Margin="4"
+                                        Moniker="{x:Static catalog:KnownMonikers.ElementSeparator}" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+
+                            <Separator toolkit:Themes.UseVsTheme="True" />
+
+                            <MenuItem
+                                toolkit:Themes.UseVsTheme="True"
+                                Command="{Binding ClickViewModel}"
+                                Header="{glob:Translate ResourceKey=EMIT_VIEWMODEL}">
                                 <MenuItem.Icon>
                                     <imaging:CrispImage
                                         Width="16"

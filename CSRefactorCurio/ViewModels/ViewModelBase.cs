@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -364,8 +365,15 @@ namespace CSRefactorCurio.ViewModels
             {
                 if (prop.PropertyType == typeof(IOwnedCommand) || prop.PropertyType.GetInterface(typeof(IOwnedCommand).FullName) != null)
                 {
-                    IOwnedCommand obj = prop.GetValue(target) as IOwnedCommand;
-                    target.registeredCommands.Add(prop.Name, obj);
+                    try
+                    {
+                        IOwnedCommand obj = prop.GetValue(target) as IOwnedCommand;
+                        if (obj != null) target.registeredCommands.Add(prop.Name, obj);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                    }
                 }
             }
 
@@ -425,8 +433,9 @@ namespace CSRefactorCurio.ViewModels
                 eq = backingStore.Equals(value);
             }
 
-            if (eq)
+            if (!eq)
             {
+                backingStore = value;
                 OnPropertyChanged(propertyName);
             }
 
@@ -457,7 +466,7 @@ namespace CSRefactorCurio.ViewModels
 
                 foreach (var kv in registeredCommands)
                 {
-                    kv.Value.Dispose();
+                    kv.Value?.Dispose();
                 }
 
                 disposedValue = true;
