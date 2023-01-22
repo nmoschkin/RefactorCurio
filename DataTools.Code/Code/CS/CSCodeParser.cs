@@ -412,6 +412,31 @@ namespace DataTools.Code.CS
                         i = (int)ept;
                         scanStartPos = i + 1;
                     }
+                    else if (chars[i] == ';' && currPatt == MarkerKind.Property)
+                    {
+                        var fs = forScan.ToString().Replace(";", "").Trim();
+                        if (fs == "get" || fs == "set")
+                        {
+                            var tmark = new TMarker
+                            {
+                                Namespace = currNS,
+                                StartPos = i - 4,
+                                StartLine = currLine,
+                                StartColumn = ColumnFromHere(chars, i - 4),
+                                ParentElementPath = currName,
+                                EndPos = i - 1,
+                                EndLine = currLine,
+                                EndColumn = ColumnFromHere(chars, i - 1),
+                                Kind = fs == "set" ? MarkerKind.Set : MarkerKind.Get,
+                                Name = fs,
+                                Level = currLevel,
+                                ScanHit = fs,
+                            };
+
+                            markers.Add(tmark);
+                            forScan.Clear();
+                        }
+                    }
                     else if (chars[i] == ';' || chars[i] == ',' && currPatt == MarkerKind.Enum)
                     {
                         clo = false;

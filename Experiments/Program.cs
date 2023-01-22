@@ -35,7 +35,7 @@ namespace Experiments
             //var str = tool.FindILDasm();
             //var data = File.ReadAllText(path);
 
-            var file = CSCodeFile.LoadFromFile("E:\\Projects\\Personal Projects\\Repos\\misctools\\DataTools\\Win32\\DataTools.Win32\\User32\\Classes\\User32.cs");
+            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\post-build-tool\post-build-tool\ProgramOptions.cs");
 
             var first = file.ScanMarker(file.Markers, (m) =>
             {

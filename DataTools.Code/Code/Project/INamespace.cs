@@ -1,5 +1,8 @@
 ﻿namespace DataTools.Code.Project
 {
+    /// <summary>
+    /// Interface for an object that is at home inside of a namespace.
+    /// </summary>
     public interface INamespace : IProjectNode
     {
         /// <summary>
