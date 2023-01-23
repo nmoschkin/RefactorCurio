@@ -272,7 +272,7 @@ namespace DataTools.Code.CS
 
                 forScan.Capacity = chars.Length;
                 int inif = 0;
-
+                int gbstart = 0;
                 int startPos = 0;
                 int scanStartPos = 0;
 
@@ -286,7 +286,7 @@ namespace DataTools.Code.CS
 
                 int pre = -1;
 
-                bool clo = false;
+                bool parenclo = false;
 
                 Regex currCons = null;
                 Regex currDecons = null;
@@ -295,6 +295,7 @@ namespace DataTools.Code.CS
                 MarkerKind currPatt = MarkerKind.Code;
 
                 List<string> attrs = null;
+                bool zapbody = false;
 
                 unrecognizedWords.Clear();
 
@@ -364,10 +365,10 @@ namespace DataTools.Code.CS
                     }
                     else if (chars[i] == '(')
                     {
-                        clo = true;
+                        parenclo = true;
                         prevWord = "";
                     }
-                    else if (chars[i] == '[' && !clo)
+                    else if (chars[i] == '[' && !parenclo)
                     {
                         prevWord = "";
 
@@ -412,7 +413,7 @@ namespace DataTools.Code.CS
                         i = (int)ept;
                         scanStartPos = i + 1;
                     }
-                    else if (chars[i] == ';' && currPatt == MarkerKind.Property)
+                    else if ((chars[i] == ';' && !zapbody) && currPatt == MarkerKind.Property)
                     {
                         var fs = forScan.ToString().Replace(";", "").Trim();
                         if (fs == "get" || fs == "set")
@@ -437,9 +438,9 @@ namespace DataTools.Code.CS
                             forScan.Clear();
                         }
                     }
-                    else if (chars[i] == ';' || chars[i] == ',' && currPatt == MarkerKind.Enum)
+                    else if ((chars[i] == ';' && !zapbody) || (chars[i] == ',' && currPatt == MarkerKind.Enum))
                     {
-                        clo = false;
+                        parenclo = false;
 
                         if (currPatt == MarkerKind.Enum || (currPatt & MarkerKind.IsBlockLevel) != MarkerKind.IsBlockLevel)
                         {
@@ -511,6 +512,8 @@ namespace DataTools.Code.CS
                             markers.Add(currMarker);
                         }
 
+                        while (i < c - 1 && ((chars[i + 1] == '\r') || (chars[i + 1] == '\n'))) i++;
+
                         scanStartPos = startPos = i + 1;
                         forScan.Clear();
 
@@ -519,10 +522,21 @@ namespace DataTools.Code.CS
                         startLine = currLine;
                         attrs = null;
                     }
-                    else if (chars[i] == '{')
+                    else if (chars[i] == '{' || (chars[i] == '>' && i > 0 && chars[i - 1] == '='))
                     {
-                        forScan.Remove(forScan.Length - 1, 1);
-                        clo = false;
+                        zapbody = (chars[i] == '>' && i > 0 && chars[i - 1] == '=');
+
+                        if (zapbody)
+                        {
+                            forScan.Remove(forScan.Length - 2, 2);
+                            gbstart = i - 1;
+                        }
+                        else
+                        {
+                            forScan.Remove(forScan.Length - 1, 1);
+                        }
+
+                        parenclo = false;
                         ++currLevel;
 
                         strack.Push(currPatt);
@@ -611,6 +625,19 @@ namespace DataTools.Code.CS
 
                                     markers.Add(currMarker);
 
+                                    if (currPatt == MarkerKind.Property && zapbody)
+                                    {
+                                        currMarker.Children = new TList();
+                                        currMarker.Children.Add(new TMarker()
+                                        {
+                                            Kind = MarkerKind.Get,
+                                            StartPos = gbstart,
+                                            StartLine = currLine,
+                                            StartColumn = ColumnFromHere(chars, gbstart),
+                                            ParentElementPath = currMarker.Name
+                                        });
+                                    }
+
                                     if (currPatt == MarkerKind.Class || currPatt == MarkerKind.Struct || currPatt == MarkerKind.Record)
                                     {
                                         currName = currMarker.Name;
@@ -627,15 +654,17 @@ namespace DataTools.Code.CS
                         markers = new TList();
 
                         scanStartPos = startPos = i + 1;
+
                         forScan.Clear();
                         prevWord = "";
 
                         startLine = currLine;
                         attrs = null;
                     }
-                    else if (chars[i] == '}')
+                    else if (chars[i] == '}' || (chars[i] == ';' && zapbody))
                     {
-                        clo = false;
+                        parenclo = false;
+
                         if (currPatt == MarkerKind.Enum)
                         {
                             forScan.Remove(forScan.Length - 1, 1);
@@ -668,9 +697,21 @@ namespace DataTools.Code.CS
                             }
                         }
 
+                        if (zapbody && currMarker.Kind == MarkerKind.Property)
+                        {
+                            currMarker.Children[0].EndPos = i;
+                            currMarker.Children[0].EndLine = currLine;
+                            currMarker.Children[0].EndColumn = ColumnFromHere(chars, i);
+                            currMarker.Children[0].ScanHit = Text.Substring(gbstart, (i - gbstart) + 1);
+                            currMarker.Children[0].Kind = MarkerKind.Get;
+
+                            gbstart = 0;
+                        }
+
+                        zapbody = false;
+
                         --currLevel;
                         currPatt = strack.Pop();
-
                         currMarker = stack.Pop();
 
                         if (currMarker != null)
@@ -678,10 +719,21 @@ namespace DataTools.Code.CS
                             currMarker.EndPos = i;
                             currMarker.EndLine = currLine;
                             currMarker.EndColumn = ColumnFromHere(chars, i);
-                            currMarker.Children = markers;
+                            if (currMarker.Children == null || currMarker.Children.Count == 0) currMarker.Children = markers;
                         }
 
                         markers = listStack.Pop();
+
+                        //while (i < c - 1 && char.IsWhiteSpace(chars[i + 1]))
+                        //{
+                        //    i++;
+                        //}
+
+                        //while (i < c - 1 && ((chars[i + 1] == '\r') || (chars[i + 1] == '\n')))
+                        //{
+                        //    if (chars[i + 1] == '\n') currLine++;
+                        //    i++;
+                        //}
 
                         scanStartPos = startPos = i + 1;
 
@@ -705,7 +757,7 @@ namespace DataTools.Code.CS
                         forScan.Remove(forScan.Length - 1, 1);
                         forScan.Append(' ');
 
-                        clo = false;
+                        parenclo = false;
 
                         currMarker = new TMarker()
                         {
@@ -763,7 +815,7 @@ namespace DataTools.Code.CS
                     {
                         forScan.Remove(forScan.Length - 1, 1);
                         forScan.Append(' ');
-                        clo = false;
+                        parenclo = false;
                         currMarker = new TMarker()
                         {
                             StartColumn = ColumnFromHere(chars, i),
@@ -815,7 +867,7 @@ namespace DataTools.Code.CS
                         forScan.Remove(forScan.Length - 1, 1);
                         forScan.Append(' ');
 
-                        clo = false;
+                        parenclo = false;
                         currMarker = new TMarker()
                         {
                             StartColumn = ColumnFromHere(chars, i),
@@ -865,6 +917,7 @@ namespace DataTools.Code.CS
                 }
 
                 preambleTo = pre;
+
                 PostScanTasks(markers);
 
                 return markers;
@@ -932,7 +985,7 @@ namespace DataTools.Code.CS
             {
                 ch = w[i];
 
-                if (AllowedChar(ch, true) && i < c - 1)
+                if (AllowedChar(ch, true, types: true) && i < c - 1)
                 {
                     if (fl) break;
                     tsb.Append(ch);
@@ -1100,6 +1153,18 @@ namespace DataTools.Code.CS
                                     marker.IsVirtual = true;
                                     break;
 
+                                case "ref":
+                                    marker.IsRef = true;
+                                    break;
+
+                                case "unsafe":
+                                    marker.IsUnsafe = true;
+                                    break;
+
+                                case "partial":
+                                    marker.IsPartial = true;
+                                    break;
+
                                 default:
                                     break;
                             }
@@ -1136,6 +1201,13 @@ namespace DataTools.Code.CS
                         case MarkerKind.Enum:
                             marker.Name = tsb.ToString();
                             marker.Generics = generics1;
+                            break;
+
+                        case MarkerKind.Get:
+                        case MarkerKind.Set:
+                        case MarkerKind.Add:
+                        case MarkerKind.Remove:
+                            marker.Name = marker.Kind.ToString().ToLower();
                             break;
 
                         case MarkerKind.Event:
@@ -1249,6 +1321,17 @@ namespace DataTools.Code.CS
                             if (bx != null) i = (int)bx;
                             hasParams = true;
                             retVal++;
+                        }
+                    }
+                    else if (marker.Name == "this" && ch == '[')
+                    {
+                        var parms = TextTools.TextBetween(w, i, ref l, '[', ']', out int? ax, out int? bx, withDelimiters: true);
+                        if (parms != null)
+                        {
+                            marker.MethodParamsString = parms;
+
+                            marker.Kind = MarkerKind.This;
+                            if (bx != null) i = (int)bx;
                         }
                     }
                     else if (ch == '<')
@@ -1483,8 +1566,9 @@ namespace DataTools.Code.CS
         /// <param name="ch">Character to test.</param>
         /// <param name="alsoDot">Dot is valid.</param>
         /// <param name="first">Valid for first character.</param>
+        /// <param name="types">Parsing for types includes the * pointer allowable.</param>
         /// <returns></returns>
-        private bool AllowedChar(char ch, bool alsoDot, bool first = false)
+        private bool AllowedChar(char ch, bool alsoDot, bool first = false, bool types = false)
         {
             if (first)
             {
@@ -1492,7 +1576,7 @@ namespace DataTools.Code.CS
             }
             else
             {
-                return char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || alsoDot && ch == '.';
+                return char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || (alsoDot && ch == '.') || (types && ch == '*');
             }
         }
 
@@ -1579,7 +1663,7 @@ namespace DataTools.Code.CS
                 c++;
             }
 
-            return pos;
+            return 0;
         }
 
         #endregion CSharp Code Parsing Internals

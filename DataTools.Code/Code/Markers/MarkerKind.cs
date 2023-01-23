@@ -41,7 +41,7 @@ namespace DataTools.Code.Markers
         /// this[] Indexer
         /// </summary>
         [Description("this[] Indexer")]
-        This = 0x105,
+        This = 0x5,
 
         /// <summary>
         /// Class
@@ -83,7 +83,7 @@ namespace DataTools.Code.Markers
         /// Event
         /// </summary>
         [Description("Event")]
-        Event = 0x10c,
+        Event = 0xc,
 
         /// <summary>
         /// Constant
@@ -227,7 +227,7 @@ namespace DataTools.Code.Markers
         /// Property
         /// </summary>
         [Description("Property")]
-        Property = 0x123,
+        Property = 0x23,
 
         /// <summary>
         /// Field

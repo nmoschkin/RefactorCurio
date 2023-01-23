@@ -215,11 +215,17 @@ namespace DataTools.Code.Markers
 
         public virtual bool IsOverride { get; set; }
 
+        public virtual bool IsPartial { get; set; }
+
         public virtual bool IsReadOnly { get; set; }
+
+        public virtual bool IsRef { get; set; }
 
         public virtual bool IsSealed { get; set; }
 
         public virtual bool IsStatic { get; set; }
+
+        public virtual bool IsUnsafe { get; set; }
 
         public virtual bool IsVirtual { get; set; }
 

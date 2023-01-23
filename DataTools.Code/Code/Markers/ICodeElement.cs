@@ -79,9 +79,19 @@ namespace DataTools.Code.Markers
         bool IsOverride { get; set; }
 
         /// <summary>
+        /// Is a partial class
+        /// </summary>
+        bool IsPartial { get; set; }
+
+        /// <summary>
         /// Element is marked readonly.
         /// </summary>
         bool IsReadOnly { get; set; }
+
+        /// <summary>
+        /// Is reference value.
+        /// </summary>
+        bool IsRef { get; set; }
 
         /// <summary>
         /// Element is a sealed class.
@@ -92,6 +102,11 @@ namespace DataTools.Code.Markers
         /// Element is a static member.
         /// </summary>
         bool IsStatic { get; set; }
+
+        /// <summary>
+        /// Element is an unsafe context (Certain languages only)
+        /// </summary>
+        bool IsUnsafe { get; set; }
 
         /// <summary>
         /// Element is marked virtual.
