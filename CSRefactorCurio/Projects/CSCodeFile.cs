@@ -99,6 +99,18 @@ namespace DataTools.CSTools
             }
         }
 
+        /// <summary>
+        /// Ensure text for the file is loaded.
+        /// </summary>
+        public virtual void EnsureText()
+        {
+            if (string.IsNullOrEmpty(Text))
+            {
+                text = File.ReadAllText(Filename);
+                OnPropertyChanged(nameof(Text));
+            }
+        }
+
         public MarkerFilterManager<CSMarker, ObservableMarkerList<CSMarker>> Filter { get; } = new MarkerFilterManager<CSMarker, ObservableMarkerList<CSMarker>>();
 
         public virtual ObservableMarkerList<CSMarker> FilteredItems

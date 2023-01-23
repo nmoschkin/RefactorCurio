@@ -29,6 +29,8 @@ namespace DataTools.CSTools
 
         public override string FormatContents()
         {
+            HomeFile.EnsureText();
+
             if (Children != null && Children.Count > 0)
             {
                 var sb = new StringBuilder();

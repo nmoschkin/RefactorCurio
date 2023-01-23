@@ -19,7 +19,7 @@
     mc:Ignorable="d">
     <platform:DialogWindow.Resources>
         <Style TargetType="TextBox">
-            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="Padding" Value="8,2" />
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="14" />
         </Style>
@@ -33,8 +33,10 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
-                <CheckBox Content="{Binding IsSelected}" />
-                <Label Content="{Binding Marker.Name}" />
+                <CheckBox IsChecked="{Binding IsSelected}" />
+                <Label
+                    Grid.Column="1"
+                    Content="{Binding Marker.Name}" />
             </Grid>
         </DataTemplate>
     </platform:DialogWindow.Resources>
@@ -60,7 +62,9 @@
 
             <Label Content="{glob:Translate ResourceKey=NEW_CLASS_NAME, AddColon=True}" />
 
-            <TextBox Margin="16,4" />
+            <TextBox
+                Margin="16,4"
+                Text="{Binding ClassName}" />
         </StackPanel>
 
         <StackPanel Grid.Row="1">
