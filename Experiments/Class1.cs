@@ -1,25 +1,20 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-
-namespace Experiments
+﻿namespace Experiments
 {
     internal class Class1
     {
-        public (int, int)? Run(int arg1, char ch, string bbvvv)
+        private string bolides = "bolides";
+
+        public string Test1 => "Bonkers";
+
+        public int Test2() => 1;
+
+        public string Test3
         {
-            (int a, int b) = (arg1 ^ -1 >> (arg1 & 0xf), arg1 ^ -1 >> (arg1 & 0xf));
-
-            return (a, b);
-        }
-
-        public bool Retest => false;
-
-        public event EventHandler<MouseEventArgs> WireMeMatey
-        {
-            add { WireMeMatey += value; }
-            remove { WireMeMatey -= value; }
+            get => bolides;
+            set
+            {
+                bolides = value;
+            }
         }
     }
 }

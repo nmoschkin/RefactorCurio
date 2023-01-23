@@ -35,24 +35,28 @@ namespace Experiments
             //var str = tool.FindILDasm();
             //var data = File.ReadAllText(path);
 
-            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\post-build-tool\post-build-tool\ProgramOptions.cs");
+            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\RefactorCurio\Experiments\Class1.cs");
 
-            var first = file.ScanMarker(file.Markers, (m) =>
-            {
-                return m.IsExtern == true;
-            });
+            var filter = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 
-            CodeFilterOptions cfo = new CodeFilterOptions(first, true);
+            var results = filter.ApplyFilter(file.Markers);
 
-            var b = cfo.Validate(first);
+            //var first = file.ScanMarker(file.Markers, (m) =>
+            //{
+            //    return m.IsExtern == true;
+            //});
 
-            Console.WriteLine($"{b}");
+            //CodeFilterOptions cfo = new CodeFilterOptions(first, true);
 
-            var cfr = new CodeFilterRule<CSMarker, ObservableMarkerList<CSMarker>>(new CodeFilterOptions() { IsExtern = true });
+            //var b = cfo.Validate(first);
 
-            var results = cfr.ApplyFilter(file.Markers);
+            //Console.WriteLine($"{b}");
 
-            WriteResult(results);
+            //var cfr = new CodeFilterRule<CSMarker, ObservableMarkerList<CSMarker>>(new CodeFilterOptions() { IsExtern = true });
+
+            //var results = cfr.ApplyFilter(file.Markers);
+
+            //WriteResult(results);
 
             Console.Read();
             //var outdir = @"C:\Users\theim\Desktop\Spasms";
