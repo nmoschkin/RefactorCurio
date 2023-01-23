@@ -34,9 +34,12 @@ namespace DataTools.Code.CS.Filtering
         public virtual bool? IsImplicit { get; set; } = null;
         public virtual bool? IsNew { get; set; } = null;
         public virtual bool? IsOverride { get; set; } = null;
+        public virtual bool? IsPartial { get; set; } = null;
         public virtual bool? IsReadOnly { get; set; } = null;
+        public virtual bool? IsRef { get; set; } = null;
         public virtual bool? IsSealed { get; set; } = null;
         public virtual bool? IsStatic { get; set; } = null;
+        public virtual bool? IsUnsafe { get; set; } = null;
         public virtual bool? IsVirtual { get; set; } = null;
         public virtual MarkerKind? Kind { get; set; } = null;
         public virtual AccessModifiers? AccessModifiers { get; set; } = null;
@@ -87,10 +90,22 @@ namespace DataTools.Code.CS.Filtering
             set => IsOverride = value;
         }
 
+        bool ICodeElement.IsPartial
+        {
+            get => IsPartial ?? false;
+            set => IsPartial = value;
+        }
+
         bool ICodeElement.IsReadOnly
         {
             get => IsReadOnly ?? false;
             set => IsReadOnly = value;
+        }
+
+        bool ICodeElement.IsRef
+        {
+            get => IsRef ?? false;
+            set => IsRef = value;
         }
 
         bool ICodeElement.IsSealed
@@ -109,6 +124,12 @@ namespace DataTools.Code.CS.Filtering
         {
             get => IsVirtual ?? false;
             set => IsVirtual = value;
+        }
+
+        bool ICodeElement.IsUnsafe
+        {
+            get => IsUnsafe ?? false;
+            set => IsUnsafe = value;
         }
 
         MarkerKind ICodeElement.Kind

@@ -274,7 +274,13 @@ namespace DataTools.Code
             return null;
         }
 
-        public string[] GetLines(int startline, int endline)
+        /// <summary>
+        /// Return lines from the file according to their 1-based indices.
+        /// </summary>
+        /// <param name="startline">The 1-based start index of the first line.</param>
+        /// <param name="endline">The 1-based end index of the last line.</param>
+        /// <returns></returns>
+        public virtual string[] GetLines(int startline, int endline)
         {
             var filename = Filename;
 
