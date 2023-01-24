@@ -416,20 +416,24 @@ namespace DataTools.Code.CS
                     else if ((chars[i] == ';' && !zapbody) && currPatt == MarkerKind.Property)
                     {
                         var fs = forScan.ToString().Replace(";", "").Trim();
-                        if (fs == "get" || fs == "set")
+
+                        StripAccessModifiers(fs, out var amres, out var pros);
+
+                        if (pros == "get" || pros == "set")
                         {
                             var tmark = new TMarker
                             {
                                 Namespace = currNS,
                                 StartPos = i - 4,
+                                AccessModifiers = amres,
                                 StartLine = currLine,
                                 StartColumn = ColumnFromHere(chars, i - 4),
                                 ParentElementPath = currName,
                                 EndPos = i - 1,
                                 EndLine = currLine,
                                 EndColumn = ColumnFromHere(chars, i - 1),
-                                Kind = fs == "set" ? MarkerKind.Set : MarkerKind.Get,
-                                Name = fs,
+                                Kind = pros == "set" ? MarkerKind.Set : MarkerKind.Get,
+                                Name = pros,
                                 Level = currLevel,
                                 ScanHit = fs,
                             };
@@ -512,7 +516,21 @@ namespace DataTools.Code.CS
                             markers.Add(currMarker);
                         }
 
-                        while (i < c - 1 && ((chars[i + 1] == '\r') || (chars[i + 1] == '\n'))) i++;
+                        if (i < c - 1)
+                        {
+                            for (i = i + 1; i < c; i++)
+                            {
+                                if ((char.IsWhiteSpace(chars[i]) || (chars[i] == '\r') || (chars[i] == '\n')))
+                                {
+                                    if (chars[i] == '\n') currLine++;
+                                }
+                                else
+                                {
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
 
                         scanStartPos = startPos = i + 1;
                         forScan.Clear();
@@ -631,10 +649,12 @@ namespace DataTools.Code.CS
                                         currMarker.Children.Add(new TMarker()
                                         {
                                             Kind = MarkerKind.Get,
+                                            Name = "get",
+                                            Namespace = currNS,
                                             StartPos = gbstart,
                                             StartLine = currLine,
                                             StartColumn = ColumnFromHere(chars, gbstart),
-                                            ParentElementPath = currMarker.Name
+                                            ParentElementPath = currMarker.FullyQualifiedName.Replace(currNS + ".", "")
                                         });
                                     }
 
@@ -652,6 +672,22 @@ namespace DataTools.Code.CS
                         stack.Push(currMarker);
                         listStack.Push(markers);
                         markers = new TList();
+
+                        if (i < c - 1)
+                        {
+                            for (i = i + 1; i < c; i++)
+                            {
+                                if ((char.IsWhiteSpace(chars[i]) || (chars[i] == '\r') || (chars[i] == '\n')))
+                                {
+                                    if (chars[i] == '\n') currLine++;
+                                }
+                                else
+                                {
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
 
                         scanStartPos = startPos = i + 1;
 
@@ -700,6 +736,7 @@ namespace DataTools.Code.CS
                         if (zapbody && currMarker.Kind == MarkerKind.Property)
                         {
                             currMarker.Children[0].EndPos = i;
+                            currMarker.Children[0].Name = "get";
                             currMarker.Children[0].EndLine = currLine;
                             currMarker.Children[0].EndColumn = ColumnFromHere(chars, i);
                             currMarker.Children[0].ScanHit = Text.Substring(gbstart, (i - gbstart) + 1);
@@ -729,11 +766,21 @@ namespace DataTools.Code.CS
                         //    i++;
                         //}
 
-                        //while (i < c - 1 && ((chars[i + 1] == '\r') || (chars[i + 1] == '\n')))
-                        //{
-                        //    if (chars[i + 1] == '\n') currLine++;
-                        //    i++;
-                        //}
+                        if (i < c - 1)
+                        {
+                            for (i = i + 1; i < c; i++)
+                            {
+                                if ((char.IsWhiteSpace(chars[i]) || (chars[i] == '\r') || (chars[i] == '\n')))
+                                {
+                                    if (chars[i] == '\n') currLine++;
+                                }
+                                else
+                                {
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
 
                         scanStartPos = startPos = i + 1;
 
@@ -1203,13 +1250,6 @@ namespace DataTools.Code.CS
                             marker.Generics = generics1;
                             break;
 
-                        case MarkerKind.Get:
-                        case MarkerKind.Set:
-                        case MarkerKind.Add:
-                        case MarkerKind.Remove:
-                            marker.Name = marker.Kind.ToString().ToLower();
-                            break;
-
                         case MarkerKind.Event:
                             marker.DataType = tsb.ToString();
                             marker.Generics = generics1;
@@ -1228,7 +1268,18 @@ namespace DataTools.Code.CS
             }
             else
             {
-                return 0;
+                switch (marker.Kind)
+                {
+                    case MarkerKind.Get:
+                    case MarkerKind.Set:
+                    case MarkerKind.Add:
+                    case MarkerKind.Remove:
+                        marker.Name = marker.Kind.ToString().ToLower();
+                        break;
+
+                    default:
+                        return 0;
+                }
             }
 
             tsb.Clear();
@@ -1629,6 +1680,35 @@ namespace DataTools.Code.CS
                     }
                 }
             }
+        }
+
+        public void StripAccessModifiers(string sample, out AccessModifiers modifiers, out string leftOver)
+        {
+            sample = sample.Replace("\r", "").Replace("\n", "").Trim();
+
+            var sret = new List<string>();
+            var m = AccessModifiers.None;
+            var sb = new StringBuilder();
+
+            var words = TextTools.Words(sample);
+
+            foreach (var word in words)
+            {
+                var amtest = TextTools.TitleCase(word);
+
+                if (Enum.TryParse<AccessModifiers>(amtest, out var result))
+                {
+                    m |= result;
+                }
+                else
+                {
+                    if (sb.Length > 0) sb.Append(" ");
+                    sb.Append(word);
+                }
+            }
+
+            modifiers = m;
+            leftOver = sb.ToString();
         }
 
         private int CountLines(string text)

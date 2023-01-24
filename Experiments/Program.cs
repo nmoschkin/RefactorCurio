@@ -58,7 +58,7 @@ namespace Experiments
 
             //WriteResult(results);
 
-            Console.Read();
+            //Console.Read();
             //var outdir = @"C:\Users\theim\Desktop\Spasms";
             //file.OutputMarkers(outdir);
 

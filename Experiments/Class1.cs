@@ -2,8 +2,16 @@
 {
     internal class Class1
     {
-        private string bolides = "bolides";
+        public string Test4
+        {
+            get
+            {
+                return "Bonny";
+            }
+        }
 
+        private string bolides = "bolides";
+        private string bolides2 = "Bunny";
         public string Test1 => "Bonkers";
 
         public int Test2() => 1;
@@ -14,6 +22,18 @@
             set
             {
                 bolides = value;
+            }
+        }
+
+        public string Test5
+        {
+            get
+            {
+                return bolides2;
+            }
+            protected set
+            {
+                bolides2 = value;
             }
         }
     }
