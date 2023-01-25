@@ -3,6 +3,7 @@
 using DataTools.Code.Project;
 using DataTools.CSTools;
 
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -25,6 +26,8 @@ namespace CSRefactorCurio
             }
         }
 
+        private Dictionary<string, string> brushkeys = new Dictionary<string, string>();
+
         private void ToolBar_Loaded(object sender, RoutedEventArgs e)
         {
             ToolBar toolBar = sender as ToolBar;
@@ -39,6 +42,24 @@ namespace CSRefactorCurio
             {
                 mainPanelBorder.Margin = new Thickness(0);
             }
+
+            //var props = typeof(VsBrushes).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            //var samctl = new Label();
+
+            //foreach (var p in props)
+            //{
+            //    object obj;
+            //    var s = (string)p.GetValue(null);
+
+            //    samctl.SetResourceReference(Label.BackgroundProperty, s);
+
+            //    if (samctl.Background is SolidColorBrush br)
+            //    {
+            //        brushkeys.Add(p.Name, br.Color.ToString());
+            //    }
+            //}
+
+            //Clipboard.SetText(JsonConvert.SerializeObject(brushkeys));
         }
 
         private void CurioExplorer_Loaded(object sender, RoutedEventArgs e)
