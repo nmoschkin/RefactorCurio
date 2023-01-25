@@ -546,6 +546,12 @@ namespace DataTools.Code.CS
 
                         if (zapbody)
                         {
+                            if (ContainsCode(currPatt))
+                            {
+                                zapbody = false;
+                                continue;
+                            }
+
                             forScan.Remove(forScan.Length - 2, 2);
                             gbstart = i - 1;
                         }
@@ -1744,6 +1750,11 @@ namespace DataTools.Code.CS
             }
 
             return 0;
+        }
+
+        private bool ContainsCode(MarkerKind kind)
+        {
+            return kind == MarkerKind.Method || kind == MarkerKind.Constructor || kind == MarkerKind.Destructor || kind == MarkerKind.Get || kind == MarkerKind.Set || kind == MarkerKind.Add || kind == MarkerKind.Remove || kind == MarkerKind.Operator;
         }
 
         #endregion CSharp Code Parsing Internals

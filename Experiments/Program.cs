@@ -35,7 +35,7 @@ namespace Experiments
             //var str = tool.FindILDasm();
             //var data = File.ReadAllText(path);
 
-            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\RefactorCurio\Experiments\Class1.cs");
+            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\post-build-tool\post-build-tool\CommandSwitch.cs");
 
             var filter = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 

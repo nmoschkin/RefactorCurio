@@ -325,7 +325,7 @@ namespace DataTools.Code.Markers
                 if (scanHit != value)
                 {
                     scanHit = value;
-                    if (scanHit.StartsWith("=")) kind = MarkerKind.Code;
+                    if (scanHit.StartsWith("=") && !scanHit.StartsWith("=>")) kind = MarkerKind.Code;
                 }
             }
         }
