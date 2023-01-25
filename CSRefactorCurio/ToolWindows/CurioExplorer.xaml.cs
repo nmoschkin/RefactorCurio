@@ -3,7 +3,6 @@
 using DataTools.Code.Project;
 using DataTools.CSTools;
 
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -68,8 +67,11 @@ namespace CSRefactorCurio
                 {
                     var window = item.Open();
                     window.Activate();
-                    Thread.Sleep(50);
-                    window.DTE.ExecuteCommand("Edit.GoTo " + selMarker.StartLine.ToString());
+
+                    System.Threading.Thread.Sleep(50);
+
+                    EnvDTE.TextSelection ts = window.Selection as EnvDTE.TextSelection;
+                    ts.MoveToLineAndOffset(selMarker.StartLine, selMarker.StartColumn);
                 }
                 catch
                 {

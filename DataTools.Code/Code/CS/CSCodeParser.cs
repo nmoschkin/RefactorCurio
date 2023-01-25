@@ -419,19 +419,24 @@ namespace DataTools.Code.CS
 
                         StripAccessModifiers(fs, out var amres, out var pros);
 
+                        while (startPos < c - 1 && char.IsWhiteSpace(chars[startPos]))
+                        {
+                            startPos++;
+                        }
+
                         if (pros == "get" || pros == "set")
                         {
                             var tmark = new TMarker
                             {
                                 Namespace = currNS,
-                                StartPos = i - 4,
+                                StartPos = startPos,
                                 AccessModifiers = amres,
                                 StartLine = currLine,
-                                StartColumn = ColumnFromHere(chars, i - 4),
+                                StartColumn = ColumnFromHere(chars, startPos),
                                 ParentElementPath = currName,
                                 EndPos = i - 1,
                                 EndLine = currLine,
-                                EndColumn = ColumnFromHere(chars, i - 1),
+                                EndColumn = ColumnFromHere(chars, startPos + fs.Length),
                                 Kind = pros == "set" ? MarkerKind.Set : MarkerKind.Get,
                                 Name = pros,
                                 Level = currLevel,
@@ -441,6 +446,7 @@ namespace DataTools.Code.CS
                             markers.Add(tmark);
                             forScan.Clear();
                         }
+                        startPos = i + 1;
                     }
                     else if ((chars[i] == ';' && !zapbody) || (chars[i] == ',' && currPatt == MarkerKind.Enum))
                     {
@@ -1738,7 +1744,7 @@ namespace DataTools.Code.CS
         /// <returns></returns>
         private int ColumnFromHere(char[] chars, int pos)
         {
-            int c = 0;
+            int c = 1;
             int i;
 
             for (i = pos - 1; i >= 0; i--)
@@ -1749,7 +1755,7 @@ namespace DataTools.Code.CS
                 c++;
             }
 
-            return 0;
+            return 1;
         }
 
         private bool ContainsCode(MarkerKind kind)
