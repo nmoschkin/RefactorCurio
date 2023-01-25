@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
     xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     mc:Ignorable="d">
     <SolidColorBrush
@@ -39,22 +40,17 @@
     <SolidColorBrush
         x:Key="MenuItem.Highlight.Disabled.Border"
         Color="#21000000" />
-    <MenuScrollingVisibilityConverter
-        x:Key="MenuScrollingVisibilityConverter" />
-    <Geometry
-        x:Key="DownArrow">
+    <MenuScrollingVisibilityConverter x:Key="MenuScrollingVisibilityConverter" />
+    <Geometry x:Key="DownArrow">
         M 0,0 L 3.5,4 L 7,0 Z
     </Geometry>
-    <Geometry
-        x:Key="UpArrow">
+    <Geometry x:Key="UpArrow">
         M 0,4 L 3.5,0 L 7,4 Z
     </Geometry>
-    <Geometry
-        x:Key="RightArrow">
+    <Geometry x:Key="RightArrow">
         M 0,0 L 4,3.5 L 0,7 Z
     </Geometry>
-    <Geometry
-        x:Key="Checkmark">
+    <Geometry x:Key="Checkmark">
         F1 M 10.0,1.2 L 4.7,9.1 L 4.5,9.1 L 0,5.2 L 1.3,3.5 L 4.3,6.1L 8.3,0 L 10.0,1.2 Z
     </Geometry>
     <Style
@@ -64,8 +60,7 @@
         <Setter Property="ClickMode" Value="Hover" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate
-                    TargetType="{x:Type RepeatButton}">
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
                     <Border
                         x:Name="templateRoot"
                         Background="Transparent"
@@ -90,21 +85,15 @@
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate
-                    TargetType="{x:Type ScrollViewer}">
-                    <Grid
-                        SnapsToDevicePixels="true">
+                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                    <Grid SnapsToDevicePixels="true">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition
-                                Height="Auto" />
-                            <RowDefinition
-                                Height="*" />
-                            <RowDefinition
-                                Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Border
                             Grid.Row="1"
@@ -188,13 +177,10 @@
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
             SnapsToDevicePixels="true">
-            <Grid
-                VerticalAlignment="Center">
+            <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="Auto" />
-                    <ColumnDefinition
-                        Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <ContentPresenter
                     x:Name="Icon"
@@ -203,6 +189,7 @@
                     Margin="3"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    toolkit:Themes.UseVsTheme="True"
                     ContentSource="Icon"
                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                 <Path
@@ -257,13 +244,10 @@
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
             SnapsToDevicePixels="true">
-            <Grid
-                VerticalAlignment="Center">
+            <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="Auto" />
-                    <ColumnDefinition
-                        Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <ContentPresenter
                     x:Name="Icon"
@@ -300,14 +284,13 @@
                         x:Name="SubMenuBorder"
                         Padding="2"
                         Background="{StaticResource Menu.Static.Background}"
-                        BorderBrush="{StaticResource Menu.Static.Border}"
+                        BorderBrush="{StaticResource Menu.Static.Background}"
                         BorderThickness="1">
                         <ScrollViewer
                             x:Name="SubMenuScrollViewer"
                             Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer,
                                                                           TypeInTargetAssembly={x:Type FrameworkElement}}}">
-                            <Grid
-                                RenderOptions.ClearTypeHint="Enabled">
+                            <Grid RenderOptions.ClearTypeHint="Enabled">
                                 <Canvas
                                     Width="0"
                                     Height="0"
@@ -323,7 +306,7 @@
                                     Width="1"
                                     Margin="29,2,0,2"
                                     HorizontalAlignment="Left"
-                                    Fill="{StaticResource Menu.Static.Separator}" />
+                                    Fill="{StaticResource Menu.Static.Background}" />
                                 <ItemsPresenter
                                     x:Name="ItemsPresenter"
                                     Grid.IsSharedSizeScope="true"
@@ -372,24 +355,19 @@
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
             SnapsToDevicePixels="true">
-            <Grid
-                Margin="-1">
+            <Grid Margin="-1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
                         Width="Auto"
                         MinWidth="22"
                         SharedSizeGroup="MenuItemIconColumnGroup" />
-                    <ColumnDefinition
-                        Width="13" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="30" />
+                    <ColumnDefinition Width="13" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="30" />
                     <ColumnDefinition
                         Width="Auto"
                         SharedSizeGroup="MenuItemIGTColumnGroup" />
-                    <ColumnDefinition
-                        Width="20" />
+                    <ColumnDefinition Width="20" />
                 </Grid.ColumnDefinitions>
                 <ContentPresenter
                     x:Name="Icon"
@@ -475,24 +453,19 @@
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
             SnapsToDevicePixels="true">
-            <Grid
-                Margin="-1">
+            <Grid Margin="-1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
                         Width="Auto"
                         MinWidth="22"
                         SharedSizeGroup="MenuItemIconColumnGroup" />
-                    <ColumnDefinition
-                        Width="13" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="30" />
+                    <ColumnDefinition Width="13" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="30" />
                     <ColumnDefinition
                         Width="Auto"
                         SharedSizeGroup="MenuItemIGTColumnGroup" />
-                    <ColumnDefinition
-                        Width="20" />
+                    <ColumnDefinition Width="20" />
                 </Grid.ColumnDefinitions>
                 <ContentPresenter
                     x:Name="Icon"
@@ -501,6 +474,7 @@
                     Margin="3"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    toolkit:Themes.UseVsTheme="True"
                     ContentSource="Icon"
                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                 <Border
@@ -556,14 +530,13 @@
                         x:Name="SubMenuBorder"
                         Padding="2"
                         Background="{StaticResource Menu.Static.Background}"
-                        BorderBrush="{StaticResource Menu.Static.Border}"
+                        BorderBrush="{StaticResource Menu.Static.Background}"
                         BorderThickness="1">
                         <ScrollViewer
                             x:Name="SubMenuScrollViewer"
                             Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer,
                                                                           TypeInTargetAssembly={x:Type FrameworkElement}}}">
-                            <Grid
-                                RenderOptions.ClearTypeHint="Enabled">
+                            <Grid RenderOptions.ClearTypeHint="Enabled">
                                 <Canvas
                                     Width="0"
                                     Height="0"
@@ -579,7 +552,7 @@
                                     Width="1"
                                     Margin="29,2,0,2"
                                     HorizontalAlignment="Left"
-                                    Fill="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+                                    Fill="{DynamicResource {x:Static shell:VsBrushes.ButtonFaceKey}}" />
                                 <ItemsPresenter
                                     x:Name="ItemsPresenter"
                                     Grid.IsSharedSizeScope="true"
@@ -618,8 +591,7 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
-    <Style
-        TargetType="{x:Type MenuItem}">
+    <Style TargetType="{x:Type MenuItem}">
         <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
         <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
         <Setter Property="Background" Value="Transparent" />

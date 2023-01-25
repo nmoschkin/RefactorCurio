@@ -9,7 +9,6 @@
     xmlns:glob="clr-namespace:CSRefactorCurio.Globalization"
     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
-    xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     Name="MyToolWindow"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -20,32 +19,12 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
                 <ResourceDictionary Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
                 <ResourceDictionary>
 
-                    <ContextMenu
-                        x:Key="TreeContext"
-                        toolkit:Themes.UseVsTheme="True">
-
-                        <ContextMenu.Resources>
-                            <ResourceDictionary>
-                                <ResourceDictionary.MergedDictionaries>
-                                    <ResourceDictionary>
-                                        <Style TargetType="ItemsControl">
-                                            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.ButtonFaceKey}}" />
-                                            <Setter Property="BorderThickness" Value="1" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsBrushes.ActiveBorderKey}}" />
-                                            <Setter Property="Margin" Value="0" />
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
-                                        </Style>
-                                    </ResourceDictionary>
-                                    <ResourceDictionary Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
-                                </ResourceDictionary.MergedDictionaries>
-                            </ResourceDictionary>
-                        </ContextMenu.Resources>
+                    <ContextMenu x:Key="TreeContext">
                         <ContextMenu.Items>
                             <MenuItem
-                                toolkit:Themes.UseVsTheme="True"
                                 Command="{Binding ClickBuild}"
                                 Header="{glob:Translate ResourceKey=MI_BUILD_SOLUTION}">
                                 <MenuItem.Icon>
@@ -60,7 +39,6 @@
                             </MenuItem>
 
                             <MenuItem
-                                toolkit:Themes.UseVsTheme="True"
                                 Command="{Binding ReportCommand}"
                                 Header="{glob:Translate ResourceKey=REPORTS}">
                                 <MenuItem.Icon>
@@ -75,7 +53,6 @@
                             <!--<Separator toolkit:Themes.UseVsTheme="True" />-->
 
                             <MenuItem
-                                toolkit:Themes.UseVsTheme="True"
                                 Command="{Binding SplitFileCommand}"
                                 Header="{glob:Translate ResourceKey=SPLIT_FILE_DEFAULT_OPTIONS}">
                                 <MenuItem.Icon>
@@ -90,7 +67,6 @@
                             <Separator toolkit:Themes.UseVsTheme="True" />
 
                             <MenuItem
-                                toolkit:Themes.UseVsTheme="True"
                                 Command="{Binding ClickFilter}"
                                 Header="{glob:Translate ResourceKey=OPEN_FILTER_DIALOG}">
                                 <MenuItem.Icon>
@@ -105,7 +81,6 @@
                             <Separator toolkit:Themes.UseVsTheme="True" />
 
                             <MenuItem
-                                toolkit:Themes.UseVsTheme="True"
                                 Command="{Binding ClickViewModel}"
                                 Header="{glob:Translate ResourceKey=EMIT_VIEWMODEL}">
                                 <MenuItem.Icon>
@@ -127,6 +102,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
+
         <ToolBarTray
             Margin="4"
             HorizontalAlignment="Stretch"
