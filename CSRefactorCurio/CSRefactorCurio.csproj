@@ -270,26 +270,26 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Community.VisualStudio.VSCT" Version="16.0.29.6" PrivateAssets="all" />
-    <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.486" ExcludeAssets="Runtime">
+    <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.492" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="DataTools.Essentials">
-      <Version>8.0.0.1059</Version>
+      <Version>8.0.0.1065</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Graphics">
-      <Version>8.0.0.1059</Version>
+      <Version>8.0.0.1065</Version>
     </PackageReference>
     <PackageReference Include="DataTools.MathTools">
-      <Version>8.0.0.1059</Version>
+      <Version>8.0.0.1065</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Memory">
-      <Version>8.0.0.1059</Version>
+      <Version>8.0.0.1065</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Text">
-      <Version>8.0.0.1059</Version>
+      <Version>8.0.0.1065</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Win32.Memory">
-      <Version>8.0.0.1059</Version>
+      <Version>8.0.0.1065</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
       <Version>7.0.0</Version>

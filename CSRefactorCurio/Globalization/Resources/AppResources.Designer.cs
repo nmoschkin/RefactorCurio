@@ -556,7 +556,25 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use Source Object.
+        ///   Looks up a localized string similar to Plain ViewModel (no wire-up).
+        /// </summary>
+        internal static string MODE_PLAIN {
+            get {
+                return ResourceManager.GetString("MODE_PLAIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plain ViewModel (populated with initial source).
+        /// </summary>
+        internal static string MODE_PLAIN_INIT {
+            get {
+                return ResourceManager.GetString("MODE_PLAIN_INIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Live Source Object.
         /// </summary>
         internal static string MODE_SOURCE {
             get {

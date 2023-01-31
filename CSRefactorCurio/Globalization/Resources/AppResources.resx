@@ -282,8 +282,14 @@
   <data name="MODE_INHERIT" xml:space="preserve">
     <value>Inherit From Class</value>
   </data>
+  <data name="MODE_PLAIN" xml:space="preserve">
+    <value>Plain ViewModel (no wire-up)</value>
+  </data>
+  <data name="MODE_PLAIN_INIT" xml:space="preserve">
+    <value>Plain ViewModel (populated with initial source)</value>
+  </data>
   <data name="MODE_SOURCE" xml:space="preserve">
-    <value>Use Source Object</value>
+    <value>Use Live Source Object</value>
   </data>
   <data name="NAME" xml:space="preserve">
     <value>Name</value>

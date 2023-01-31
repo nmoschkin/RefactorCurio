@@ -2,9 +2,13 @@
 
 using DataTools.Code.Markers;
 using DataTools.CSTools;
+using DataTools.Essentials.Converters.ClassDescriptions;
+using DataTools.Essentials.Converters.ClassDescriptions.Framework;
+using DataTools.Essentials.Converters.EnumDescriptions.Framework;
 using DataTools.Essentials.Observable;
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -45,6 +49,22 @@ namespace CSRefactorCurio.ViewModels
         }
     }
 
+    [Globalized(typeof(GenerationMode), typeof(AppResources))]
+    public enum GenerationMode
+    {
+        [TranslationKey("MODE_INHERIT")]
+        MODE_INHERIT,
+
+        [TranslationKey("MODE_PLAIN")]
+        MODE_PLAIN,
+
+        [TranslationKey("MODE_PLAIN_INIT")]
+        MODE_PLAIN_INIT,
+
+        [TranslationKey("MODE_SOURCE")]
+        MODE_SOURCE,
+    }
+
     internal class EmitVMViewModel : ViewModelBase
     {
         private EmitViewModelMode mode;
@@ -58,6 +78,30 @@ namespace CSRefactorCurio.ViewModels
         private CSMarker sourceClass;
         private string className;
         private bool cloneAvailable;
+
+        private DescribedEnum<GenerationMode> selectedMode;
+
+        private List<DescribedEnum<GenerationMode>> modes = new List<DescribedEnum<GenerationMode>>();
+
+        public List<DescribedEnum<GenerationMode>> GenerationModes => modes;
+
+        public DescribedEnum<GenerationMode> SelectedMode
+        {
+            get => selectedMode;
+            set
+            {
+                SetProperty(ref selectedMode, value);
+            }
+        }
+
+        public bool CloneAvailable
+        {
+            get => cloneAvailable;
+            protected set
+            {
+                SetProperty(ref cloneAvailable, value);
+            }
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -76,6 +120,11 @@ namespace CSRefactorCurio.ViewModels
         public EmitVMViewModel(CSMarker sourceClass) : base(true, true, true, false)
         {
             if (sourceClass.Kind != MarkerKind.Class) throw new ArgumentException("Source Marker Must Be A Class");
+
+            modes.Add(new DescribedEnum<GenerationMode>(GenerationMode.MODE_INHERIT));
+            modes.Add(new DescribedEnum<GenerationMode>(GenerationMode.MODE_PLAIN));
+            modes.Add(new DescribedEnum<GenerationMode>(GenerationMode.MODE_PLAIN_INIT));
+            modes.Add(new DescribedEnum<GenerationMode>(GenerationMode.MODE_SOURCE));
 
             this.sourceClass = sourceClass;
 

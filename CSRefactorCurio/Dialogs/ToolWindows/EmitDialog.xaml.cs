@@ -15,6 +15,7 @@ namespace CSRefactorCurio.Dialogs
             InitializeComponent();
             vm = new EmitVMViewModel(source);
             DataContext = vm;
+            vm.RequestClose += Vm_RequestClose;
         }
 
         private void Vm_RequestClose(object sender, RequestCloseEventArgs e)

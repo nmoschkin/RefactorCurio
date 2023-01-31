@@ -64,23 +64,26 @@
 
             <TextBox
                 Margin="16,4"
-                Text="{Binding ClassName}" />
+                toolkit:Themes.UseVsTheme="True"
+                Text="{Binding ClassName, Mode=TwoWay}" />
         </StackPanel>
 
-        <StackPanel Grid.Row="1">
-            <Label Content="{glob:Translate ResourceKey=EMIT_VIEWMODEL_MODE, AddColon=True}" />
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <Label Content="{glob:Translate ResourceKey=EMIT_VIEWMODEL_MODE, AddColon=True}" />
 
-            <RadioButton
-                Margin="16,4"
-                Content="{glob:Translate ResourceKey=MODE_INHERIT}"
-                GroupName="VIEWMODEL_MODE" />
-
-            <RadioButton
-                Margin="16,4"
-                Content="{glob:Translate ResourceKey=MODE_SOURCE}"
-                GroupName="VIEWMODEL_MODE" />
-        </StackPanel>
-
+                <ComboBox
+                    Margin="16,4"
+                    toolkit:Themes.UseVsTheme="True"
+                    DisplayMemberPath="Description"
+                    ItemsSource="{Binding GenerationModes}"
+                    SelectedIndex="{Binding SelectedMode}" />
+            </StackPanel>
+        </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
