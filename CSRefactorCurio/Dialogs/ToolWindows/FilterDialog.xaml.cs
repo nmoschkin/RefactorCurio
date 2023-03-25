@@ -6,6 +6,7 @@ using DataTools.Essentials.Converters.EnumDescriptions.Framework;
 using Microsoft.VisualStudio.PlatformUI;
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -145,8 +146,6 @@ namespace CSRefactorCurio.Dialogs
                 {
                     for (i = 0; i < c; i++)
                     {
-                        UIElement newobj;
-
                         var eval = (Enum)values[i].GetValue(null);
                         var apptry = EnumInfo.GetEnumName(eval);
 
@@ -155,16 +154,27 @@ namespace CSRefactorCurio.Dialogs
                             g.RowDefinitions.Add(new RowDefinition());
                         }
 
-                        newobj = new CheckBox()
+                        try
                         {
-                            Content = apptry,
-                            Tag = new DescribedEnum(eval)
-                        };
+                            var newobj = new CheckBox()
+                            {
+                                Content = apptry,
+                                Tag = new DescribedEnum(eval)
+                            };
 
-                        newobj.SetValue(Grid.ColumnProperty, cc);
-                        newobj.SetValue(Grid.RowProperty, cr);
+                            if (newobj != null)
+                            {
+                                newobj.SetValue(Grid.ColumnProperty, cc);
+                                newobj.SetValue(Grid.RowProperty, cr);
 
-                        g.Children.Add(newobj);
+                                g.Children.Add(newobj);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex);
+                            continue;
+                        }
                     }
 
                     cc++;

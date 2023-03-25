@@ -292,18 +292,18 @@
       <Version>8.0.0.1065</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
-      <Version>7.0.0</Version>
+      <Version>8.0.0-preview.2.23128.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Imaging">
-      <Version>17.4.33103.184</Version>
+      <Version>17.5.33428.366</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime">
-      <Version>17.4.33103.184</Version>
+      <Version>17.5.33428.366</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>17.4.33103.184</Version>
+      <Version>17.5.33428.388</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.4.2119">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.5.4072">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
