@@ -35,7 +35,7 @@ namespace Experiments
             //var str = tool.FindILDasm();
             //var data = File.ReadAllText(path);
 
-            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\post-build-tool\post-build-tool\CommandSwitch.cs");
+            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\DataTools\Core\DataTools.Graphics\Structs\HUE.cs");
 
             var filter = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
+    <TargetFrameworks>net48;net6.0-windows;net7.0-windows</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
 	  <UseWPF>true</UseWPF>
@@ -12,13 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DataTools.Desktop" Version="8.0.0.1065" />
-    <PackageReference Include="DataTools.Essentials" Version="8.0.0.1065" />
-    <PackageReference Include="DataTools.Graphics" Version="8.0.0.1065" />
-    <PackageReference Include="DataTools.MathTools" Version="8.0.0.1065" />
-    <PackageReference Include="DataTools.Memory" Version="8.0.0.1065" />
-    <PackageReference Include="DataTools.Text" Version="8.0.0.1065" />
-    <PackageReference Include="DataTools.Win32" Version="8.0.0.1065" />
+    <PackageReference Include="DataTools.Desktop" Version="8.0.0.1074" />
+    <PackageReference Include="DataTools.Essentials" Version="8.0.0.1074" />
+    <PackageReference Include="DataTools.Graphics" Version="8.0.0.1074" />
+    <PackageReference Include="DataTools.MathTools" Version="8.0.0.1074" />
+    <PackageReference Include="DataTools.Memory" Version="8.0.0.1074" />
+    <PackageReference Include="DataTools.Text" Version="8.0.0.1074" />
+    <PackageReference Include="DataTools.Win32" Version="8.0.0.1074" />
   </ItemGroup>
 
   <ItemGroup>

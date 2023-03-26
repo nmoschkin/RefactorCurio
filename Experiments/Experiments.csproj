@@ -67,6 +67,7 @@
     <None Include="App.config" />
     <None Include="ClassDiagram1.cd" />
     <None Include="curio.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CSRefactorCurio\CSRefactorCurio.csproj">

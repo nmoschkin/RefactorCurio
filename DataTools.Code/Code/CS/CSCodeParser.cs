@@ -548,22 +548,25 @@ namespace DataTools.Code.CS
                     }
                     else if (chars[i] == '{' || (chars[i] == '>' && i > 0 && chars[i - 1] == '='))
                     {
-                        zapbody = (chars[i] == '>' && i > 0 && chars[i - 1] == '=');
-
-                        if (zapbody)
+                        if (!zapbody)
                         {
-                            if (ContainsCode(currPatt))
+                            zapbody = (chars[i] == '>' && i > 0 && chars[i - 1] == '=');
+
+                            if (zapbody)
                             {
-                                zapbody = false;
-                                continue;
-                            }
+                                if (ContainsCode(currPatt))
+                                {
+                                    zapbody = false;
+                                    continue;
+                                }
 
-                            forScan.Remove(forScan.Length - 2, 2);
-                            gbstart = i - 1;
-                        }
-                        else
-                        {
-                            forScan.Remove(forScan.Length - 1, 1);
+                                forScan.Remove(forScan.Length - 2, 2);
+                                gbstart = i - 1;
+                            }
+                            else
+                            {
+                                forScan.Remove(forScan.Length - 1, 1);
+                            }
                         }
 
                         parenclo = false;
@@ -756,8 +759,8 @@ namespace DataTools.Code.CS
 
                             gbstart = 0;
                         }
-
-                        zapbody = false;
+                        
+                        if (zapbody && chars[i] == ';') zapbody = false;
 
                         --currLevel;
                         currPatt = strack.Pop();
@@ -1088,7 +1091,11 @@ namespace DataTools.Code.CS
                             var j = i + 1;
                             while (j < c - 1)
                             {
-                                if (char.IsWhiteSpace(w[j])) continue;
+                                if (char.IsWhiteSpace(w[j]))
+                                {
+                                    j++;
+                                    continue;
+                                }
                                 else if (w[j] == '?')
                                 {
                                     tsb.Append('?');
@@ -1703,6 +1710,13 @@ namespace DataTools.Code.CS
             var sb = new StringBuilder();
 
             var words = TextTools.Words(sample);
+
+            if (words == null || words.Length == 0)
+            {
+                leftOver = "";
+                modifiers = AccessModifiers.None;
+                return;
+            }
 
             foreach (var word in words)
             {
