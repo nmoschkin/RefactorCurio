@@ -34,7 +34,7 @@ namespace CSRefactorCurio.Projects
         private IOwnedCommand clickFilter;
         private IOwnedCommand clickViewModel;
         private Cursor cursor = Cursors.Arrow;
-        private bool[] isActive = new bool[3];
+        
         private Dictionary<string, CSNamespace> namespacesMap = new Dictionary<string, CSNamespace>();
         private IOwnedCommand reportCommand;
         private object selectedItem;
@@ -60,13 +60,14 @@ namespace CSRefactorCurio.Projects
 
             clickNamespace = new OwnedCommand(this, (o) =>
             {
-                ClassMode = 1;
+                //ClassMode = 1;
             }, nameof(ClickNamespace));
 
             clickClasses = new OwnedCommand(this, (o) =>
             {
-                ClassMode = 0;
+                //ClassMode = 0;
             }, nameof(ClickClasses));
+
             clickBuild = new OwnedCommand(this, (o) =>
             {
                 _sln?.SolutionBuild?.Build();
@@ -116,8 +117,6 @@ namespace CSRefactorCurio.Projects
                 }
             });
 
-            isActive[classMode] = true;
-
             AutoRegisterCommands(this);
         }
 
@@ -142,19 +141,12 @@ namespace CSRefactorCurio.Projects
                 {
                     if (classMode != 0)
                     {
-                        RefreshNamespaces();
+                        _ = RefreshNamespacesAsync();
                     }
-                    for (int i = 0; i < isActive.Length; i++)
+                    else
                     {
-                        if (i == value) isActive[i] = true;
-                        else isActive[i] = false;
+                        OnPropertyChanged(nameof(CurrentItems));
                     }
-
-                    OnPropertyChanged(nameof(CurrentItems));
-
-                    OnPropertyChanged(nameof(IsActive1));
-                    OnPropertyChanged(nameof(IsActive2));
-                    OnPropertyChanged(nameof(IsActive3));
                 }
             }
         }
@@ -197,53 +189,6 @@ namespace CSRefactorCurio.Projects
             }
         }
 
-        /// <summary>
-        /// True if mode 1 (projects) is active
-        /// </summary>
-        public bool IsActive1
-        {
-            get => isActive[0];
-            set
-            {
-                if (!value) return;
-                if (SetProperty(ref isActive[0], value) && value && classMode != 0)
-                {
-                    ClassMode = 0;
-                }
-            }
-        }
-
-        /// <summary>
-        /// True if mode 2 (namespaces) is active
-        /// </summary>
-        public bool IsActive2
-        {
-            get => isActive[1];
-            set
-            {
-                if (!value) return;
-                if (SetProperty(ref isActive[1], value) && value && classMode != 1)
-                {
-                    ClassMode = 1;
-                }
-            }
-        }
-
-        /// <summary>
-        /// True if mode 3 (most-used objects) is active
-        /// </summary>
-        public bool IsActive3
-        {
-            get => isActive[2];
-            set
-            {
-                if (!value) return;
-                if (SetProperty(ref isActive[2], value) && value && classMode != 2)
-                {
-                    ClassMode = 2;
-                }
-            }
-        }
 
         /// <summary>
         /// Gets the most-used objects map.
@@ -330,8 +275,8 @@ namespace CSRefactorCurio.Projects
             foreach (var col in classModes) col.Clear();
             namespacesMap.Clear();
 
-            ClassMode = 0;
             LoadingFlag = false;
+            ClassMode = 0;
         }
 
         /// <summary>
@@ -397,17 +342,19 @@ namespace CSRefactorCurio.Projects
         /// Load from native solution.
         /// </summary>
         /// <param name="dte"></param>
-        public void LoadFromDTE(EnvDTE.DTE dte)
+        public async Task LoadFromDTEAsync(EnvDTE.DTE dte)
         {
-            Clear();
-            LoadingFlag = true;
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            Clear();
+
+            LoadingFlag = true;
             Solution = dte.Solution;
 
             PopulateFrom(Projects, dte.Solution);
 
             LoadingFlag = false;
-            if (classMode != 0) RefreshNamespaces();
+            if (classMode != 0) await RefreshNamespacesAsync();
         }
 
         /// <summary>
@@ -416,12 +363,13 @@ namespace CSRefactorCurio.Projects
         /// <remarks>
         /// All lazy-load files will be touched and read, at this point.
         /// </remarks>
-        public void RefreshNamespaces()
+        public async Task RefreshNamespacesAsync()
         {
             //var project = GetAllProjects(Projects).FirstOrDefault();
 
             //project.ReadTheFile();
 
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             Cursor = Cursors.Wait;
             namespacesMap.Clear();
 
@@ -436,8 +384,7 @@ namespace CSRefactorCurio.Projects
             OnPropertyChanged(nameof(Namespaces));
             OnPropertyChanged(nameof(MostUsedMap));
 
-            if (classMode == 1) OnPropertyChanged(nameof(CurrentItems));
-
+            if (classMode != 0) OnPropertyChanged(nameof(CurrentItems));
             Cursor = null;
         }
 
@@ -586,7 +533,7 @@ namespace CSRefactorCurio.Projects
 
         private void Projects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (classMode != 0 && !LoadingFlag) RefreshNamespaces();
+            if (classMode != 0 && !LoadingFlag) RefreshNamespacesAsync();
         }
     }
 }

@@ -2,7 +2,7 @@
 
 using DataTools.Code.Project;
 using DataTools.CSTools;
-
+using Microsoft.VisualStudio.Threading;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +23,16 @@ namespace CSRefactorCurio
             lock (CSRefactorCurioPackage.SyncRoot)
             {
                 DataContext = vm = CSRefactorCurioPackage.Instance.CurioSolution;
+                UpdateButtons(vm.ClassMode);
+                vm.PropertyChanged += Vm_PropertyChanged;
+            }
+        }
+
+        private void Vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CurioExplorerSolution.ClassMode))
+            {
+                UpdateButtons(vm.ClassMode);
             }
         }
 
@@ -98,6 +108,61 @@ namespace CSRefactorCurio
                 {
                 }
             }
+        }
+
+        private async void UpdateButtons(int cm)
+        {            
+            Dispatcher.Invoke(() =>
+            {
+                BtnViewProject.IsChecked = cm == 0;
+                BtnViewNamespace.IsChecked = cm == 1;
+                BtnViewAuxTree.IsChecked = cm == 2;
+            });
+        }
+
+        private void BtnViewProject_Click(object sender, RoutedEventArgs e)
+        {
+            vm.ClassMode = 0;
+        }
+
+        private void BtnViewNamespace_Click(object sender, RoutedEventArgs e)
+        {
+            vm.ClassMode = 1;
+        }
+
+        private void BtnViewAuxTree_Click(object sender, RoutedEventArgs e)
+        {
+            vm.ClassMode = 2;
+        }
+
+        private void BtnViewProject_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnViewProject_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnViewNamespace_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnViewNamespace_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnViewAuxTree_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnViewAuxTree_Unchecked(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

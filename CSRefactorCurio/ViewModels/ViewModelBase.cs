@@ -98,18 +98,25 @@ namespace CSRefactorCurio.ViewModels
         /// <param name="obj">Parameter object (can be null)</param>
         protected void BeginInvoke(SendOrPostCallback action, object obj)
         {
-            if (nosend && nopost)
+
+            _ = Task.Run(async () =>
             {
-                _ = Task.Run(() => action(obj));
-            }
-            else if (nopost)
-            {
-                _ = InvokeAsync(action, obj);
-            }
-            else
-            {
-                sync.Post(action, obj);
-            }
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                action(obj);
+            });
+
+            //if (nosend && nopost)
+            //{
+            //    _ = Task.Run(() => action(obj));
+            //}
+            //else if (nopost)
+            //{
+            //    _ = InvokeAsync(action, obj);
+            //}
+            //else
+            //{
+            //    sync.Post(action, obj);
+            //}
         }
 
         /// <summary>
@@ -439,7 +446,7 @@ namespace CSRefactorCurio.ViewModels
                 OnPropertyChanged(propertyName);
             }
 
-            return eq;
+            return !eq;
         }
 
         #endregion INotifyPropertyChanged

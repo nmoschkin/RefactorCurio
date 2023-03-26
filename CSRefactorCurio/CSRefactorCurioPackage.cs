@@ -150,9 +150,9 @@ namespace CSRefactorCurio
             {
                 if (!reload && dte.Solution == currSln) return;
                 currSln = (EnvDTE.Solution)dte.Solution;
-
-                CurioSolution.LoadFromDTE(dte);
             }
+
+            await CurioSolution.LoadFromDTEAsync(dte);
         }
 
         private void LoadProject()
