@@ -12,7 +12,12 @@ using System.ComponentModel;
 
 namespace CSRefactorCurio.Reporting
 {
-    internal class HeaviestReferencesReport : ReportBase<ReportNode<INamespace>>
+    internal class NamespaceReportNode : ReportNode<INamespace>
+    {
+    }
+
+
+    internal class HeaviestReferencesReport : ReportBase<NamespaceReportNode>
     {
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_REFERENCED_OBJECTS;
@@ -81,7 +86,7 @@ namespace CSRefactorCurio.Reporting
                 return c;
             });
 
-            var rpts = new List<ReportNode<INamespace>>();
+            var rpts = new List<NamespaceReportNode>();
 
             CSMarker curr = null;
 
@@ -93,7 +98,7 @@ namespace CSRefactorCurio.Reporting
                 {
                     if (markers.Count > 0)
                     {
-                        var rpt = new ReportNode<INamespace>()
+                        var rpt = new NamespaceReportNode()
                         {
                             AssociatedList = markers.ToArray(),
                             Element = curr
@@ -113,7 +118,7 @@ namespace CSRefactorCurio.Reporting
             {
                 if (markers.Count > 0)
                 {
-                    var rpt = new ReportNode<INamespace>()
+                    var rpt = new NamespaceReportNode()
                     {
                         AssociatedList = markers.ToArray(),
                         Element = curr

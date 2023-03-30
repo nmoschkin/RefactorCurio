@@ -1154,6 +1154,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Types.
+        /// </summary>
+        internal static string TYPES {
+            get {
+                return ResourceManager.GetString("TYPES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ({0} Objects).
         /// </summary>
         internal static string X_OBJECTS {

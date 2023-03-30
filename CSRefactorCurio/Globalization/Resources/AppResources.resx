@@ -475,6 +475,9 @@
   <data name="TRUE" xml:space="preserve">
     <value>True</value>
   </data>
+  <data name="TYPES" xml:space="preserve">
+    <value>Types</value>
+  </data>
   <data name="X_OBJECTS" xml:space="preserve">
     <value>({0} Objects)</value>
   </data>

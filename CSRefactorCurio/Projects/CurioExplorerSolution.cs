@@ -393,7 +393,7 @@ namespace CSRefactorCurio.Projects
         /// </summary>
         /// <param name="commandId"></param>
         /// <returns></returns>
-        public bool RequestCanExecute(string commandId)
+        public override bool RequestCanExecute(string commandId)
         {
             if (commandId == nameof(splitFileCommand))
             {

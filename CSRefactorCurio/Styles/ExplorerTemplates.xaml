@@ -135,7 +135,7 @@
                 Text="{Binding FilteredItems.Count, Converter={StaticResource intConv}}" />
         </Grid>
     </HierarchicalDataTemplate>
-    <HierarchicalDataTemplate DataType="{x:Type rpt:MostSpreadOutNamespacesReport}" ItemsSource="{Binding AssociatedList}">
+    <HierarchicalDataTemplate DataType="{x:Type rpt:ProjectReportNode}" ItemsSource="{Binding AssociatedList}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -151,7 +151,26 @@
             <TextBlock
                 Grid.Column="1"
                 Margin="2"
-                Text="{Binding Title}" />
+                Text="{Binding}" />
+        </Grid>
+    </HierarchicalDataTemplate>
+    <HierarchicalDataTemplate DataType="{x:Type rpt:NamespaceReportNode}" ItemsSource="{Binding AssociatedList}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <imaging:CrispImage
+                Width="16"
+                Height="16"
+                Margin="2"
+                Moniker="{x:Static catalog:KnownMonikers.SubReport}" />
+
+            <TextBlock
+                Grid.Column="1"
+                Margin="2"
+                Text="{Binding}" />
         </Grid>
     </HierarchicalDataTemplate>
     <HierarchicalDataTemplate DataType="{x:Type mod:CSMarker}" ItemsSource="{Binding Children}">

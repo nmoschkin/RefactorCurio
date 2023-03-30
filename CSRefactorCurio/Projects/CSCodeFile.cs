@@ -6,6 +6,7 @@ using DataTools.Code.Markers;
 using DataTools.Code.Project;
 
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -270,6 +271,38 @@ namespace DataTools.CSTools
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+
+        /// <summary>
+        /// Gets all markers that represent a data type
+        /// </summary>
+        /// <typeparam name="T">The type of list to create</typeparam>
+        /// <returns>A list of markers</returns>
+        public virtual T GetAllTypes<T>() where T : class, IList<CSMarker>, new()
+        {
+            var tcol = new T();
+            GetAllTypes(tcol);
+            return tcol;
+        }
+
+
+        /// <summary>
+        /// Gets all markers that represent a data type
+        /// </summary>
+        /// <typeparam name="T">The type of list to create</typeparam>
+        /// <returns>A list of markers</returns>
+        protected virtual void GetAllTypes<T>(T currList) where T : class, IList<CSMarker>, new()
+        {
+            var tcol = currList;
+
+            if (Children != null && Children.Count > 0)
+            {
+                foreach (var item in Children)
+                {
+                    item.GetAllTypes(tcol);
+                }
+            }
+        }
+                
         protected override bool Parse(string text)
         {
             markers.Clear();

@@ -139,6 +139,43 @@ namespace DataTools.CSTools
             return usings.ToArray();
         }
 
+
+        /// <summary>
+        /// Gets all markers that represent a data type
+        /// </summary>
+        /// <typeparam name="T">The type of list to create</typeparam>
+        /// <returns>A list of markers</returns>
+        public virtual T GetAllTypes<T>() where T : class, IList<CSMarker>, new()
+        {
+            var tcol = new T();
+            GetAllTypes(tcol);
+            return tcol;
+        }
+
+        /// <summary>
+        /// Gets all markers that represent a data type
+        /// </summary>
+        /// <param name="currList">The list of markers to populate</param>
+        /// <returns>A list of markers</returns>
+        public virtual void GetAllTypes<T>(T currList) where T : class, IList<CSMarker>, new()
+        {
+            var tcol = currList;
+
+            if (KindIsType(Kind))
+            {
+                currList.Add(this);
+            }
+
+            if (Children != null && Children.Count > 0)
+            {
+                foreach (var item in Children)
+                {
+                    item.GetAllTypes(tcol);
+                }
+            }
+        }
+
+
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

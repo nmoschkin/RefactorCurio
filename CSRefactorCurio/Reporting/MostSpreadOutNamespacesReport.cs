@@ -15,7 +15,17 @@ namespace CSRefactorCurio.Reporting
 {
     internal delegate bool ItemFilterFunc(INamespace item);
 
-    internal class MostSpreadOutNamespacesReport : ReportBase<ReportNode<IProjectNode>>
+    internal class ProjectReportNode : ReportNode<IProjectNode>
+    {
+        public int TypeCount { get; protected internal set; }
+
+        public override string ToString()
+        {            
+            return $"{base.ToString()} ({AssociatedList.Count} {AppResources.FILES}) ({TypeCount} {AppResources.TYPES})";
+        }
+    }
+
+    internal class MostSpreadOutNamespacesReport : ReportBase<ProjectReportNode>
     {
         [Browsable(true)]
         public override string ReportName { get; } = AppResources.REPORT_MOST_SPREAD_OUT;
@@ -41,36 +51,20 @@ namespace CSRefactorCurio.Reporting
 
             var allref = ReportHelper.CountFilesForNamespaces(allFQN);
 
-            var rpts = new List<ReportNode<IProjectNode>>();
-
-            CSMarker curr = null;
+            var rpts = new List<ProjectReportNode>();
 
             List<CSMarker> markers = new List<CSMarker>();
 
             foreach (var item in allref)
             {
-                var rpt = new ReportNode<IProjectNode>()
+                var rpt = new ProjectReportNode()
                 {
                     AssociatedList = new List<IProjectNode>(item.Value.Select((x) => (IProjectNode)x)),
-                    Element = allFQN.Where((x) => x.Key == item.Key).First().Value.First(),
+                    Element = allFQN.Where((x) => x.Key == item.Key).First().Value.First()                    
                 };
 
+                rpt.TypeCount = rpt.AssociatedList.Sum((x) => ((CSCodeFile)x).GetAllTypes<List<CSMarker>>()?.Count ?? 0);
                 rpts.Add(rpt);
-            }
-
-            if (curr != null)
-            {
-                if (markers.Count > 0)
-                {
-                    var rpt = new ReportNode<IProjectNode>()
-                    {
-                        AssociatedList = markers.ToArray(),
-                        Element = curr
-                    };
-
-                    rpts.Add(rpt);
-                    markers = new List<CSMarker>();
-                }
             }
 
             Reports = rpts;
