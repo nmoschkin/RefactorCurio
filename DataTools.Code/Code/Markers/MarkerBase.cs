@@ -307,7 +307,7 @@ namespace DataTools.Code.Markers
             {
                 parentElement = new WeakReference<IMarker>(value);
             }
-        }
+        }        
 
         ISolutionElement IProjectElement.ParentElement => ParentElement ?? HomeFile;
 
@@ -516,7 +516,34 @@ namespace DataTools.Code.Markers
         /// </summary>
         /// <param name="parentKind"></param>
         /// <returns></returns>
-        public abstract TMarker FindParent(MarkerKind parentKind);
+        public virtual TMarker FindParent(MarkerKind parentKind)
+        {
+            TMarker p = (TMarker)this.ParentElement;
+
+            while (p != null)
+            {
+                if (p.Kind == parentKind) return p;
+                p = (TMarker)p.ParentElement;
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// Return the deepest ancestor of this node
+        /// </summary>
+        /// <returns></returns>
+        public virtual TMarker GetRoot()
+        {
+            TMarker p = (TMarker)this.ParentElement;
+
+            while (p != null)
+            {
+                p = (TMarker)p.ParentElement;
+            }
+
+            return p;
+        }
 
         public override string ToString()
         {

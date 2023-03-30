@@ -12,6 +12,26 @@ namespace DataTools.Code.Markers
 
         public abstract IMarker GetMarkerAt(int index);
 
+
+        public static bool KindIsType(MarkerKind kind)
+        {
+            switch(kind)
+            {
+
+                case MarkerKind.Class:
+                case MarkerKind.Enum:
+                case MarkerKind.Struct:
+                case MarkerKind.Record:
+                case MarkerKind.Interface:
+                case MarkerKind.Delegate:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+
         public virtual IMarker ScanMarker(IEnumerable<IMarker> markers, Func<IMarker, bool> scanFunc)
         {
             foreach (var marker in markers)

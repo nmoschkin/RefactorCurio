@@ -1364,8 +1364,6 @@ namespace DataTools.Code.CS
                 }
             }
 
-            bool inh = false;
-
             var retVal = 1;
 
             tsb.Clear();
@@ -1502,7 +1500,6 @@ namespace DataTools.Code.CS
                         }
                         else if (ch == ',')
                         {
-                            inh = true;
                             ihits.Add(tsb.ToString().Trim());
                             tsb.Clear();
                         }
@@ -1522,7 +1519,6 @@ namespace DataTools.Code.CS
                             else
                             {
                                 x = -1;
-                                inh = false;
                                 if (tsb.Length > 0)
                                     ihits.Add(tsb.ToString().Trim());
                                 tsb.Clear();

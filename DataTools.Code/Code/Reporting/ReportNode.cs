@@ -81,6 +81,10 @@ namespace DataTools.Code.Reporting
             }
         }
 
+        public override string ToString()
+        {
+            return $"{Title ?? Element?.ToString() ?? AssociatedList?.Count.ToString()}";
+        }
         public override ISolutionElement ParentElement => element;
 
         [Browsable(true)]
