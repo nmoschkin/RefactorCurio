@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace DataTools.Code
 {
@@ -210,6 +211,7 @@ namespace DataTools.Code
             lock (SyncRoot)
             {
                 IsLazyLoad = false;
+                Thread.Sleep(500);
                 Parse(File.ReadAllText(Filename));
             }
         }
