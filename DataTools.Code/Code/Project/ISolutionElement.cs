@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the basis for all solution elements.
     /// </summary>
-    public interface ISolutionElement
+    public interface ISolutionElement 
     {
         /// <summary>
         /// The element type.

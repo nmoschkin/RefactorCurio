@@ -194,7 +194,7 @@ namespace DataTools.CSTools
         /// <param name="create"></param>
         /// <returns>A directory object or null.</returns>
         /// <remarks>
-        /// The file must already exist on disk.
+        /// If <paramref name="create"/> is false the file must already exist on disk.
         /// </remarks>
         public CSCodeFile FindFile(string filename, bool create = false)
         {
@@ -295,7 +295,7 @@ namespace DataTools.CSTools
                     {
                         if (obj is CSCodeFile file)
                         {
-                            if (File.Exists(file.Filename)) file.Refresh();
+                            if (File.Exists(file.Filename)) file.Refresh(500);
 
                             if (!info.NewName.EndsWith("TMP"))
                             {
@@ -313,7 +313,7 @@ namespace DataTools.CSTools
                     var fobj = FindFile(s);
                     if (fobj != null)
                     {
-                        fobj.Refresh();
+                        fobj.Refresh(500);
                     }
                     break;
             }

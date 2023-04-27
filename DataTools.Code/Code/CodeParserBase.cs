@@ -206,12 +206,12 @@ namespace DataTools.Code
         /// <remarks>
         /// This method will unset <see cref="IsLazyLoad"/>.
         /// </remarks>
-        public virtual void Refresh()
+        public virtual void Refresh(int sleep = 0)
         {
             lock (SyncRoot)
             {
                 IsLazyLoad = false;
-                Thread.Sleep(500);
+                if (sleep > 0) Thread.Sleep(sleep);
                 Parse(File.ReadAllText(Filename));
             }
         }

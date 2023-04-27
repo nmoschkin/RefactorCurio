@@ -293,33 +293,17 @@ namespace DataTools.CSTools
             }
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!IsDisposed)
             {
-                //if (disposing)
-                //{
-                //    // Nothing to do in this section.
-                //}
-
-                ((IDisposable)monitor).Dispose();
+                monitor.WatchNotifyChange -= OnDirectoryChanged;
+                monitor.Dispose();
                 monitor = null;
-
-                disposedValue = true;
             }
+
+            base.Dispose(disposing);
         }
 
-        ~CurioProject()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

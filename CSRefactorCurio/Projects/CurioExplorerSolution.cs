@@ -403,6 +403,34 @@ namespace CSRefactorCurio.Projects
             return true;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (Projects != null && Projects.Count > 0)
+            {
+                DestroyProjects(Projects);
+            }
+            
+            base.Dispose(disposing);
+        }
+
+        protected virtual void DestroyProjects(ObservableCollection<IProjectElement> projects)
+        {
+            foreach (var item in projects)
+            {
+                if (item is CurioProject proj)
+                {
+                    proj.Dispose();
+                }
+                else if (item is CSSolutionFolder sf)
+                {
+                    DestroyProjects(sf.Children);
+                }
+            }
+
+            projects.Clear();
+
+        }
+
         /// <summary>
         /// Populate wrapped items from native items list.
         /// </summary>

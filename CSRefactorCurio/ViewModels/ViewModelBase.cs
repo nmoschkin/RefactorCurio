@@ -455,6 +455,8 @@ namespace CSRefactorCurio.ViewModels
 
         private bool disposedValue;
 
+        protected bool IsDisposed => disposedValue;
+
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
