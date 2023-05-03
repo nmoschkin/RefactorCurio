@@ -7,7 +7,7 @@ using DataTools.Code.Project;
 using DataTools.CSTools;
 
 using EnvDTE80;
-
+using Microsoft.Internal.VisualStudio.PlatformUI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -516,13 +516,29 @@ namespace CSRefactorCurio.Projects
         {
             string nn;
 
-            if (currPath != null)
+            if (!string.IsNullOrEmpty(currPath))
             {
-                nn = currPath + "\\" + itemSearch.Name;
+                if (itemSearch.Name.ToLower().EndsWith(".xaml") && itemSearch.ProjectItems.Count > 0)
+                {
+                    nn = currPath;
+                }
+                else
+                {
+                    nn = currPath + "\\" + itemSearch.Name;
+                }
             }
             else
             {
-                nn = itemSearch.Name;
+
+                if (itemSearch.Name.ToLower().EndsWith(".xaml") && itemSearch.ProjectItems.Count > 0)
+                {
+                    nn = "";
+                }
+                else
+                {
+                    nn = itemSearch.Name;
+                }
+
             }
 
             if (nn == path) return itemSearch;
