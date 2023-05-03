@@ -1,4 +1,5 @@
 ﻿using DataTools.Code.Markers;
+using DataTools.Code.Project;
 using DataTools.Essentials.Helpers;
 
 using System;
@@ -20,7 +21,6 @@ namespace DataTools.Code.CS.Filtering
         protected static readonly PropertyInfo[] codeFilterProps = typeof(CodeFilterOptions).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
         protected static readonly PropertyInfo[] codeElementProps = typeof(ICodeElement).GetProperties();
-
         public virtual List<string> Attributes { get; set; } = null;
         public virtual string DataType { get; set; } = null;
         public virtual string Generics { get; set; } = null;
