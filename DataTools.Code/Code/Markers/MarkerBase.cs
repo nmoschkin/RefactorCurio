@@ -28,7 +28,7 @@ namespace DataTools.Code.Markers
         protected string name;
         protected string scanHit;
         protected List<string> unknownWords;
-        protected string parentElementString;
+        protected ElementToken parentElementString = ElementToken.Empty;
         protected string content = null;
 
         public virtual AccessModifiers AccessModifiers { get; set; }
@@ -159,17 +159,17 @@ namespace DataTools.Code.Markers
 
         public virtual int EndPos { get; set; }
 
-        public virtual string FullyQualifiedName
+        public virtual ElementToken FullyQualifiedName
         {
             get
             {
                 if (!string.IsNullOrEmpty(ParentElementPath))
                 {
-                    return $"{Namespace}.{ParentElementPath}.{Name}";
+                    return ParentElementPath.Join(Name);
                 }
                 else
                 {
-                    return $"{Namespace}.{Name}";
+                    return Namespace.Join(Name);
                 }
             }
         }
@@ -290,7 +290,7 @@ namespace DataTools.Code.Markers
             }
         }
 
-        public virtual string Namespace { get; set; }
+        public virtual ElementToken Namespace { get; set; } = ElementToken.Empty;
 
         public virtual IMarker ParentElement
         {
@@ -311,7 +311,7 @@ namespace DataTools.Code.Markers
 
         ISolutionElement IProjectElement.ParentElement => ParentElement ?? HomeFile;
 
-        public virtual string ParentElementPath
+        public virtual ElementToken ParentElementPath
         {
             get => parentElementString;
             set => parentElementString = value;

@@ -669,7 +669,7 @@ namespace DataTools.Code.CS
                                             StartPos = gbstart,
                                             StartLine = currLine,
                                             StartColumn = ColumnFromHere(chars, gbstart),
-                                            ParentElementPath = currMarker.FullyQualifiedName.Replace(currNS + ".", "")
+                                            ParentElementPath = currMarker.FullyQualifiedName.GetParent()
                                         });
                                     }
 

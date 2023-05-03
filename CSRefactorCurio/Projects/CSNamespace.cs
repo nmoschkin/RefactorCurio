@@ -15,7 +15,7 @@ namespace DataTools.CSTools
     internal class CSNamespace : ProjectNodeBase<ObservableCollection<IProjectElement>>, INamespace
     {
         private ObservableCollection<CSMarker> markers = new ObservableCollection<CSMarker>();
-        private string name;
+        private ElementToken name;
         private ObservableCollection<CSNamespace> namespaces = new ObservableCollection<CSNamespace>();
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace DataTools.CSTools
             this.name = name;
         }
 
-        string INamespace.Namespace
+        ElementToken INamespace.Namespace
         {
             get => name;
             set
@@ -51,7 +51,7 @@ namespace DataTools.CSTools
             }
         }
 
-        public string FullyQualifiedName => name;
+        public ElementToken FullyQualifiedName => name;
 
         public override ElementType ChildType => ElementType.SolutionFolder | ElementType.Namespace;
 
