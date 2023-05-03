@@ -8,11 +8,11 @@
         /// <summary>
         /// Home namespace of this element.
         /// </summary>
-        ElementToken Namespace { get; set; }
+        string Namespace { get; set; }
 
         /// <summary>
         /// Gets the fully-qualified name calculated from the <see cref="Namespace"/> and <see cref="Name"/> properties.
         /// </summary>
-        ElementToken FullyQualifiedName { get; }
+        string FullyQualifiedName { get; }
     }
 }

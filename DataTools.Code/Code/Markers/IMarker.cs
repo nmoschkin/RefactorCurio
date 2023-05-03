@@ -56,7 +56,7 @@ namespace DataTools.Code.Markers
         /// <summary>
         /// The name of the parent element.
         /// </summary>
-        ElementToken ParentElementPath { get; set; }
+        string ParentElementPath { get; set; }
 
         /// <summary>
         /// The scanned text that was used to determine the nature of the current element.
