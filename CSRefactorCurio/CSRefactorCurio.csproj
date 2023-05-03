@@ -102,7 +102,7 @@
     <Compile Include="Projects\Properties\PropertiesContainerBase.cs" />
     <Compile Include="Projects\Properties\Property.cs" />
     <Compile Include="Reporting\CSReference.cs" />
-    <Compile Include="Reporting\HeaviestReferencesReport.cs" />
+    <Compile Include="Reporting\CountReferencesReport.cs" />
     <Compile Include="Reporting\ReportHelper.cs" />
     <Compile Include="Styles\ExplorerTemplates.xaml.cs">
       <DependentUpon>ExplorerTemplates.xaml</DependentUpon>
@@ -157,7 +157,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\ShowCurioExplorerCommand.cs" />
     <Compile Include="CSRefactorCurioPackage.cs" />
-    <Compile Include="Reporting\MostSpreadOutNamespacesReport.cs" />
+    <Compile Include="Reporting\NamespaceDistributionReport.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

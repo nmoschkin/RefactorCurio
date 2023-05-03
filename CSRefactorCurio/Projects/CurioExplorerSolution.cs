@@ -373,13 +373,10 @@ namespace CSRefactorCurio.Projects
             Cursor = Cursors.Wait;
             namespacesMap.Clear();
 
-            var rpt = new MostSpreadOutNamespacesReport(this);
+            var rpt = new NamespaceDistributionReport(this);
 
             classModes[1] = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
-
-            rpt.CompileReport(namespacesMap.Values.ToArray());
-
-            classModes[2] = new ObservableCollection<IProjectElement>(rpt.Reports.Select((x) => (IProjectElement)x));
+            classModes[2] = rpt.CompilePreparedReport(namespacesMap.Values.ToArray());
 
             OnPropertyChanged(nameof(Namespaces));
             OnPropertyChanged(nameof(MostUsedMap));

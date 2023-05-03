@@ -16,11 +16,10 @@ namespace CSRefactorCurio.Reporting
     {
     }
 
-
-    internal class HeaviestReferencesReport : ReportBase<NamespaceReportNode>
+    internal class CountReferencesReport : ReportBase<INamespace, NamespaceReportNode>
     {
         [Browsable(true)]
-        public override string ReportName { get; } = AppResources.REPORT_MOST_REFERENCED_OBJECTS;
+        public override string ReportName { get; } = AppResources.REPORT_COUNT_REFERENCES;
 
         [Browsable(true)]
         public override string AssociatedReason { get; }
@@ -28,17 +27,17 @@ namespace CSRefactorCurio.Reporting
         [Browsable(true)]
         public override int ReportId { get; } = 1;
 
-        public HeaviestReferencesReport(ISolution solution, string associated) : base(solution)
+        public CountReferencesReport(ISolution solution, string associated) : base(solution)
         {
             AssociatedReason = associated;
         }
 
-        public HeaviestReferencesReport(ISolution solution) : this(solution, "DEFAULT")
+        public CountReferencesReport(ISolution solution) : this(solution, "DEFAULT")
         {
         }
 
-        public override void CompileReport<T>(IList<T> context)
-        {
+        public override void CompileReport(IList<INamespace> context)
+        {            
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
             var allref = ReportHelper.GetReferences(Solution.Projects, allFQN);

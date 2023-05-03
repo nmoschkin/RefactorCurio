@@ -880,6 +880,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Count References.
+        /// </summary>
+        internal static string REPORT_COUNT_REFERENCES {
+            get {
+                return ResourceManager.GetString("REPORT_COUNT_REFERENCES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Most Interdependent Namespaces.
         /// </summary>
         internal static string REPORT_MOST_INTERDEPENDENT {
@@ -903,6 +912,15 @@ namespace CSRefactorCurio.Globalization.Resources {
         internal static string REPORT_MOST_SPREAD_OUT {
             get {
                 return ResourceManager.GetString("REPORT_MOST_SPREAD_OUT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Namespace Distribution.
+        /// </summary>
+        internal static string REPORT_NAMESPACE_DISTRIBUTION {
+            get {
+                return ResourceManager.GetString("REPORT_NAMESPACE_DISTRIBUTION", resourceCulture);
             }
         }
         

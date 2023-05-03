@@ -12,7 +12,7 @@ namespace CSRefactorCurio.Reporting
 {
     internal static class ReportHelper
     {
-        public static Dictionary<string, List<CSCodeFile>> CountFilesForNamespaces(Dictionary<string, List<INamespace>> allfqn)
+        public static Dictionary<string, List<CSCodeFile>> CountFilesForNamespaces(Dictionary<string, List<ISolutionElement>> allfqn)
         {
             var outDict = new Dictionary<string, List<CSCodeFile>>();
 
@@ -24,10 +24,10 @@ namespace CSRefactorCurio.Reporting
                 {
                     if (item is CSMarker marker)
                     {
-                        if (!outDict.TryGetValue(item.Namespace, out var csFiles))
+                        if (!outDict.TryGetValue(marker.Namespace, out var csFiles))
                         {
                             csFiles = new List<CSCodeFile>();
-                            outDict.Add(item.Namespace, csFiles);
+                            outDict.Add(marker.Namespace, csFiles);
                         }
 
                         var file = marker.HomeFile as CSCodeFile;
@@ -56,12 +56,12 @@ namespace CSRefactorCurio.Reporting
             return outDict;
         }
 
-        public static List<CSReference<CSMarker>> GetReferences(CurioExplorerSolution sln, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CurioExplorerSolution sln, Dictionary<string, List<ISolutionElement>> allfqn)
         {
             return GetReferences(sln.Projects, allfqn);
         }
 
-        public static List<CSReference<CSMarker>> GetReferences(IEnumerable<IProjectElement> projects, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(IEnumerable<IProjectElement> projects, Dictionary<string, List<ISolutionElement>> allfqn)
         {
             var lt = new List<CSReference<CSMarker>>();
 
@@ -80,12 +80,12 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        public static List<CSReference<CSMarker>> GetReferences(CurioProject proj, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CurioProject proj, Dictionary<string, List<ISolutionElement>> allfqn)
         {
             return GetReferences(proj.RootFolder, allfqn);
         }
 
-        public static List<CSReference<CSMarker>> GetReferences(CSDirectory dir, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CSDirectory dir, Dictionary<string, List<ISolutionElement>> allfqn)
         {
             var lt = new List<CSReference<CSMarker>>();
 
@@ -102,7 +102,7 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        public static List<CSReference<CSMarker>> GetReferences(CSCodeFile file, Dictionary<string, List<INamespace>> allfqn)
+        public static List<CSReference<CSMarker>> GetReferences(CSCodeFile file, Dictionary<string, List<ISolutionElement>> allfqn)
         {
             var lt = new List<CSReference<CSMarker>>();
 
@@ -121,7 +121,7 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        private static List<CSReference<CSMarker>> GetReferences(List<string> usings, CSMarker marker, Dictionary<string, List<INamespace>> allfqn)
+        private static List<CSReference<CSMarker>> GetReferences(List<string> usings, CSMarker marker, Dictionary<string, List<ISolutionElement>> allfqn)
         {
             var nsi = usings;
             if (nsi == null || nsi.Count == 0) return new List<CSReference<CSMarker>>();
@@ -167,20 +167,20 @@ namespace CSRefactorCurio.Reporting
             return lt;
         }
 
-        public static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, ItemFilterFunc filter) where T : INamespace
+        public static Dictionary<string, List<ISolutionElement>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, ItemFilterFunc filter) where T : ISolutionElement
         {
-            var dict = new Dictionary<string, List<INamespace>>();
+            var dict = new Dictionary<string, List<ISolutionElement>>();
             return AllFullyQualifiedNames(namespaces, dict, filter);
         }
 
-        public static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, MarkerKind[] filter = null) where T : INamespace
+        public static Dictionary<string, List<ISolutionElement>> AllFullyQualifiedNames<T>(IEnumerable<T> namespaces, MarkerKind[] filter = null) where T : ISolutionElement
         {
             if (filter == null || filter.Length == 0)
             {
                 filter = DefaultOrders.DefaultFQNFilter;
             }
 
-            var dict = new Dictionary<string, List<INamespace>>();
+            var dict = new Dictionary<string, List<ISolutionElement>>();
 
             return AllFullyQualifiedNames(namespaces, dict, (t) =>
             {
@@ -195,16 +195,16 @@ namespace CSRefactorCurio.Reporting
             });
         }
 
-        private static Dictionary<string, List<INamespace>> AllFullyQualifiedNames<T>(IEnumerable<T> items, Dictionary<string, List<INamespace>> currDict, ItemFilterFunc filter) where T : INamespace
+        private static Dictionary<string, List<ISolutionElement>> AllFullyQualifiedNames<T>(IEnumerable<T> items, Dictionary<string, List<ISolutionElement>> currDict, ItemFilterFunc filter) where T : ISolutionElement
         {
             foreach (var nsobj in items)
             {
-                if (filter(nsobj))
+                if (filter(nsobj) && nsobj is INamespace nsz)
                 {
-                    if (!currDict.TryGetValue(nsobj.FullyQualifiedName, out List<INamespace> myf))
+                    if (!currDict.TryGetValue(nsz.FullyQualifiedName, out List<ISolutionElement> myf))
                     {
-                        myf = new List<INamespace>();
-                        currDict.Add(nsobj.FullyQualifiedName, myf);
+                        myf = new List<ISolutionElement>();
+                        currDict.Add(nsz.FullyQualifiedName, myf);
                     }
 
                     if (!myf.Contains(nsobj))

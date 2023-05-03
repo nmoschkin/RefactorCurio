@@ -4,14 +4,18 @@ using DataTools.Essentials.Observable;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace DataTools.Code.Reporting
 {
+
+
     internal abstract class ReportBase : ObservableBase, IReport
     {
+
         protected IList reports;
 
         [Browsable(true)]
@@ -40,8 +44,6 @@ namespace DataTools.Code.Reporting
         [Browsable(true)]
         public abstract int ReportId { get; }
 
-        public abstract void CompileReport<T>(IList<T> context) where T : INamespace;
-
         public abstract void Sort();
 
         public ReportBase(ISolution solution)
@@ -55,15 +57,28 @@ namespace DataTools.Code.Reporting
         }
     }
 
-    internal abstract class ReportBase<T> : ReportBase, IReport<T> where T : IReportNode, new()
+
+    internal abstract class ReportBase<TContext> : ReportBase, IReport<TContext>
+         where TContext : class, ISolutionElement
     {
-        private new IList<T> reports;
+        public ReportBase(ISolution solution) : base(solution)
+        {
+        }
+
+        public abstract void CompileReport(IList<TContext> context);
+    }
+    
+    internal abstract class ReportBase<TContext, TRpt> : ReportBase<TContext>, IReport<TContext, TRpt> 
+        where TRpt : IReportNode, new()
+        where TContext : class, ISolutionElement
+    {
+        private new IList<TRpt> reports;
 
         public override int Count => reports?.Count ?? 0;
 
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public virtual new IList<T> Reports
+        public virtual new IList<TRpt> Reports
         {
             get => reports;
             set
@@ -74,6 +89,27 @@ namespace DataTools.Code.Reporting
                     OnPropertyChanged(nameof(Count));
                 }
             }
+        }
+
+        /// <summary>
+        /// Compile, generate, and return a prepared report.
+        /// </summary>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public ObservableCollection<IProjectElement> CompilePreparedReport(IList<TContext> context) 
+        {
+            CompileReport(context);
+            return GeneratePreparedReport();
+        }
+
+        /// <summary>
+        /// Gets a report prepared in for the view
+        /// </summary>
+        /// <returns></returns>
+        public virtual ObservableCollection<IProjectElement> GeneratePreparedReport()
+        {
+            return new ObservableCollection<IProjectElement>(Reports.Select((x) => (IProjectElement)x));
         }
 
         public ReportBase(ISolution solution) : base(solution)

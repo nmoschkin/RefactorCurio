@@ -393,6 +393,9 @@
   <data name="REPORT_CHOOSE_RESULT_TYPE" xml:space="preserve">
     <value>Choose Result Type</value>
   </data>
+  <data name="REPORT_COUNT_REFERENCES" xml:space="preserve">
+    <value>Count References</value>
+  </data>
   <data name="REPORT_MOST_INTERDEPENDENT" xml:space="preserve">
     <value>Most Interdependent Namespaces</value>
   </data>
@@ -401,6 +404,9 @@
   </data>
   <data name="REPORT_MOST_SPREAD_OUT" xml:space="preserve">
     <value>Most Spread Out Namespaces</value>
+  </data>
+  <data name="REPORT_NAMESPACE_DISTRIBUTION" xml:space="preserve">
+    <value>Namespace Distribution</value>
   </data>
   <data name="RESCAN" xml:space="preserve">
     <value>Rescan</value>

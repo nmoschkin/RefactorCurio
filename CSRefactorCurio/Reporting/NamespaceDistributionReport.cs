@@ -13,7 +13,7 @@ using System.Text;
 
 namespace CSRefactorCurio.Reporting
 {
-    internal delegate bool ItemFilterFunc(INamespace item);
+    internal delegate bool ItemFilterFunc(ISolutionElement item);
 
     internal class ProjectReportNode : ReportNode<IProjectNode>
     {
@@ -25,10 +25,10 @@ namespace CSRefactorCurio.Reporting
         }
     }
 
-    internal class MostSpreadOutNamespacesReport : ReportBase<ProjectReportNode>
+    internal class NamespaceDistributionReport : ReportBase<INamespace, ProjectReportNode>
     {
         [Browsable(true)]
-        public override string ReportName { get; } = AppResources.REPORT_MOST_SPREAD_OUT;
+        public override string ReportName { get; } = AppResources.REPORT_NAMESPACE_DISTRIBUTION;
 
         [Browsable(true)]
         public override string AssociatedReason { get; }
@@ -36,16 +36,16 @@ namespace CSRefactorCurio.Reporting
         [Browsable(true)]
         public override int ReportId { get; } = 1;
 
-        public MostSpreadOutNamespacesReport(ISolution solution, string associated) : base(solution)
+        public NamespaceDistributionReport(ISolution solution, string associated) : base(solution)
         {
             AssociatedReason = associated;
         }
 
-        public MostSpreadOutNamespacesReport(ISolution solution) : this(solution, "DEFAULT")
+        public NamespaceDistributionReport(ISolution solution) : this(solution, "DEFAULT")
         {
         }
 
-        public override void CompileReport<T>(IList<T> context)
+        public override void CompileReport(IList<INamespace> context) 
         {
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
@@ -60,7 +60,7 @@ namespace CSRefactorCurio.Reporting
                 var rpt = new ProjectReportNode()
                 {
                     AssociatedList = new List<IProjectNode>(item.Value.Select((x) => (IProjectNode)x)),
-                    Element = allFQN.Where((x) => x.Key == item.Key).First().Value.First()                    
+                    Element = allFQN.Where((x) => x.Key == item.Key).First().Value.First() as IProjectNode                 
                 };
 
                 rpt.TypeCount = rpt.AssociatedList.Sum((x) => ((CSCodeFile)x).GetAllTypes<List<CSMarker>>()?.Count ?? 0);

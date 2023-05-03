@@ -39,15 +39,19 @@ namespace CSRefactorCurio.ViewModels
 
         public ReportViewModel(ISolution solution) : base(false, false, false, false)
         {
-            ReportTypes = new string[] { AppResources.REPORT_MOST_INTERDEPENDENT, AppResources.REPORT_MOST_REFERENCED_OBJECTS, AppResources.REPORT_MOST_SPREAD_OUT };
+            ReportTypes = new string[] { AppResources.REPORT_MOST_INTERDEPENDENT, AppResources.REPORT_COUNT_REFERENCES, AppResources.REPORT_NAMESPACE_DISTRIBUTION };
             this.solution = solution;
 
-            reports.Add(new HeaviestReferencesReport(this.Solution));
-            reports.Add(new MostSpreadOutNamespacesReport(this.Solution));
+            reports.Add(new CountReferencesReport(this.Solution));
+            reports.Add(new NamespaceDistributionReport(this.Solution));
+
             runReport = new OwnedCommand(this, (o) =>
             {
-                var b = solution.Namespaces.Where(o => o is INamespace).Select(o => o as INamespace).ToList();
-                SelectedReport.CompileReport(b);
+                if (SelectedReport is ReportBase<INamespace> selrpt)
+                {
+                    var b = solution.Namespaces.Where(o => o is INamespace).Select(o => o as INamespace).ToList();
+                    selrpt.CompileReport(b);
+                }
             }, nameof(RunReportCommand));
 
             AutoRegisterCommands(this);
