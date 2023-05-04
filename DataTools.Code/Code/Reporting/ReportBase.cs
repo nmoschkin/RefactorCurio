@@ -46,6 +46,14 @@ namespace DataTools.Code.Reporting
 
         public abstract void Sort();
 
+
+        protected abstract void CompileReport(IEnumerable context);
+
+        void IReport.CompileReport(IEnumerable context)
+        {
+            CompileReport(context);
+        }
+
         public ReportBase(ISolution solution)
         {
             Solution = solution;
@@ -65,20 +73,26 @@ namespace DataTools.Code.Reporting
         {
         }
 
-        public abstract void CompileReport(IList<TContext> context);
+        public abstract void CompileReport(IEnumerable<TContext> context);
+
+        protected override sealed void CompileReport(IEnumerable context)
+        {
+            
+            CompileReport((IEnumerable<TContext>)context);
+        }
     }
     
-    internal abstract class ReportBase<TContext, TRpt> : ReportBase<TContext>, IReport<TContext, TRpt> 
-        where TRpt : IReportNode, new()
+    internal abstract class ReportBase<TContext, TReport> : ReportBase<TContext>, IReport<TContext, TReport> 
+        where TReport : IReportNode, new()
         where TContext : class, ISolutionElement
     {
-        private new IList<TRpt> reports;
+        private new IList<TReport> reports;
 
         public override int Count => reports?.Count ?? 0;
 
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public virtual new IList<TRpt> Reports
+        public virtual new IList<TReport> Reports
         {
             get => reports;
             set
@@ -97,7 +111,7 @@ namespace DataTools.Code.Reporting
         /// <typeparam name="U"></typeparam>
         /// <param name="context"></param>
         /// <returns></returns>
-        public ObservableCollection<IProjectElement> CompilePreparedReport(IList<TContext> context) 
+        public ObservableCollection<IProjectElement> CompilePreparedReport(IEnumerable<TContext> context) 
         {
             CompileReport(context);
             return GeneratePreparedReport();

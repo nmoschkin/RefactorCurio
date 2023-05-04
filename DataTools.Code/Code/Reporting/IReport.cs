@@ -21,17 +21,20 @@ namespace DataTools.Code.Reporting
         IList Reports { get; }
 
         void Sort();
+
+        void CompileReport(IEnumerable context);
     }
 
     public interface IReport<TContext> : IReport
          where TContext : class, ISolutionElement
     {
-        void CompileReport(IList<TContext> context);
+        void CompileReport(IEnumerable<TContext> context);
     }
 
-    public interface IReport<TContext, TRpt> : IReport<TContext>
+    public interface IReport<TContext, TReport> : IReport<TContext>
          where TContext : class, ISolutionElement
+         where TReport : IReportNode, new()
     {
-        new IList<TRpt> Reports { get; }
+        new IList<TReport> Reports { get; }
     }
 }

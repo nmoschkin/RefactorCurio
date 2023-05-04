@@ -1,0 +1,129 @@
+﻿using DataTools.Code.Project;
+using DataTools.CSTools;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CSRefactorCurio.Services
+{
+    internal static class NamespaceLoaderService
+    {
+        /// <summary>
+        /// Generate a namespace map from the specified projects.
+        /// </summary>
+        /// <param name="projects">The projects to generate the namespace map for.</param>
+        /// <param name="namespaces">Optional namespace dictionary.</param>
+        /// <returns>A new <see cref="ObservableCollection{T}"/> of <see cref="IProjectElement"/> objects.</returns>
+        public static ObservableCollection<IProjectElement> NamespacesFromProjects(IEnumerable<CurioProject> projects, Dictionary<string, CSNamespace> namespaces = null)
+        {
+            var statusBar = CSRefactorCurioPackage.Instance.CurioSolution.Solution.DTE.StatusBar;
+
+            namespaces ??= new Dictionary<string, CSNamespace>();
+
+            int tc = 0;
+
+            foreach (var project in projects)
+            {
+                var root = project.RootFolder;
+                tc += root.GetTotalFilesCount();
+            }
+
+            int proc = 0;
+
+            foreach (var project in projects)
+            {
+                var root = project.RootFolder;
+                proc = NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title, statusBar, tc, proc); ;
+            }
+
+            if (statusBar != null)
+            {
+                statusBar.Progress(false);
+            }
+
+            return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.ParentElement == null));
+        }
+
+        /// <summary>
+        /// Ensure that a dictionary map of namespaces has the specified namespace element, creating it if necessary.
+        /// </summary>
+        /// <param name="name">The fully qualified namespace.</param>
+        /// <param name="namespaces">The namespace map.</param>
+        /// <returns>The found/created namespace.</returns>
+        private static CSNamespace EnsureNamespace(string name, Dictionary<string, CSNamespace> namespaces, string defaultNamespace)
+        {
+            name ??= defaultNamespace;
+
+            var ns = name.Split('.');
+            int c = ns.Length;
+            var sb = new StringBuilder();
+
+            CSNamespace lvn = null;
+
+            for (int x = 0; x < c; x++)
+            {
+                if (sb.Length > 0) sb.Append('.');
+                sb.Append(ns[x]);
+
+                if (!namespaces.TryGetValue(sb.ToString(), out CSNamespace vns))
+                {
+                    vns = new CSNamespace(sb.ToString(), lvn);
+                    if (lvn != null)
+                    {
+                        lvn.Children.Add(vns);
+                        lvn.Namespaces.Add(vns);
+
+                        lvn.Sort();
+                    }
+
+                    namespaces.Add(sb.ToString(), vns);
+                }
+
+                lvn = vns;
+            }
+
+            return lvn;
+        }
+
+        /// <summary>
+        /// Get the namespaces for the specified node.
+        /// </summary>
+        /// <param name="node">The directory/node to map.</param>
+        /// <param name="namespaces">The current namespace map.</param>
+        private static int NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace, EnvDTE.StatusBar statusBar = null, int totalFiles = 0, int processed = 0)
+        {
+            foreach (var file in node.Files)
+            {
+                processed++;
+                if (statusBar != null)
+                {
+                    statusBar.Progress(true, file.Filename, processed, totalFiles);
+                }
+
+                foreach (CSMarker cls in file.FilteredItems)
+                {
+                    var ns = EnsureNamespace(cls.Namespace, namespaces, defaultNamespace);
+
+                    if (ns != null)
+                    {
+                        ns.Children.Add(cls);
+                        ns.Markers.Add(cls);
+
+                        ns.Sort();
+                    }
+                }
+            }
+
+            foreach (var dir in node.Directories)
+            {
+                processed = NamespacesFromNode(dir, namespaces, defaultNamespace, statusBar, totalFiles, processed);
+            }
+
+            return processed;
+        }
+
+    }
+}

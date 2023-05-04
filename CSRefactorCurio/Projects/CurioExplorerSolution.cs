@@ -1,5 +1,6 @@
 ﻿using CSRefactorCurio.Dialogs;
 using CSRefactorCurio.Reporting;
+using CSRefactorCurio.Services;
 using CSRefactorCurio.ViewModels;
 
 using DataTools.Code.CS.Filtering;
@@ -375,7 +376,7 @@ namespace CSRefactorCurio.Projects
 
             var rpt = new NamespaceDistributionReport(this);
 
-            classModes[1] = CSNamespace.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap, _sln.DTE.StatusBar);
+            classModes[1] = NamespaceLoaderService.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap);
             classModes[2] = rpt.CompilePreparedReport(namespacesMap.Values.ToArray());
 
             OnPropertyChanged(nameof(Namespaces));

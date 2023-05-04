@@ -45,7 +45,7 @@ namespace CSRefactorCurio.Reporting
         {
         }
 
-        public override void CompileReport(IList<INamespace> context) 
+        public override void CompileReport(IEnumerable<INamespace> context) 
         {
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
