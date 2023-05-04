@@ -7,13 +7,24 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+    xmlns:viewmodels="clr-namespace:CSRefactorCurio.ViewModels"
     Width="600"
     Height="400"
+    d:DataContext="{d:DesignInstance Type=viewmodels:ReportViewModel}"
     d:DesignHeight="400"
     d:DesignWidth="600"
     toolkit:Themes.UseVsTheme="True"
-    mc:Ignorable="d"
-    >
+    mc:Ignorable="d">
+    <platform:DialogWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/TreeStyles.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/ExplorerTemplates.xaml" />
+                <ResourceDictionary Source="/CSRefactorCurio;component/Styles/MenuStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </platform:DialogWindow.Resources>
+
     <Grid>
 
         <Grid.RowDefinitions>
@@ -23,27 +34,21 @@
         </Grid.RowDefinitions>
 
         <ToolBar toolkit:Themes.UseVsTheme="True">
-            <Label
-                Margin="2"
-                Content="{glob:Translate AddColon=True,
-                                         ResourceKey=REPORT_CHOOSE_RESULT_TYPE}"
-                />
+            <Label Margin="2" Content="{glob:Translate AddColon=True, ResourceKey=REPORT_CHOOSE_RESULT_TYPE}" />
             <ComboBox
                 Width="150"
                 Margin="2"
                 toolkit:Themes.UseVsTheme="True"
                 ItemsSource="{Binding Reports, Mode=OneWay}"
-                SelectedItem="{Binding SelectedReport, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                />
+                SelectedItem="{Binding SelectedReport, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </ToolBar>
 
-        <DataGrid
+        <!--<DataGrid
             Grid.Row="1"
             toolkit:Themes.UseVsTheme="True"
             AutoGenerateColumns="False"
             Background="Transparent"
-            ItemsSource="{Binding SelectedReport.Reports}"
-            >
+            ItemsSource="{Binding SelectedReport.Reports}">
             <DataGrid.Resources>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="toolkit:Themes.UseVsTheme" Value="True" />
@@ -77,20 +82,23 @@
                 <DataGridTextColumn
                     Binding="{Binding Element.NameWithGenerics}"
                     Header="{glob:Translate ResourceKey=OBJECT}"
-                    IsReadOnly="True"
-                    />
+                    IsReadOnly="True" />
                 <DataGridTextColumn
                     Binding="{Binding AssociatedList.Count}"
                     Header="{glob:Translate ResourceKey=COUNT}"
-                    IsReadOnly="True"
-                    />
+                    IsReadOnly="True" />
             </DataGrid.Columns>
-        </DataGrid>
+        </DataGrid>-->
+        <TreeView
+            x:Name="ProjTree"
+            Grid.Row="1"
+            Background="Transparent"
+            ItemContainerStyle="{StaticResource BeautifulStyle}"
+            ItemsSource="{Binding SelectedReport.Reports}"
+            MouseDoubleClick="ProjTree_MouseDoubleClick"
+            SelectedItemChanged="ProjTree_SelectedItemChanged" />
 
-        <Grid
-            Grid.Row="2"
-            toolkit:Themes.UseVsTheme="True"
-            >
+        <Grid Grid.Row="2" toolkit:Themes.UseVsTheme="True">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -104,8 +112,7 @@
                 Margin="8"
                 toolkit:Themes.UseVsTheme="True"
                 Command="{Binding RunReportCommand}"
-                Content="{glob:Translate ResourceKey=RUN_SELECTED_REPORT}"
-                />
+                Content="{glob:Translate ResourceKey=RUN_SELECTED_REPORT}" />
         </Grid>
     </Grid>
 </platform:DialogWindow>

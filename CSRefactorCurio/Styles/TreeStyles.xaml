@@ -8,23 +8,18 @@
     xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     mc:Ignorable="d">
 
-    <SolidColorBrush
-        x:Key="GlyphBrush"
-        Color="#444" />
+    <SolidColorBrush x:Key="GlyphBrush" Color="#444" />
 
     <!--
         =================================================================
         TreeViewItem
         ==================================================================
     -->
-    <Style
-        x:Key="ExpandCollapseToggleStyle"
-        TargetType="ToggleButton">
+    <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate
-                    TargetType="ToggleButton">
+                <ControlTemplate TargetType="ToggleButton">
                     <Grid
                         Width="15"
                         Height="13"
@@ -46,8 +41,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style
-        x:Key="TreeViewItemFocusVisual">
+    <Style x:Key="TreeViewItemFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -64,9 +58,7 @@
         </Setter>
     </Style>
 
-    <Style
-        x:Key="BeautifulStyle"
-        TargetType="{x:Type TreeViewItem}">
+    <Style x:Key="BeautifulStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
         <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
@@ -76,12 +68,9 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate
-                    TargetType="{x:Type TreeViewItem}">
+                <ControlTemplate TargetType="{x:Type TreeViewItem}">
                     <ControlTemplate.Resources>
-                        <local:LeftMarginMultiplierConverter
-                            x:Key="lengthConverter"
-                            Length="19" />
+                        <local:LeftMarginMultiplierConverter x:Key="lengthConverter" Length="19" />
                     </ControlTemplate.Resources>
                     <StackPanel>
                         <Border
@@ -90,11 +79,9 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                            <Grid
-                                Margin="{Binding Converter={StaticResource lengthConverter}, RelativeSource={RelativeSource TemplatedParent}}">
+                            <Grid Margin="{Binding Converter={StaticResource lengthConverter}, RelativeSource={RelativeSource TemplatedParent}}">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition
-                                        Width="19" />
+                                    <ColumnDefinition Width="19" />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <ToggleButton
@@ -110,8 +97,7 @@
                                     ContentSource="Header" />
                             </Grid>
                         </Border>
-                        <ItemsPresenter
-                            x:Name="ItemsHost" />
+                        <ItemsPresenter x:Name="ItemsHost" />
                     </StackPanel>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsExpanded" Value="false">

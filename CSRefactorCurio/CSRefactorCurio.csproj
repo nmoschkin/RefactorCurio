@@ -70,6 +70,9 @@
   <ItemGroup>
     <Compile Include="Build\MSBuildTool.cs" />
     <Compile Include="Commands\IOwnedCommand.cs" />
+    <Compile Include="Controls\VSThemeToolbar.xaml.cs">
+      <DependentUpon>VSThemeToolbar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ToolWindows\FilterDialog.xaml.cs">
       <DependentUpon>FilterDialog.xaml</DependentUpon>
     </Compile>
@@ -204,6 +207,10 @@
   <ItemGroup>
     <Compile Include="ToolWindows\CurioExplorerToolWindow.cs" />
     <Page Include="Controls\SortOrderControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\VSThemeToolbar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
