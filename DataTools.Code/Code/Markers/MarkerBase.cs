@@ -165,7 +165,7 @@ namespace DataTools.Code.Markers
             {
                 if (!string.IsNullOrEmpty(ParentElementPath))
                 {
-                    return string.Join(ParentElementPath, Name);
+                    return string.Join(".", ParentElementPath, Name);
                 }
                 else
                 {
