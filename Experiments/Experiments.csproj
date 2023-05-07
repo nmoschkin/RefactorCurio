@@ -49,8 +49,8 @@
     <AssemblyOriginatorKeyFile>curio.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DataTools.Text, Version=8.0.0.1089, Culture=neutral, PublicKeyToken=9765c690422cf684, processorArchitecture=MSIL">
-      <HintPath>..\packages\DataTools.Text.8.0.0.1089\lib\net48\DataTools.Text.dll</HintPath>
+    <Reference Include="DataTools.Text, Version=8.0.0.1094, Culture=neutral, PublicKeyToken=9765c690422cf684, processorArchitecture=MSIL">
+      <HintPath>..\packages\DataTools.Text.8.0.0.1094\lib\net48\DataTools.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
