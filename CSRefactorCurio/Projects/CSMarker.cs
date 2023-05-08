@@ -111,7 +111,14 @@ namespace DataTools.CSTools
 
             if (kind == MarkerKind.Using)
             {
-                usings.Add(Name);
+                if (!string.IsNullOrEmpty(InheritanceString))
+                {
+                    usings.Add(Name + " = " + InheritanceString);
+                }
+                else
+                {
+                    usings.Add(Name);
+                }
             }
 
             foreach (var c in Children)

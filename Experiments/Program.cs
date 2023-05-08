@@ -35,7 +35,7 @@ namespace Experiments
             //var str = tool.FindILDasm();
             //var data = File.ReadAllText(path);
 
-            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\DataTools\Core\DataTools.Graphics\Structs\HUE.cs");
+            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\project-protean\ProteanLib\Inflore\Inflore256.cs");
 
             var filter = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 

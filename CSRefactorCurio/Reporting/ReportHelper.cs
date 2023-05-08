@@ -139,7 +139,17 @@ namespace CSRefactorCurio.Reporting
                     {
                         if (s != "")
                         {
-                            combos.Add(s + "." + s2);
+                            var sp = s.Split('=');
+
+                            if (sp.Length == 2)
+                            {
+                                combos.Add(sp[1].Trim() + "." + s2);
+                            }
+                            else
+                            {
+                                combos.Add(s + "." + s2);
+                            }
+                            
                         }
                     }
                 }

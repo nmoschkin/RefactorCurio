@@ -1275,7 +1275,8 @@ namespace DataTools.Code.CS
                             break;
 
                         case MarkerKind.Using:
-                            marker.Name = tsb.ToString();
+                            //marker.Name = tsb.ToString();
+                            ParseUsing(marker);
                             return 1;
 
                         default:
@@ -1771,6 +1772,43 @@ namespace DataTools.Code.CS
         private bool ContainsCode(MarkerKind kind)
         {
             return kind == MarkerKind.Method || kind == MarkerKind.Constructor || kind == MarkerKind.Destructor || kind == MarkerKind.Get || kind == MarkerKind.Set || kind == MarkerKind.Add || kind == MarkerKind.Remove || kind == MarkerKind.Operator;
+        }
+
+        private void ParseUsing(TMarker marker)
+        {
+
+            var sh = marker.ScanHit?.Replace("global", "").Trim();
+            Regex regex;
+
+            regex = new Regex(@"using\s+(\w+)\s*=\s*(.+);");
+
+            if (regex.IsMatch(sh))
+            {
+                var m = regex.Match(sh);
+                marker.InheritanceString = m.Groups[2].Value;
+                marker.Name = m.Groups[1].Value;
+                marker.IsStatic = false;
+                return;
+            }
+
+            regex = new Regex(@"using\s+static\s+(.+);");
+
+            if (regex.IsMatch(sh))
+            {
+                var m = regex.Match(sh);
+                marker.Name = m.Groups[1].Value;
+                marker.IsStatic = true;
+                return;
+            }
+
+            regex = new Regex(@"using\s+(.+);");
+
+            if (regex.IsMatch(sh))
+            {
+                var m = regex.Match(sh);
+                marker.Name = m.Groups[1].Value;
+                marker.IsStatic = false;
+            }
         }
 
         #endregion CSharp Code Parsing Internals

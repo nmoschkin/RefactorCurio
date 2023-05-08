@@ -167,9 +167,13 @@ namespace DataTools.Code.Markers
                 {
                     return string.Join(".", ParentElementPath, Name);
                 }
-                else
+                else if (!string.IsNullOrEmpty(Namespace))
                 {
                     return string.Join(".", Namespace, Name);
+                }
+                else
+                {
+                    return Name;
                 }
             }
         }
@@ -547,13 +551,31 @@ namespace DataTools.Code.Markers
 
         public override string ToString()
         {
-            if (StartLine == EndLine)
+            string nme;
+            
+            if (Kind == MarkerKind.Using)
             {
-                return $"{Kind} {Name}{Generics}, Line {StartLine}";
+                if (!string.IsNullOrEmpty(InheritanceString))
+                {
+                    nme = $"{Name} = {InheritanceString}";
+                }
+                else
+                {
+                    nme = Name;
+                }
             }
             else
             {
-                return $"{Kind} {Name}{Generics}, Line {StartLine} to {EndLine}";
+                nme = Name + Generics;
+            }
+
+            if (StartLine == EndLine)
+            {
+                return $"{Kind} {nme}, Line {StartLine}";
+            }
+            else
+            {
+                return $"{Kind} {nme}, Line {StartLine} to {EndLine}";
             }
         }
 
