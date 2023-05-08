@@ -9,6 +9,7 @@ global using Task = System.Threading.Tasks.Task;
 
 using CSRefactorCurio.Options;
 using CSRefactorCurio.Projects;
+using CSRefactorCurio.Services;
 using CSRefactorCurio.ViewModels;
 
 using Microsoft.VisualStudio.PlatformUI;
@@ -103,6 +104,8 @@ namespace CSRefactorCurio
             CurioSolution = new CurioExplorerSolution();
 
             EnvDTE.DTE dte = (EnvDTE.DTE)await GetServiceAsync(typeof(EnvDTE.DTE));
+
+            StatusBarDispatcherService.Initialize(dte);
 
             if (dte != null && dte.Solution is object && dte.Solution.IsOpen)
             {

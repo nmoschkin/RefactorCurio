@@ -376,7 +376,11 @@ namespace CSRefactorCurio.Projects
 
             var rpt = new NamespaceDistributionReport(this);
 
-            classModes[1] = NamespaceLoaderService.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap);
+            using (var ldr = new NamespaceLoaderService())
+            {
+                classModes[1] = ldr.NamespacesFromProjects(GetAllProjects(Projects), namespacesMap);
+            }
+
             classModes[2] = rpt.CompilePreparedReport(namespacesMap.Values.ToArray());
 
             OnPropertyChanged(nameof(Namespaces));

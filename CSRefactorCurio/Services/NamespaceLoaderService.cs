@@ -1,26 +1,37 @@
 ﻿using DataTools.Code.Project;
 using DataTools.CSTools;
+using DataTools.Essentials.Observable;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace CSRefactorCurio.Services
 {
-    internal static class NamespaceLoaderService
+
+    /// <summary>
+    /// Disposable service to load the namespaces
+    /// </summary>
+    /// <remarks>
+    /// Subscription to the status bar dispatcher is required. Use this object in a using block for best results.
+    /// </remarks>
+    internal class NamespaceLoaderService : StatusBarInformer<CSCodeFile>
     {
+        public NamespaceLoaderService() : base(nameof(NamespaceLoaderService) + Guid.NewGuid(), true)
+        {
+        }
+
         /// <summary>
         /// Generate a namespace map from the specified projects.
         /// </summary>
         /// <param name="projects">The projects to generate the namespace map for.</param>
         /// <param name="namespaces">Optional namespace dictionary.</param>
         /// <returns>A new <see cref="ObservableCollection{T}"/> of <see cref="IProjectElement"/> objects.</returns>
-        public static ObservableCollection<IProjectElement> NamespacesFromProjects(IEnumerable<CurioProject> projects, Dictionary<string, CSNamespace> namespaces = null)
+        public ObservableCollection<IProjectElement> NamespacesFromProjects(IEnumerable<CurioProject> projects, Dictionary<string, CSNamespace> namespaces = null)
         {
-            var statusBar = CSRefactorCurioPackage.Instance.CurioSolution.Solution.DTE.StatusBar;
-
             namespaces ??= new Dictionary<string, CSNamespace>();
 
             int tc = 0;
@@ -36,15 +47,17 @@ namespace CSRefactorCurio.Services
             foreach (var project in projects)
             {
                 var root = project.RootFolder;
-                proc = NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title, statusBar, tc, proc); ;
+                proc = NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title, tc, proc); ;
             }
 
-            if (statusBar != null)
-            {
-                statusBar.Progress(false);
-            }
+            Inform(false);
 
             return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.ParentElement == null));
+        }
+
+        protected override void Inform(CSCodeFile data, int value = 0, int count = 0)
+        {
+            Inform(true, data.Filename, value, count);
         }
 
         /// <summary>
@@ -53,7 +66,7 @@ namespace CSRefactorCurio.Services
         /// <param name="name">The fully qualified namespace.</param>
         /// <param name="namespaces">The namespace map.</param>
         /// <returns>The found/created namespace.</returns>
-        private static CSNamespace EnsureNamespace(string name, Dictionary<string, CSNamespace> namespaces, string defaultNamespace)
+        private CSNamespace EnsureNamespace(string name, Dictionary<string, CSNamespace> namespaces, string defaultNamespace)
         {
             name ??= defaultNamespace;
 
@@ -93,15 +106,12 @@ namespace CSRefactorCurio.Services
         /// </summary>
         /// <param name="node">The directory/node to map.</param>
         /// <param name="namespaces">The current namespace map.</param>
-        private static int NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace, EnvDTE.StatusBar statusBar = null, int totalFiles = 0, int processed = 0)
+        private int NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace, int totalFiles = 0, int processed = 0)
         {
             foreach (var file in node.Files)
             {
                 processed++;
-                if (statusBar != null)
-                {
-                    statusBar.Progress(true, file.Filename, processed, totalFiles);
-                }
+                Inform(file, processed, totalFiles);
 
                 foreach (CSMarker cls in file.FilteredItems)
                 {
@@ -119,7 +129,7 @@ namespace CSRefactorCurio.Services
 
             foreach (var dir in node.Directories)
             {
-                processed = NamespacesFromNode(dir, namespaces, defaultNamespace, statusBar, totalFiles, processed);
+                processed = NamespacesFromNode(dir, namespaces, defaultNamespace, totalFiles, processed);
             }
 
             return processed;

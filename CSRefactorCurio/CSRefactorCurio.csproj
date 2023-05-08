@@ -108,7 +108,12 @@
     <Compile Include="Reporting\CountReferencesReport.cs" />
     <Compile Include="Reporting\ReportHelper.cs" />
     <Compile Include="Services\FileLoaderService.cs" />
-    <Compile Include="Services\NamespaceLoaderSvc.cs" />
+    <Compile Include="Services\IStatusProgress.cs" />
+    <Compile Include="Services\NamespaceLoaderService.cs" />
+    <Compile Include="Services\StatusBarDispatcherService.cs" />
+    <Compile Include="Services\StatusBarInformer.cs" />
+    <Compile Include="Services\StatusProgress.cs" />
+    <Compile Include="Services\StatusProgressMode.cs" />
     <Compile Include="Styles\ExplorerTemplates.xaml.cs">
       <DependentUpon>ExplorerTemplates.xaml</DependentUpon>
     </Compile>
@@ -283,22 +288,22 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="DataTools.Essentials">
-      <Version>8.0.0.1094</Version>
+      <Version>8.0.0.1097</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Graphics">
-      <Version>8.0.0.1094</Version>
+      <Version>8.0.0.1097</Version>
     </PackageReference>
     <PackageReference Include="DataTools.MathTools">
-      <Version>8.0.0.1094</Version>
+      <Version>8.0.0.1097</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Memory">
-      <Version>8.0.0.1094</Version>
+      <Version>8.0.0.1097</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Text">
-      <Version>8.0.0.1094</Version>
+      <Version>8.0.0.1097</Version>
     </PackageReference>
     <PackageReference Include="DataTools.Win32.Memory">
-      <Version>8.0.0.1094</Version>
+      <Version>8.0.0.1097</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.ILDAsm">
       <Version>8.0.0-preview.2.23128.3</Version>

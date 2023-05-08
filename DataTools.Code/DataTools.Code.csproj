@@ -12,13 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DataTools.Desktop" Version="8.0.0.1094" />
-    <PackageReference Include="DataTools.Essentials" Version="8.0.0.1094" />
-    <PackageReference Include="DataTools.Graphics" Version="8.0.0.1094" />
-    <PackageReference Include="DataTools.MathTools" Version="8.0.0.1094" />
-    <PackageReference Include="DataTools.Memory" Version="8.0.0.1094" />
-    <PackageReference Include="DataTools.Text" Version="8.0.0.1094" />
-    <PackageReference Include="DataTools.Win32" Version="8.0.0.1094" />
+    <PackageReference Include="DataTools.Desktop" Version="8.0.0.1097" />
+    <PackageReference Include="DataTools.Essentials" Version="8.0.0.1097" />
+    <PackageReference Include="DataTools.Graphics" Version="8.0.0.1097" />
+    <PackageReference Include="DataTools.MathTools" Version="8.0.0.1097" />
+    <PackageReference Include="DataTools.Memory" Version="8.0.0.1097" />
+    <PackageReference Include="DataTools.Text" Version="8.0.0.1097" />
+    <PackageReference Include="DataTools.Win32" Version="8.0.0.1097" />
   </ItemGroup>
 
   <ItemGroup>
