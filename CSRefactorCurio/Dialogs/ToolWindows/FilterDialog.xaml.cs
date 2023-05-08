@@ -17,13 +17,14 @@ namespace CSRefactorCurio.Dialogs
     {
         private CodeFilterOptions options;
 
-        public FilterDialog()
+        public FilterDialog() : this(null)
         {
-            InitializeComponent();
         }
 
-        internal FilterDialog(CodeFilterOptions options = null) : this()
+        internal FilterDialog(CodeFilterOptions options) 
         {
+            InitializeComponent();
+
             this.options = options ?? new CodeFilterOptions();
 
             var props = typeof(CodeFilterOptions).GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -154,13 +155,21 @@ namespace CSRefactorCurio.Dialogs
                             g.RowDefinitions.Add(new RowDefinition());
                         }
 
+                        CheckBox newobj = null;
+
                         try
                         {
-                            var newobj = new CheckBox()
+                            try
                             {
-                                Content = apptry,
-                                Tag = new DescribedEnum(eval)
-                            };
+                                newobj = new CheckBox
+                                {
+                                    Content = apptry,
+                                    Tag = new DescribedEnum(eval)
+                                };
+                            }
+                            catch
+                            {
+                            }
 
                             if (newobj != null)
                             {
