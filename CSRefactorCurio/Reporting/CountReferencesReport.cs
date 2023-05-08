@@ -37,7 +37,12 @@ namespace CSRefactorCurio.Reporting
         }
 
         public override void CompileReport(IEnumerable<INamespace> context)
-        {            
+        {
+            CompileReport(context, true);
+        }
+
+        public void CompileReport(IEnumerable<INamespace> context, bool includeEmpty)
+        {
             var allFQN = ReportHelper.AllFullyQualifiedNames(context);
 
             var allref = ReportHelper.GetReferences(Solution.Projects, allFQN);
@@ -95,7 +100,7 @@ namespace CSRefactorCurio.Reporting
             {
                 if (curr != item.ReferencedObject)
                 {
-                    if (markers.Count > 0)
+                    if (curr != null && (includeEmpty || markers.Count > 0))
                     {
                         var rpt = new NamespaceReportNode()
                         {
@@ -113,19 +118,16 @@ namespace CSRefactorCurio.Reporting
                 if (!markers.Contains(item.CallingObject)) markers.Add(item.CallingObject);
             }
 
-            if (curr != null)
+            if (curr != null && (includeEmpty || markers.Count > 0))
             {
-                if (markers.Count > 0)
+                var rpt = new NamespaceReportNode()
                 {
-                    var rpt = new NamespaceReportNode()
-                    {
-                        AssociatedList = markers.ToArray(),
-                        Element = curr
-                    };
+                    AssociatedList = markers.ToArray(),
+                    Element = curr
+                };
 
-                    rpts.Add(rpt);
-                    markers = new List<CSMarker>();
-                }
+                rpts.Add(rpt);
+                markers = new List<CSMarker>();
             }
 
             Reports = rpts;
