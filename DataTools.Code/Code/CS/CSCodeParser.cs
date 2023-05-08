@@ -1638,11 +1638,11 @@ namespace DataTools.Code.CS
         {
             if (first)
             {
-                return char.IsLetter(ch) || ch == '@' || ch == '_';
+                return char.IsLetter(ch) || ch == '@' || ch == '_' || ch == '$';
             }
             else
             {
-                return char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || (alsoDot && ch == '.') || (types && ch == '*');
+                return char.IsLetterOrDigit(ch) || ch == '@' || ch == '_' || ch == '$' || (alsoDot && ch == '.') || (types && ch == '*');
             }
         }
 
