@@ -32,32 +32,68 @@ namespace CSRefactorCurio.Services
         /// <returns>A new <see cref="ObservableCollection{T}"/> of <see cref="IProjectElement"/> objects.</returns>
         public ObservableCollection<IProjectElement> NamespacesFromProjects(IEnumerable<CurioProject> projects, Dictionary<string, CSNamespace> namespaces = null)
         {
-            namespaces ??= new Dictionary<string, CSNamespace>();
-
-            int tc = 0;
-
-            foreach (var project in projects)
+            try
             {
-                var root = project.RootFolder;
-                tc += root.GetTotalFilesCount();
+                namespaces ??= new Dictionary<string, CSNamespace>();
+
+                int tc = 0;
+
+                foreach (var project in projects)
+                {
+                    var root = project.RootFolder;
+                    tc += root.GetTotalFilesCount();
+                }
+
+                int proc = 0;
+
+                SetCount(tc);
+
+                foreach (var project in projects)
+                {
+                    var root = project.RootFolder;
+                    NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title);
+                }
             }
-
-            int proc = 0;
-
-            foreach (var project in projects)
+            finally
             {
-                var root = project.RootFolder;
-                proc = NamespacesFromNode(root, namespaces, project.DefaultNamespace ?? project.AssemblyName ?? project.Title, tc, proc); ;
+                Inform(false);
             }
-
-            Inform(false);
 
             return new ObservableCollection<IProjectElement>(namespaces.Values.Where((v) => v.ParentElement == null));
         }
 
-        protected override void Inform(CSCodeFile data, int value = 0, int count = 0)
+        protected override string GetInformText(CSCodeFile data)
         {
-            Inform(true, data.Filename, value, count);
+            return data.Filename;
+        }
+
+        /// <summary>
+        /// Get the namespaces for the specified node.
+        /// </summary>
+        /// <param name="node">The directory/node to map.</param>
+        /// <param name="namespaces">The current namespace map.</param>
+        private void NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace)
+        {
+            Inform(node.Files, (file) =>
+            {
+                foreach (CSMarker cls in file.FilteredItems)
+                {
+                    var ns = EnsureNamespace(cls.Namespace, namespaces, defaultNamespace);
+
+                    if (ns != null)
+                    {
+                        ns.Children.Add(cls);
+                        ns.Markers.Add(cls);
+
+                        ns.Sort();
+                    }
+                }
+            }, false);
+
+            foreach (var dir in node.Directories)
+            {
+                NamespacesFromNode(dir, namespaces, defaultNamespace);
+            }            
         }
 
         /// <summary>
@@ -99,40 +135,6 @@ namespace CSRefactorCurio.Services
             }
 
             return lvn;
-        }
-
-        /// <summary>
-        /// Get the namespaces for the specified node.
-        /// </summary>
-        /// <param name="node">The directory/node to map.</param>
-        /// <param name="namespaces">The current namespace map.</param>
-        private int NamespacesFromNode(CSDirectory node, Dictionary<string, CSNamespace> namespaces, string defaultNamespace, int totalFiles = 0, int processed = 0)
-        {
-            foreach (var file in node.Files)
-            {
-                processed++;
-                Inform(file, processed, totalFiles);
-
-                foreach (CSMarker cls in file.FilteredItems)
-                {
-                    var ns = EnsureNamespace(cls.Namespace, namespaces, defaultNamespace);
-
-                    if (ns != null)
-                    {
-                        ns.Children.Add(cls);
-                        ns.Markers.Add(cls);
-
-                        ns.Sort();
-                    }
-                }
-            }
-
-            foreach (var dir in node.Directories)
-            {
-                processed = NamespacesFromNode(dir, namespaces, defaultNamespace, totalFiles, processed);
-            }
-
-            return processed;
         }
 
     }
