@@ -71,15 +71,16 @@ namespace CSRefactorCurio.Services
 
         public void ReceiveData(IStatusProgress value, ISideBandData sideBandData)
         {
-            if (lockToken != ChannelToken.Empty && lockToken != sideBandData.ChannelToken) return;
-
-            if (value.Mode == StatusProgressMode.Initialize || value.Mode == StatusProgressMode.Run)
+            if (lockToken == ChannelToken.Empty || lockToken == sideBandData.ChannelToken)
             {
-                _dte.StatusBar.Progress(true, value.Message, value.Value, value.Count);
-            }
-            else
-            {
-                _dte.StatusBar.Progress(false, value.Message, value.Value, value.Count);
+                if (value.Mode == StatusProgressMode.Initialize || value.Mode == StatusProgressMode.Run)
+                {
+                    _dte.StatusBar.Progress(true, value.Message, value.Value, value.Count);
+                }
+                else
+                {
+                    _dte.StatusBar.Progress(false, value.Message, value.Value, value.Count);
+                }
             }
         }
     }
