@@ -55,7 +55,7 @@ namespace DataTools.Code
         /// <param name="sepDirs">True to put different kinds of items in separate directories.</param>
         /// <param name="parser">The code parser instance.</param>
         /// <returns>A new output file.</returns>
-        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, AtomicGenerationInfo<TI, TL> file, string[] lines, bool sepDirs, CodeParserBase<TI, TL> parser = null) where TI : IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
+        public static OutputFile<TI, TL> NewFile<TI, TL>(string path, AtomicGenerationInfo<TI, TL> file, IReadOnlyList<string> lines, bool sepDirs, CodeParserBase<TI, TL> parser = null) where TI : IMarker<TI, TL>, new() where TL : IMarkerList<TI>, new()
         {
             return NewFile(path, file.Markers[0].Kind, file.Markers[0].Name, FormatOutputText<TI, TL>(file.Markers, lines, file.PreambleEnd, file.PreambleBegin), sepDirs, parser);
         }
@@ -137,7 +137,7 @@ namespace DataTools.Code
         /// <param name="preambleTo">The end position of the common preamble calculated from the source file.</param>
         /// <param name="preambleFrom">Optional start position of the common preamble.</param>
         /// <returns>Formatted Code</returns>
-        public static string FormatOutputText<TI, TL>(TL markers, string[] lines, int preambleTo = -1, int preambleFrom = 0) where TI : IMarker, new() where TL : IList<TI>, new()
+        public static string FormatOutputText<TI, TL>(TL markers, IReadOnlyList<string> lines, int preambleTo = -1, int preambleFrom = 0) where TI : IMarker, new() where TL : IList<TI>, new()
         {
             string t = "";
             string lastns = null;
@@ -196,7 +196,7 @@ namespace DataTools.Code
         /// <param name="preambleTo">End position.</param>
         /// <param name="preambleFrom">Start Position.</param>
         /// <returns></returns>
-        public static string GetPreamble(string[] lines, int preambleTo, int preambleFrom)
+        public static string GetPreamble(IReadOnlyList<string> lines, int preambleTo, int preambleFrom)
         {
             var sb = new StringBuilder();
 

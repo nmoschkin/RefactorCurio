@@ -4,6 +4,7 @@ using DataTools.Essentials.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -113,11 +114,14 @@ namespace DataTools.Code.Markers
             get
             {
                 if (content == null)
-                {
+                {                    
                     var hf = HomeFile;
                     if (hf is IProjectFile cf)
                     {
-                        content = cf.Text?.Substring(StartPos, EndPos - StartPos + 1);
+                        if (!string.IsNullOrEmpty(cf.Text))
+                        {
+                            content = cf.Text.Substring(StartPos, EndPos - StartPos + 1);
+                        }
                     }
                 }
 

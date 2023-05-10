@@ -4,6 +4,7 @@ using DataTools.CSTools;
 
 using System;
 using System.Collections;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -34,13 +35,14 @@ namespace Experiments
             //var tool = new MSBuildTool();
             //var str = tool.FindILDasm();
             //var data = File.ReadAllText(path);
-
-            var file = CSCodeFile.LoadFromFile(@"E:\Projects\Personal Projects\Repos\project-protean\ProteanLib\Inflore\Inflore256.cs");
-
+                        
+            var file = CSCodeFile.LoadFromFile<CSCodeFile>(@"E:\Projects\Personal Projects\Repos\project-protean\ProteanLib\Inflore\Inflore256.cs");
             var filter = new CSProjectDisplayChain<CSMarker, ObservableMarkerList<CSMarker>>();
 
             var results = filter.ApplyFilter(file.Markers);
-
+            var marker = results[0].Children[0];
+            file.EnsureText();
+            var content = marker.Content;
             //var first = file.ScanMarker(file.Markers, (m) =>
             //{
             //    return m.IsExtern == true;

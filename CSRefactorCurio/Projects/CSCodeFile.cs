@@ -49,6 +49,11 @@ namespace DataTools.CSTools
             Parse(text);
         }
 
+        public CSCodeFile()
+        {
+
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public virtual ObservableMarkerList<CSMarker> Children
@@ -107,7 +112,7 @@ namespace DataTools.CSTools
         {
             if (string.IsNullOrEmpty(Text))
             {
-                text = File.ReadAllText(Filename);
+                content = File.ReadAllText(Filename);
                 OnPropertyChanged(nameof(Text));
             }
         }
@@ -310,7 +315,7 @@ namespace DataTools.CSTools
 
             if (base.Parse(text) && markers != null)
             {
-                SetHomeFile(markers);
+                SetHomeFile(this, markers);
                 RunFilters(markers);
 
                 nocolnotify = false;
@@ -326,12 +331,12 @@ namespace DataTools.CSTools
             if (!nocolnotify) RunFilters(markers);
         }
 
-        private void SetHomeFile(IMarkerList markers)
+        private void SetHomeFile(IProjectNode hf, IMarkerList markers)
         {
             foreach (IMarker item in markers)
             {
-                item.HomeFile = this;
-                SetHomeFile(item.Children);
+                item.HomeFile = hf;
+                if (item.Children != null) SetHomeFile(hf, item.Children);
             }
         }
     }

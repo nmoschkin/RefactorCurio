@@ -69,11 +69,12 @@ namespace DataTools.Code.CS
         /// <param name="lazy">True to load the file without parsing it.</param>
         /// <returns>A new <see cref="CSCodeParser{TMarker, TList}"/> or derived object.</returns>
         /// <exception cref="FileNotFoundException"></exception>
-        public static CSCodeParser<TMarker, TList> LoadFromFile(string filename, bool lazy = false)
+        public static T LoadFromFile<T>(string filename, bool lazy = false) where T: CSCodeParser<TMarker, TList>, new() 
         {
             if (!File.Exists(filename)) throw new FileNotFoundException(filename);
-            var res = new CSCodeParser<TMarker, TList>();
+            var res = new T();
             res.LoadFile(filename, lazy);
+
             return res;
         }
 
@@ -108,9 +109,7 @@ namespace DataTools.Code.CS
             lock (SyncRoot)
             {
                 ParseSuccess = false;
-
-                this.text = text;
-                lines = text.Replace("\r", "").Split('\n');
+                this.content = text;
 
                 try
                 {
@@ -141,9 +140,7 @@ namespace DataTools.Code.CS
                     IsLazyLoad = true;
                 }
 
-                lines = null;
-                this.text = null;
-
+                content = null;
                 return ParseSuccess;
             }
         }
@@ -205,41 +202,8 @@ namespace DataTools.Code.CS
 
         static CSCodeParser()
         {
-            //patterns.Add(MarkerKind.Using, new Regex(@"using (.+)\s*;"));
-            //patterns.Add(MarkerKind.Namespace, new Regex(@"namespace (.+)"));
-            //patterns.Add(MarkerKind.This, new Regex(@".*(this)\s*\[.+\].*"));
-            //patterns.Add(MarkerKind.Class, new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
-            //patterns.Add(MarkerKind.Interface, new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
-            //patterns.Add(MarkerKind.Struct, new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
-            //patterns.Add(MarkerKind.Enum, new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
-            //patterns.Add(MarkerKind.Record, new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
-            //patterns.Add(MarkerKind.Delegate, new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
-            //patterns.Add(MarkerKind.Event, new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-            //patterns.Add(MarkerKind.Const, new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
             patterns.Add(MarkerKind.Operator, new Regex(@".*operator\s+(\S+)\(.*\)"));
-            //patterns.Add(MarkerKind.ForLoop, new Regex(@"\s*for\s*\(.*;.*;.*\)"));
-            //patterns.Add(MarkerKind.DoWhile, new Regex(@"\s*while\s*\(.*\)\s*;"));
-            //patterns.Add(MarkerKind.While, new Regex(@"\s*while\s*\(.*\)"));
-            //patterns.Add(MarkerKind.Switch, new Regex(@"\s*switch\s*\(.+\)"));
-            //patterns.Add(MarkerKind.Case, new Regex(@"\s*case\s*\(.+\)\s*:"));
-            //patterns.Add(MarkerKind.UsingBlock, new Regex(@"\s*using\s*\(.*\)"));
-            //patterns.Add(MarkerKind.Lock, new Regex(@"\s*lock\s*\(.*\)"));
-            //patterns.Add(MarkerKind.Unsafe, new Regex(@"\s*unsafe\s*$"));
-            //patterns.Add(MarkerKind.Fixed, new Regex(@"\s*fixed\s*"));
-            //patterns.Add(MarkerKind.ForEach, new Regex(@"\s*foreach\s*\(.*\)"));
-            //patterns.Add(MarkerKind.Do, new Regex(@"\s*do\s*(\(.+\)|$)"));
-            //patterns.Add(MarkerKind.Else, new Regex(@"\s*else\s*.*"));
-            //patterns.Add(MarkerKind.ElseIf, new Regex(@"\s*else if\s*(\(.+\)|$)"));
-            //patterns.Add(MarkerKind.If, new Regex(@"\s*if\s*(\(.+\)|$)"));
-            //patterns.Add(MarkerKind.Get, new Regex(@"\s*get\s*($|\=\>).*"));
-            //patterns.Add(MarkerKind.Set, new Regex(@"\s*set\s*($|\=\>).*"));
-            //patterns.Add(MarkerKind.Add, new Regex(@"\s*add\s*($|\=\>).*"));
-            //patterns.Add(MarkerKind.Remove, new Regex(@"\s*remove\s*($|\=\>).*"));
-            //patterns.Add(MarkerKind.FieldValue, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
-            //patterns.Add(MarkerKind.Method, new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
             patterns.Add(MarkerKind.EnumValue, new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
-            //patterns.Add(MarkerKind.Property, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
-            //patterns.Add(MarkerKind.Field, new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
 
             genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
         }
@@ -1698,7 +1662,7 @@ namespace DataTools.Code.CS
             }
         }
 
-        public void StripAccessModifiers(string sample, out AccessModifiers modifiers, out string leftOver)
+        private void StripAccessModifiers(string sample, out AccessModifiers modifiers, out string leftOver)
         {
             sample = sample.Replace("\r", "").Replace("\n", "").Trim();
 
@@ -1809,6 +1773,25 @@ namespace DataTools.Code.CS
                 marker.Name = m.Groups[1].Value;
                 marker.IsStatic = false;
             }
+        }
+
+        protected struct Identifier
+        {
+            string Type;
+            string Name;
+        }
+
+        private Identifier[] ParseIdentifiers(TMarker marker)
+        {
+
+            var text = marker.Content;
+            var l = new List<Identifier>();
+
+
+
+
+
+            return l.ToArray();
         }
 
         #endregion CSharp Code Parsing Internals

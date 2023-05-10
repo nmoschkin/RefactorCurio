@@ -14,7 +14,7 @@ namespace DataTools.Code
         /// <summary>
         /// The source code document lines.
         /// </summary>
-        public IList<string> Lines { get; set; }
+        public FileLines Lines { get; set; }
 
         /// <summary>
         /// The <see cref="IMarker"/> collection.
@@ -30,5 +30,10 @@ namespace DataTools.Code
         /// Character position in the source file where the preamble ends.
         /// </summary>
         public int PreambleEnd { get; set; }
+
+        public override string ToString()
+        {
+            return Lines?.ToString() ?? base.ToString();
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using DataTools.Code.Markers;
-
+using DataTools.Code.Project;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,8 +18,7 @@ namespace DataTools.Code
         where TMarker : IMarker<TMarker, TList>, new()
         where TList : IMarkerList<TMarker>, new()
     {
-        protected string[] lines = null;
-        protected string text = null;
+        protected FileLines content;
 
         protected int preambleTo = 0;
 
@@ -108,12 +107,12 @@ namespace DataTools.Code
         /// <summary>
         /// Gets the source code text.
         /// </summary>
-        public virtual string Text => text;
+        public virtual string Text => content?.Text;
 
         /// <summary>
         /// Gets the source code text broken into lines.
         /// </summary>
-        public virtual string[] Lines => lines;
+        public virtual string[] GetLines() => content?.ToArray();
 
         /// <summary>
         /// Gets a list of all unrecognized words in this file.
@@ -193,7 +192,7 @@ namespace DataTools.Code
                     PreambleEnd = mfile.PreambleEnd
                 };
 
-                var file = OutputFile<TMarker, TList>.NewFile(path, mf, lines, SeparateDirs, this);
+                var file = OutputFile<TMarker, TList>.NewFile(path, mf, content, SeparateDirs, this);
                 file.Write();
             }
 
