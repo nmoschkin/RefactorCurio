@@ -16,7 +16,7 @@ namespace CSRefactorCurio.ViewModels
 
         private ISolution solution;
 
-        public string[] ReportTypes { get; }
+        //public string[] ReportTypes { get; }
 
         public ISolution Solution => solution;
 
@@ -39,7 +39,7 @@ namespace CSRefactorCurio.ViewModels
 
         public ReportViewModel(ISolution solution) : base(false, false, false, false)
         {
-            ReportTypes = new string[] { AppResources.REPORT_MOST_INTERDEPENDENT, AppResources.REPORT_COUNT_REFERENCES, AppResources.REPORT_NAMESPACE_DISTRIBUTION };
+            //ReportTypes = new string[] { AppResources.REPORT_MOST_INTERDEPENDENT, AppResources.REPORT_COUNT_REFERENCES, AppResources.REPORT_NAMESPACE_DISTRIBUTION };
             this.solution = solution;
 
             reports.Add(new CountReferencesReport(this.Solution));
